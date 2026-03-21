@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { notFound } from "next/navigation";
@@ -101,9 +100,6 @@ export default async function BuildingPage({
       building: building.slug,
     }),
   ]);
-  const availableCount = buildingUnits.filter((unit) => unit.status === "available").length;
-  const reservedCount = buildingUnits.filter((unit) => unit.status === "reserved").length;
-  const soldCount = buildingUnits.filter((unit) => unit.status === "sold").length;
 
   return (
     <>
@@ -112,49 +108,6 @@ export default async function BuildingPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getBuildingJsonLd(building)) }}
       />
-
-      <section className="page-cover">
-        <div className="page-cover-media">
-          <Image src={building.heroImage} alt={building.name} fill className="object-cover" sizes="100vw" />
-        </div>
-        <div className="page-cover-inner">
-          <div className="page-cover-copy">
-            <span className="eyebrow-chip">{messages.building.pageEyebrow}</span>
-            <h1 className="mt-8 font-serif text-[3.5rem] leading-[0.9] text-white sm:text-[4.8rem] lg:text-[6.1rem]">{building.name}</h1>
-            <p className="mt-5 max-w-2xl text-xl leading-8 text-white/82">{building.tagline}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-3 border-t border-white/12 pt-5">
-            {[
-              { href: "#overview", label: messages.building.overview },
-              { href: "#floors", label: messages.building.floors },
-              { href: "#apartments", label: messages.building.apartments },
-            ].map((tab) => (
-              <a key={tab.href} href={tab.href} className="rounded-full border border-white/12 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/82">
-                {tab.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="page-stat-band page-stat-band-dark">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-            {[
-              { value: building.floorsCount, label: messages.common.floors },
-              { value: availableCount, label: messages.building.availableHomes },
-              { value: reservedCount, label: messages.building.reserved },
-              { value: soldCount, label: messages.building.sold },
-            ].map((item) => (
-              <div key={item.label} className="page-stat-cell px-6 py-8 text-white sm:px-8">
-                <p className="font-serif text-5xl leading-none">{item.value}</p>
-                <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/54">{item.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section id="apartments" className="section-space">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">

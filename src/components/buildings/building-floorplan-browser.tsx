@@ -23,29 +23,45 @@ type OverlayTheme = {
   shadow: string;
   button: string;
   dot: string;
+  panel: string;
+  panelTag: string;
+  floating: string;
+  floatingAction: string;
 };
 
 const overlayThemes: Record<UnitStatus, OverlayTheme> = {
   available: {
-    fill: "rgba(34, 197, 94, 0.28)",
-    border: "rgba(21, 128, 61, 0.92)",
-    shadow: "0 0 0 4px rgba(34, 197, 94, 0.18)",
-    button: "border-emerald-400/40 bg-emerald-500/14 text-white",
+    fill: "rgba(80, 166, 112, 0.42)",
+    border: "rgba(46, 111, 72, 0.98)",
+    shadow: "0 0 0 3px rgba(80, 166, 112, 0.18), inset 0 0 0 1px rgba(255,255,255,0.14)",
+    button: "border-emerald-300/40 bg-[rgba(77,138,101,0.28)] text-white shadow-[0_14px_30px_rgba(31,72,47,0.24)]",
     dot: "bg-emerald-400",
+    panel: "border-[rgba(77,138,101,0.22)] bg-[rgba(255,255,255,0.92)]",
+    panelTag: "bg-[rgba(77,138,101,0.12)] text-[rgb(46,111,72)]",
+    floating: "border-[rgba(77,138,101,0.26)] bg-[rgba(248,245,239,0.94)] text-[rgb(28,65,41)] shadow-[0_22px_48px_rgba(31,72,47,0.18)]",
+    floatingAction: "text-[rgb(46,111,72)]",
   },
   reserved: {
-    fill: "rgba(234, 179, 8, 0.28)",
-    border: "rgba(202, 138, 4, 0.96)",
-    shadow: "0 0 0 4px rgba(234, 179, 8, 0.18)",
-    button: "border-amber-300/40 bg-amber-400/16 text-white",
+    fill: "rgba(196, 156, 79, 0.38)",
+    border: "rgba(154, 114, 38, 0.98)",
+    shadow: "0 0 0 3px rgba(196, 156, 79, 0.18), inset 0 0 0 1px rgba(255,255,255,0.14)",
+    button: "border-amber-200/40 bg-[rgba(182,140,64,0.28)] text-white shadow-[0_14px_30px_rgba(102,74,24,0.24)]",
     dot: "bg-amber-300",
+    panel: "border-[rgba(182,140,64,0.2)] bg-[rgba(255,255,255,0.92)]",
+    panelTag: "bg-[rgba(182,140,64,0.14)] text-[rgb(134,96,28)]",
+    floating: "border-[rgba(182,140,64,0.26)] bg-[rgba(248,245,239,0.94)] text-[rgb(92,67,23)] shadow-[0_22px_48px_rgba(102,74,24,0.18)]",
+    floatingAction: "text-[rgb(134,96,28)]",
   },
   sold: {
-    fill: "rgba(239, 68, 68, 0.24)",
-    border: "rgba(220, 38, 38, 0.96)",
-    shadow: "0 0 0 4px rgba(239, 68, 68, 0.16)",
-    button: "border-red-400/40 bg-red-500/14 text-white",
+    fill: "rgba(180, 89, 89, 0.34)",
+    border: "rgba(143, 56, 56, 0.98)",
+    shadow: "0 0 0 3px rgba(180, 89, 89, 0.18), inset 0 0 0 1px rgba(255,255,255,0.14)",
+    button: "border-red-300/36 bg-[rgba(143,56,56,0.28)] text-white shadow-[0_14px_30px_rgba(91,34,34,0.24)]",
     dot: "bg-red-400",
+    panel: "border-[rgba(143,56,56,0.18)] bg-[rgba(255,255,255,0.92)]",
+    panelTag: "bg-[rgba(143,56,56,0.1)] text-[rgb(122,48,48)]",
+    floating: "border-[rgba(143,56,56,0.24)] bg-[rgba(248,245,239,0.94)] text-[rgb(96,37,37)] shadow-[0_22px_48px_rgba(91,34,34,0.18)]",
+    floatingAction: "text-[rgb(122,48,48)]",
   },
   hidden: {
     fill: "rgba(148, 163, 184, 0.22)",
@@ -53,6 +69,10 @@ const overlayThemes: Record<UnitStatus, OverlayTheme> = {
     shadow: "0 0 0 4px rgba(148, 163, 184, 0.16)",
     button: "border-slate-400/28 bg-slate-400/10 text-white/88",
     dot: "bg-slate-300",
+    panel: "border-[rgba(100,116,139,0.14)] bg-[rgba(255,255,255,0.92)]",
+    panelTag: "bg-[rgba(100,116,139,0.1)] text-[rgb(71,85,105)]",
+    floating: "border-[rgba(100,116,139,0.18)] bg-[rgba(248,245,239,0.94)] text-[rgb(51,65,85)] shadow-[0_22px_48px_rgba(51,65,85,0.14)]",
+    floatingAction: "text-[rgb(71,85,105)]",
   },
 };
 
@@ -87,6 +107,7 @@ export function BuildingFloorplanBrowser({
   }, [sortedUnits]);
 
   const activeUnit = sortedUnits.find((unit) => unit.id === activeUnitId) ?? sortedUnits[0] ?? null;
+  const activeTheme = activeUnit ? overlayThemes[activeUnit.status] : null;
   const ui = locale === "bg"
     ? {
         allFloors: "Всички етажи",
@@ -177,6 +198,39 @@ export function BuildingFloorplanBrowser({
               sizes="(max-width: 1024px) 100vw, 960px"
             />
 
+            {activeUnit && activeTheme ? (
+              <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center px-3 sm:top-4">
+                <div
+                  className={cn(
+                    "pointer-events-auto inline-flex items-center gap-4 rounded-full border px-4 py-3 backdrop-blur-xl sm:px-5",
+                    activeTheme.floating,
+                  )}
+                >
+                  <div>
+                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] opacity-70">
+                      {getStatusLabel(locale, activeUnit.status)}
+                    </p>
+                    <div className="mt-1 flex items-end gap-3">
+                      <span className="font-serif text-3xl leading-none">{activeUnit.code}</span>
+                      <span className="pb-1 text-sm opacity-75">
+                        {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/unit/${activeUnit.slug}`)}
+                    className={cn(
+                      "rounded-full border border-current/14 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em]",
+                      activeTheme.floatingAction,
+                    )}
+                  >
+                    {ui.details}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div className="absolute inset-0">
               {sortedUnits.map((unit) => {
                 const isActive = activeUnit?.id === unit.id;
@@ -211,14 +265,24 @@ export function BuildingFloorplanBrowser({
             </div>
           </div>
 
-          {activeUnit ? (
-            <div className="mt-4 flex flex-col gap-3 rounded-[1.15rem] border border-[color:var(--line)] bg-white/84 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">
+          {activeUnit && activeTheme ? (
+            <div
+              className={cn(
+                "mt-4 flex flex-col gap-4 rounded-[1.4rem] border px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6",
+                activeTheme.panel,
+              )}
+            >
+              <div className="min-w-0">
+                <span
+                  className={cn(
+                    "inline-flex rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.22em]",
+                    activeTheme.panelTag,
+                  )}
+                >
                   {getStatusLabel(locale, activeUnit.status)}
-                </p>
-                <h4 className="mt-2 font-serif text-2xl text-[color:var(--ink)]">{activeUnit.code}</h4>
-                <p className="mt-1 text-sm text-[color:var(--muted)]">
+                </span>
+                <h4 className="mt-3 font-serif text-[2.35rem] leading-none text-[color:var(--ink)]">{activeUnit.code}</h4>
+                <p className="mt-2 text-[1.02rem] text-[color:var(--muted)]">
                   {getResidenceLabel(locale, activeUnit.rooms)} . {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
                 </p>
               </div>
@@ -226,7 +290,7 @@ export function BuildingFloorplanBrowser({
               <button
                 type="button"
                 onClick={() => router.push(`/unit/${activeUnit.slug}`)}
-                className="premium-button-secondary px-5 py-3 text-sm font-semibold"
+                className="rounded-full border border-[color:var(--line-strong)] bg-white/86 px-7 py-3.5 text-sm font-semibold text-[color:var(--ink)] shadow-[0_10px_24px_rgba(18,19,20,0.06)]"
               >
                 {ui.details}
               </button>

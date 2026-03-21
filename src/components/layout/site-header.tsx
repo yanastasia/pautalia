@@ -95,7 +95,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
                 className={cn(
                   "inline-flex items-center justify-center rounded-full px-4 py-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] shadow-[0_12px_26px_rgba(18,15,14,0.08)]",
                   transparent
-                    ? "border border-white/18 bg-[rgba(247,244,239,0.9)] text-[color:var(--ink)] hover:bg-[rgba(247,244,239,0.96)] hover:translate-y-[-1px]"
+                    ? "border border-white/12 bg-white/6 text-white/82 shadow-none hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
                     : "border border-[color:var(--accent)]/28 bg-[rgba(178,147,102,0.14)] text-[color:var(--ink)] hover:border-[color:var(--accent)]/42 hover:bg-[rgba(178,147,102,0.22)] hover:translate-y-[-1px]",
                 )}
               >
