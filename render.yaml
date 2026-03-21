@@ -6,7 +6,7 @@ services:
     branch: main
     autoDeploy: true
     buildCommand: npm ci && npx prisma generate && npm run build
-    startCommand: npm run start
+    startCommand: npx next start -H 0.0.0.0 -p $PORT
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
