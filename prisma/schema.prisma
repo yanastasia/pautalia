@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BuildingStatus {
+  draft
+  published
+  archived
+}
+
+enum UnitStatus {
+  available
+  reserved
+  sold
+  hidden
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  archived
+  spam
+}
+
+enum ParkingStatus {
+  available
+  reserved
+  sold
+  hidden
+}
+
+model Building {
+  id               String         @id
+  slug             String         @unique
+  name             String
+  shortDescription String
+  fullDescription  String
+  status           BuildingStatus @default(published)
+  displayOrder     Int            @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  floors           Floor[]
+  units            Unit[]
+  parkingSpots     ParkingSpot[]
+  leads            Lead[]
+  events           Event[]
+}
+
+model Floor {
+  id             String   @id
+  buildingId     String
+  number         Int
+  label          String
+  description    String
+  floorplanImage String
+  mapAspectRatio String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  building       Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  units          Unit[]
+
+  @@unique([buildingId, number])
+}
+
+model Unit {
+  id              String     @id
+  externalCode    String     @unique
+  slug            String     @unique
+  buildingId      String
+  floorId         String
+  typologyId      String
+  unitNumber      String
+  rooms           Int
+  bedrooms        Int?
+  bathrooms       Int
+  areaInternalSqm Float
+  areaTotalSqm    Float
+  terraceSqm      Float      @default(0)
+  hasYard         Boolean    @default(false)
+  outdoorType     String?
+  orientation     String
+  exposure        String
+  price           Float?
+  currency        String     @default("EUR")
+  status          UnitStatus @default(available)
+  isPublished     Boolean    @default(true)
+  isPriceVisible  Boolean    @default(true)
+  description     String
+  highlight       String
+  floorplan       String
+  gallery         String[]
+  panoramaImage   String?
+  features        String[]
+  planArea        Json?
+  planRegions     Json?
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  building        Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  floor           Floor      @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  leads           Lead[]
+  events          Event[]
+
+  @@index([buildingId, status, isPublished])
+  @@index([slug])
+}
+
+model ParkingSpot {
+  id         String        @id
+  buildingId String
+  code       String        @unique
+  levelLabel String?
+  areaSqm    Float?
+  price      Float?
+  currency   String        @default("EUR")
+  status     ParkingStatus @default(available)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  building   Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+}
+
+model Lead {
+  id               String     @id @default(uuid())
+  fullName         String
+  email            String
+  phone            String?
+  message          String?
+  unitId           String?
+  buildingId       String?
+  sourcePageUrl    String
+  referrer         String?
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  utmTerm          String?
+  utmContent       String?
+  userAgentHash    String?
+  ipHash           String?
+  consentTimestamp DateTime
+  createdAt        DateTime   @default(now())
+  status           LeadStatus @default(new)
+  unit             Unit?      @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  building         Building?  @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([email])
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  eventType     String
+  sourcePageUrl String
+  buildingId    String?
+  unitId        String?
+  payload       Json?
+  userAgentHash String?
+  ipHash        String?
+  createdAt     DateTime  @default(now())
+  building      Building? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+  unit          Unit?     @relation(fields: [unitId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([eventType])
+  @@index([buildingId])
+  @@index([unitId])
+}

@@ -1,0 +1,17 @@
+.next
+.next.prev.*
+.next_stale_*
+node_modules
+.env
+.env.local
+dist
+coverage
+.playwright-cli
+.codex
+output
+tmp
+.DS_Store
+tsconfig.tsbuildinfo
+storage/leads.json
+prisma/dev.db
+*.log
