@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
@@ -49,8 +50,16 @@ export function SiteHeader({ brandName }: { brandName: string }) {
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <div className={cn("flex items-center justify-between gap-4 transition-all duration-500", transparent ? "py-5" : "py-4")}>
             <Link href="/" className="flex min-w-0 items-center sm:shrink-0">
-              <span className={cn("font-serif text-[1.18rem] leading-none sm:text-[1.5rem] sm:whitespace-nowrap", transparent ? "text-white" : "text-[color:var(--ink)]")}>
-                {brandName}
+              <span className="sr-only">{brandName}</span>
+              <span className="relative block h-[4.35rem] w-[4.35rem] sm:h-[5rem] sm:w-[5rem]">
+                <Image
+                  src="/assets/branding/pautalia-logo.png"
+                  alt={brandName}
+                  fill
+                  className="object-contain object-center"
+                  sizes="80px"
+                  priority
+                />
               </span>
             </Link>
 

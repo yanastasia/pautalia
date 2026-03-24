@@ -27,7 +27,7 @@ export default async function LocationPage() {
     <>
       <section className="page-cover">
         <div className="page-cover-media">
-          <Image src="/assets/gallery/balcony-view.jpg" alt={messages.location.heroTitle} fill className="object-cover" sizes="100vw" />
+          <Image src="/assets/location/location-hero.jpg" alt={messages.location.heroTitle} fill className="object-cover" sizes="100vw" />
         </div>
         <div className="page-cover-inner">
           <div className="page-cover-copy">
@@ -73,7 +73,7 @@ export default async function LocationPage() {
 
           <div className="page-image-block">
             <Image
-              src="/assets/gallery/exterior-front.jpg"
+              src="/assets/location/location-preview.jpg"
               alt={messages.location.previewEyebrow}
               fill
               className="object-cover"
