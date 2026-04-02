@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { KeyboardEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { resolveFloorplanFrame } from "@/components/buildings/building-floorplan-frame";
 import { getFloorLabel, getStatusLabel } from "@/lib/i18n/messages";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
@@ -39,13 +40,6 @@ type CalloutPosition = {
 };
 
 type Point = [number, number];
-
-type TrimmedPlanConfig = {
-  aspectRatio: string;
-  imageScaleClassName: string;
-  hotspotScale: number;
-  hotspotOffsetX: number;
-};
 
 const overlayThemes: Record<UnitStatus, OverlayTheme> = {
   available: {
@@ -91,33 +85,6 @@ const overlayThemes: Record<UnitStatus, OverlayTheme> = {
     panelTag: "bg-[rgba(100,116,139,0.1)] text-[rgb(71,85,105)]",
     floating: "border-[rgba(100,116,139,0.18)] bg-[rgba(248,245,239,0.94)] text-[rgb(51,65,85)] shadow-[0_22px_48px_rgba(51,65,85,0.14)]",
     floatingAction: "text-[rgb(71,85,105)]",
-  },
-};
-
-const trimmedPlanConfigs: Record<string, TrimmedPlanConfig> = {
-  "/assets/floorplans/first_floor.png": {
-    aspectRatio: "1000 / 634",
-    imageScaleClassName: "origin-center scale-[1.07]",
-    hotspotScale: 1.8,
-    hotspotOffsetX: 1.2,
-  },
-  "/assets/floorplans/second_floor.png": {
-    aspectRatio: "1000 / 634",
-    imageScaleClassName: "origin-center scale-[1.07]",
-    hotspotScale: 1,
-    hotspotOffsetX: 0,
-  },
-  "/assets/floorplans/third_floor.png": {
-    aspectRatio: "1000 / 634",
-    imageScaleClassName: "origin-center scale-[1.07]",
-    hotspotScale: 1,
-    hotspotOffsetX: 0,
-  },
-  "/assets/floorplans/fourth_floor.png": {
-    aspectRatio: "1000 / 634",
-    imageScaleClassName: "origin-center scale-[1.07]",
-    hotspotScale: 1,
-    hotspotOffsetX: 0,
   },
 };
 
@@ -180,14 +147,10 @@ export function BuildingFloorplanBrowser({
 
   const activeUnit = sortedUnits.find((unit) => unit.id === activeUnitId) ?? sortedUnits[0] ?? null;
   const activeTheme = activeUnit ? overlayThemes[activeUnit.status] : null;
-  const trimmedPlanConfig = trimmedPlanConfigs[selectedFloor.floorplanImage];
-  const trimmedHotspotScale = trimmedPlanConfig?.hotspotScale ?? 1;
-  const trimmedHotspotOffsetX = trimmedPlanConfig?.hotspotOffsetX ?? 0;
-  const mapAspectRatio = trimmedPlanConfig
-    ? trimmedPlanConfig.aspectRatio
-    : selectedFloor.mapAspectRatio === "1 / 1"
-      ? "1000 / 640"
-      : (selectedFloor.mapAspectRatio ?? "829 / 765");
+  const floorplanFrame = resolveFloorplanFrame(selectedFloor.floorplanImage, selectedFloor.mapAspectRatio);
+  const trimmedHotspotScale = floorplanFrame.hotspotScale;
+  const trimmedHotspotOffsetX = floorplanFrame.hotspotOffsetX;
+  const mapAspectRatio = floorplanFrame.aspectRatio;
   const ui = locale === "bg"
     ? {
       allFloors: "Всички етажи",
@@ -344,14 +307,14 @@ export function BuildingFloorplanBrowser({
             <div
               className={cn(
                 "absolute inset-0",
-                trimmedPlanConfig?.imageScaleClassName ?? "origin-top scale-[1.42] -translate-y-[35%]",
+                floorplanFrame.imageWrapperClassName,
               )}
             >
               <Image
                 src={selectedFloor.floorplanImage}
                 alt={`${selectedFloor.label} floor plan`}
                 fill
-                className={cn("object-contain", trimmedPlanConfig ? "object-center" : "object-top")}
+                className={cn("object-contain", floorplanFrame.imageClassName)}
                 sizes="(max-width: 1024px) 100vw, 960px"
               />
 
