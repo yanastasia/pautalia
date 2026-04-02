@@ -3,10 +3,10 @@ import type { Floor, Unit, UnitPlanArea } from "@/types/domain";
 export const buildingAFacadePhoto = "/assets/buildings/building-a-selector.png";
 
 export const buildingAFloorPlanImages = {
-  1: "/assets/floorplans/building-a-floor-1-landscape-final.png",
-  2: "/assets/floorplans/building-a-floor-2-landscape-final.png",
-  3: "/assets/floorplans/building-a-floor-3-landscape-final.png",
-  4: "/assets/floorplans/building-a-floor-4-landscape-final.png",
+  1: "/assets/floorplans/first_floor.png",
+  2: "/assets/floorplans/second_floor.png",
+  3: "/assets/floorplans/third_floor.png",
+  4: "/assets/floorplans/fourth_floor.png",
 } as const;
 
 export const buildingAFloorPlanMediaIds = {
@@ -14,6 +14,13 @@ export const buildingAFloorPlanMediaIds = {
   2: "media-floorplan-a-2",
   3: "media-floorplan-a-3",
   4: "media-floorplan-a-4",
+} as const;
+
+const buildingAFloorPlanAspectRatios = {
+  1: "1 / 1",
+  2: "1000 / 634",
+  3: "1000 / 634",
+  4: "1 / 1",
 } as const;
 
 type BuildingAFloorNumber = keyof typeof buildingAFloorPlanImages;
@@ -24,7 +31,8 @@ export const buildingAFloorOverrides: Record<string, Partial<Floor>> = Object.fr
     {
       floorplanImage: image,
       floorplanImageId: buildingAFloorPlanMediaIds[Number(floor) as keyof typeof buildingAFloorPlanMediaIds],
-      mapAspectRatio: "829 / 765",
+      mapAspectRatio:
+        buildingAFloorPlanAspectRatios[Number(floor) as keyof typeof buildingAFloorPlanAspectRatios],
     },
   ]),
 );

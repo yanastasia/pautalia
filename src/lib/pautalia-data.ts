@@ -97,7 +97,7 @@ function getBuildingPresentation(slug: string) {
       sequence: 1,
       completionPercent: 0,
       deliveryQuarter: { en: "TBC", bg: "Предстои" },
-      floorplanImage: "/assets/floorplans/floorplan-typical.jpg",
+      floorplanImage: "/assets/floorplans/first_floor.png",
       panoramaImage: "/assets/gallery/exterior-front.jpg",
       amenities: { en: [], bg: [] },
       coordinates: [0, 0, 0] as [number, number, number],

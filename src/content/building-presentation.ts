@@ -23,7 +23,7 @@ export const buildingPresentation: Record<string, BuildingPresentation> = {
       en: "Q4 2027",
       bg: "Q4 2027",
     },
-    floorplanImage: "/assets/floorplans/floorplan-typical.jpg",
+    floorplanImage: "/assets/floorplans/first_floor.png",
     panoramaImage: "/assets/panoramas/living-panorama.jpg",
     amenities: {
       en: [
