@@ -81,6 +81,7 @@ export default async function HomePage() {
         primaryLabel={messages.home.openProject}
         secondaryHref="/apartments"
         secondaryLabel={messages.home.jumpToFinder}
+        locationLabel={siteCopy.locationLabel}
         imageAlt={locale === "bg" ? "Екстериор на сградата" : "Building exterior"}
       />
 

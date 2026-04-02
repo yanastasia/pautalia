@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 
 export function HomeHero({
   eyebrow,
@@ -10,6 +10,7 @@ export function HomeHero({
   primaryLabel,
   secondaryHref,
   secondaryLabel,
+  locationLabel,
   imageAlt,
 }: {
   eyebrow: string;
@@ -19,6 +20,7 @@ export function HomeHero({
   primaryLabel: string;
   secondaryHref: string;
   secondaryLabel: string;
+  locationLabel: string;
   imageAlt: string;
 }) {
   return (
@@ -37,6 +39,7 @@ export function HomeHero({
 
       <div className="relative z-10 mx-auto flex h-full max-w-[1200px] flex-col justify-end px-4 pb-14 pt-44 sm:px-6 sm:pb-18 sm:pt-48 lg:px-8 lg:pb-24 lg:pt-52">
         <div className="max-w-[75rem]">
+          <span className="eyebrow-chip motion-fade-up">{eyebrow}</span>
           <h1 className="motion-fade-up motion-delay-1 mt-6 max-w-[75rem] font-serif text-[2rem] leading-[0.98] text-white sm:text-[2.6rem] lg:text-[3.35rem] xl:text-[3.7rem]">
             {title}
           </h1>
@@ -53,6 +56,13 @@ export function HomeHero({
             >
               {secondaryLabel}
             </Link>
+          </div>
+        </div>
+
+        <div className="motion-fade-up motion-delay-4 mt-8 flex justify-start lg:justify-end">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/78 backdrop-blur">
+            <MapPin className="size-3.5 text-white/72" />
+            <span>{locationLabel}</span>
           </div>
         </div>
       </div>
