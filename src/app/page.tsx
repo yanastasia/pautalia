@@ -74,7 +74,6 @@ export default async function HomePage() {
   return (
     <>
       <HomeHero
-        eyebrow={messages.home.eyebrow}
         title={messages.home.title}
         copy={siteCopy.heroText}
         primaryHref="/project"
