@@ -98,6 +98,7 @@ export interface Unit {
   features: string[];
   planArea: UnitPlanArea;
   planRegions?: UnitPlanArea[];
+  planPolygonPoints?: readonly string[];
   digitalTwinId?: string;
   seoTitle: string;
   seoDescription: string;

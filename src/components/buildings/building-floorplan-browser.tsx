@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import type { KeyboardEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { getFloorLabel, getResidenceLabel, getStatusLabel } from "@/lib/i18n/messages";
+import { getFloorLabel, getStatusLabel } from "@/lib/i18n/messages";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 import type { UnitStatus } from "@/types/domain";
@@ -27,6 +28,23 @@ type OverlayTheme = {
   panelTag: string;
   floating: string;
   floatingAction: string;
+};
+
+type CalloutPosition = {
+  left: string;
+  top: string;
+  transform: string;
+  maxWidthClass: string;
+  pointerClassName: string;
+};
+
+type Point = [number, number];
+
+type TrimmedPlanConfig = {
+  aspectRatio: string;
+  imageScaleClassName: string;
+  hotspotScale: number;
+  hotspotOffsetX: number;
 };
 
 const overlayThemes: Record<UnitStatus, OverlayTheme> = {
@@ -76,6 +94,60 @@ const overlayThemes: Record<UnitStatus, OverlayTheme> = {
   },
 };
 
+const trimmedPlanConfigs: Record<string, TrimmedPlanConfig> = {
+  "/assets/floorplans/first_floor.png": {
+    aspectRatio: "1000 / 634",
+    imageScaleClassName: "origin-center scale-[1.07]",
+    hotspotScale: 1.8,
+    hotspotOffsetX: 1.2,
+  },
+  "/assets/floorplans/second_floor.png": {
+    aspectRatio: "1000 / 634",
+    imageScaleClassName: "origin-center scale-[1.07]",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+  },
+  "/assets/floorplans/third_floor.png": {
+    aspectRatio: "1000 / 634",
+    imageScaleClassName: "origin-center scale-[1.07]",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+  },
+  "/assets/floorplans/fourth_floor.png": {
+    aspectRatio: "1000 / 634",
+    imageScaleClassName: "origin-center scale-[1.07]",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+  },
+};
+
+function parsePolygonPoints(points: string): Point[] {
+  return points
+    .split(" ")
+    .map((point) => point.split(",").map(Number))
+    .filter((pair): pair is Point => pair.length === 2 && pair.every((value) => Number.isFinite(value)));
+}
+
+function scalePoints(points: Point[], factor: number): Point[] {
+  if (factor === 1) {
+    return points;
+  }
+
+  return points.map(([x, y]) => [50 + (x - 50) * factor, 50 + (y - 50) * factor]);
+}
+
+function offsetPoints(points: Point[], offsetX: number, offsetY = 0): Point[] {
+  if (offsetX === 0 && offsetY === 0) {
+    return points;
+  }
+
+  return points.map(([x, y]) => [x + offsetX, y + offsetY]);
+}
+
+function stringifyPoints(points: Point[]): string {
+  return points.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+}
+
 export function BuildingFloorplanBrowser({
   floors,
   selectedFloor,
@@ -108,27 +180,116 @@ export function BuildingFloorplanBrowser({
 
   const activeUnit = sortedUnits.find((unit) => unit.id === activeUnitId) ?? sortedUnits[0] ?? null;
   const activeTheme = activeUnit ? overlayThemes[activeUnit.status] : null;
+  const trimmedPlanConfig = trimmedPlanConfigs[selectedFloor.floorplanImage];
+  const trimmedHotspotScale = trimmedPlanConfig?.hotspotScale ?? 1;
+  const trimmedHotspotOffsetX = trimmedPlanConfig?.hotspotOffsetX ?? 0;
+  const mapAspectRatio = trimmedPlanConfig
+    ? trimmedPlanConfig.aspectRatio
+    : selectedFloor.mapAspectRatio === "1 / 1"
+      ? "1000 / 640"
+      : (selectedFloor.mapAspectRatio ?? "829 / 765");
   const ui = locale === "bg"
     ? {
-        allFloors: "Всички етажи",
-        floorLabel: "Етаж",
-        hoverHint: "Посочете жилище или изберете от списъка.",
-        apartmentsLabel: "Апартаменти",
-        details: "Детайли",
-        available: "Свободен",
-      }
+      allFloors: "Всички етажи",
+      floorLabel: "Етаж",
+      hoverHint: "Посочете жилище или изберете от списъка.",
+      apartmentsLabel: "Апартаменти",
+      details: "Детайли",
+      available: "Свободен",
+    }
     : {
-        allFloors: "All floors",
-        floorLabel: "Floor",
-        hoverHint: "Hover a home or choose it from the list.",
-        apartmentsLabel: "Apartments",
-        details: "Details",
-        available: "Available",
+      allFloors: "All floors",
+      floorLabel: "Floor",
+      hoverHint: "Hover a home or choose it from the list.",
+      apartmentsLabel: "Apartments",
+      details: "Details",
+      available: "Available",
+    };
+
+  const activeCalloutPosition = useMemo<CalloutPosition | null>(() => {
+    if (!activeUnit) {
+      return null;
+    }
+
+    const getCalloutPosition = (left: number, right: number, top: number): CalloutPosition => {
+      const centerX = (left + right) / 2;
+      const anchorTop = top < 33 ? top + 5.5 : top + 2.5;
+
+      if (centerX < 28) {
+        return {
+          left: `${Math.min(right + 5.5, 40)}%`,
+          top: `${Math.max(anchorTop, 31)}%`,
+          transform: "translate(0, -50%)",
+          maxWidthClass: "max-w-[10.5rem] sm:max-w-[11.25rem]",
+          pointerClassName:
+            "left-0 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-l border-b",
+        };
+      }
+
+      if (centerX > 72) {
+        return {
+          left: `${Math.max(left - 5.5, 60)}%`,
+          top: `${Math.max(anchorTop, 31)}%`,
+          transform: "translate(-100%, -50%)",
+          maxWidthClass: "max-w-[10.5rem] sm:max-w-[11.25rem]",
+          pointerClassName:
+            "left-full top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-t border-r",
+        };
+      }
+
+      return {
+        left: `${centerX}%`,
+        top: `${Math.max(anchorTop, 31)}%`,
+        transform: "translate(-50%, -92%)",
+        maxWidthClass: "max-w-[11.25rem] sm:max-w-[12rem]",
+        pointerClassName:
+          "left-1/2 top-full h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-r border-b",
       };
+    };
+
+    if (activeUnit.planPolygonPoints?.length) {
+      const points = offsetPoints(
+        scalePoints(parsePolygonPoints(activeUnit.planPolygonPoints[0]), trimmedHotspotScale),
+        trimmedHotspotOffsetX,
+      );
+
+      if (points.length > 0) {
+        const left = points.reduce((min, [x]) => Math.min(min, x), Number.POSITIVE_INFINITY);
+        const right = points.reduce((max, [x]) => Math.max(max, x), Number.NEGATIVE_INFINITY);
+        const top = points.reduce((min, [, y]) => Math.min(min, y), Number.POSITIVE_INFINITY);
+        return getCalloutPosition(left, right, top);
+      }
+    }
+
+    const region = activeUnit.planRegions?.[0] ?? activeUnit.planArea;
+    return getCalloutPosition(region.x, region.x + region.width, region.y);
+  }, [activeUnit, trimmedHotspotOffsetX, trimmedHotspotScale]);
+
+  const handleUnitKeyDown = (event: KeyboardEvent<SVGPolygonElement | SVGRectElement>, slug: string, unitId: string) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      router.push(`/unit/${slug}`);
+      return;
+    }
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const currentIndex = sortedUnits.findIndex((unit) => unit.id === unitId);
+      const nextUnit = sortedUnits[(currentIndex + 1) % sortedUnits.length];
+      setActiveUnitId(nextUnit?.id ?? unitId);
+    }
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const currentIndex = sortedUnits.findIndex((unit) => unit.id === unitId);
+      const nextUnit = sortedUnits[(currentIndex - 1 + sortedUnits.length) % sortedUnits.length];
+      setActiveUnitId(nextUnit?.id ?? unitId);
+    }
+  };
 
   return (
-    <div className="card-surface-dark rounded-[1.9rem] p-4 sm:p-6">
-      <div className="grid gap-4 lg:grid-cols-[11rem_minmax(0,1fr)]">
+    <div className="card-surface-dark rounded-[1.9rem] p-4 sm:p-5">
+      <div className="grid gap-3 lg:grid-cols-[10.5rem_minmax(0,1fr)]">
         <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:max-h-[52rem] lg:flex-col lg:overflow-visible lg:pb-0">
           {sortedUnits.map((unit) => {
             const isActive = activeUnit?.id === unit.id;
@@ -157,18 +318,8 @@ export function BuildingFloorplanBrowser({
           })}
         </div>
 
-        <div className="order-1 rounded-[1.55rem] border border-white/10 bg-[#f6f2ea] p-3 sm:p-5 lg:order-2">
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div className="pr-4">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[color:var(--muted)]">
-                {ui.floorLabel}
-              </p>
-              <h3 className="mt-2 font-serif text-4xl text-[color:var(--ink)]">
-                {getFloorLabel(locale, selectedFloor.number)}
-              </h3>
-              <p className="mt-2 text-sm text-[color:var(--muted)]">{ui.hoverHint}</p>
-            </div>
-
+        <div className="order-1 rounded-[1.55rem] border border-white/10 bg-[#f6f2ea] p-2.5 sm:p-4 lg:order-2">
+          <div className="mb-1.5 flex justify-start">
             <label className="block min-w-[10.5rem]">
               <span className="sr-only">{ui.floorLabel}</span>
               <select
@@ -187,115 +338,138 @@ export function BuildingFloorplanBrowser({
           </div>
 
           <div
-            className="relative overflow-hidden rounded-[1.25rem] border border-[color:var(--line)] bg-white"
-            style={{ aspectRatio: selectedFloor.mapAspectRatio ?? "829 / 765" }}
+            className="relative overflow-hidden rounded-[1rem] border border-[color:var(--line)] bg-white"
+            style={{ aspectRatio: mapAspectRatio }}
           >
-            <Image
-              src={selectedFloor.floorplanImage}
-              alt={`${selectedFloor.label} floor plan`}
-              fill
-              className="object-contain"
-              sizes="(max-width: 1024px) 100vw, 960px"
-            />
+            <div
+              className={cn(
+                "absolute inset-0",
+                trimmedPlanConfig?.imageScaleClassName ?? "origin-top scale-[1.42] -translate-y-[35%]",
+              )}
+            >
+              <Image
+                src={selectedFloor.floorplanImage}
+                alt={`${selectedFloor.label} floor plan`}
+                fill
+                className={cn("object-contain", trimmedPlanConfig ? "object-center" : "object-top")}
+                sizes="(max-width: 1024px) 100vw, 960px"
+              />
 
-            {activeUnit && activeTheme ? (
-              <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center px-3 sm:top-4">
+              {activeUnit && activeTheme && activeCalloutPosition ? (
                 <div
-                  className={cn(
-                    "pointer-events-auto inline-flex items-center gap-4 rounded-full border px-4 py-3 backdrop-blur-xl sm:px-5",
-                    activeTheme.floating,
-                  )}
+                  className="pointer-events-none absolute z-10"
+                  style={{
+                    left: activeCalloutPosition.left,
+                    top: activeCalloutPosition.top,
+                    transform: activeCalloutPosition.transform,
+                  }}
                 >
-                  <div>
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] opacity-70">
-                      {getStatusLabel(locale, activeUnit.status)}
-                    </p>
-                    <div className="mt-1 flex items-end gap-3">
-                      <span className="font-serif text-3xl leading-none">{activeUnit.code}</span>
-                      <span className="pb-1 text-sm opacity-75">
-                        {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => router.push(`/unit/${activeUnit.slug}`)}
+                  <div
                     className={cn(
-                      "rounded-full border border-current/14 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em]",
-                      activeTheme.floatingAction,
+                      "pointer-events-auto relative inline-flex w-full items-center gap-1.5 rounded-[1.35rem] border px-2.5 py-1.5 backdrop-blur-xl sm:px-3 sm:py-1.75",
+                      activeCalloutPosition.maxWidthClass,
+                      activeTheme.floating,
                     )}
                   >
-                    {ui.details}
-                  </button>
+                    <div>
+                      <p className="text-[0.45rem] font-semibold uppercase tracking-[0.16em] opacity-70">
+                        {getStatusLabel(locale, activeUnit.status)}
+                      </p>
+                      <div className="mt-0.5 flex items-end gap-1">
+                        <span className="font-serif text-[1.15rem] leading-none sm:text-[1.35rem]">{activeUnit.code}</span>
+                        <span className="pb-0.5 text-[0.62rem] opacity-75 sm:text-[0.68rem]">
+                          {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/unit/${activeUnit.slug}`)}
+                      className={cn(
+                        "rounded-full border border-current/14 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.08em] sm:px-2.5 sm:text-[0.56rem]",
+                        activeTheme.floatingAction,
+                      )}
+                    >
+                      {ui.details}
+                    </button>
+                    <span
+                      className={cn("absolute", activeCalloutPosition.pointerClassName)}
+                      style={{
+                        backgroundColor: "rgba(248,245,239,0.94)",
+                        borderColor: "currentColor",
+                        opacity: 0.9,
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            <div className="absolute inset-0">
-              {sortedUnits.map((unit) => {
-                const isActive = activeUnit?.id === unit.id;
-                const theme = overlayThemes[unit.status];
-                const regions = unit.planRegions?.length ? unit.planRegions : [unit.planArea];
+              <svg
+                viewBox="0 0 100 100"
+                className="absolute inset-0 size-full"
+                aria-label={`${ui.apartmentsLabel} ${getFloorLabel(locale, selectedFloor.number)}`}
+              >
+                {sortedUnits.map((unit) => {
+                  const isActive = activeUnit?.id === unit.id;
+                  const theme = overlayThemes[unit.status];
 
-                return regions.map((region, index) => (
-                  <button
-                    key={`${unit.id}-${index}`}
-                    type="button"
-                    aria-label={index === 0 ? `${ui.apartmentsLabel} ${unit.code}` : undefined}
-                    aria-hidden={index > 0 ? true : undefined}
-                    tabIndex={index === 0 ? 0 : -1}
-                    onMouseEnter={() => setActiveUnitId(unit.id)}
-                    onFocus={() => setActiveUnitId(unit.id)}
-                    onClick={() => router.push(`/unit/${unit.slug}`)}
-                    className="absolute rounded-[0.85rem] border transition-all duration-200"
-                    style={{
-                      left: `${region.x}%`,
-                      top: `${region.y}%`,
-                      width: `${region.width}%`,
-                      height: `${region.height}%`,
-                      backgroundColor: isActive ? theme.fill : "transparent",
-                      borderColor: isActive ? theme.border : "transparent",
-                      boxShadow: isActive ? theme.shadow : "none",
-                    }}
-                  >
-                    {index === 0 ? <span className="sr-only">{unit.code}</span> : null}
-                  </button>
-                ));
-              })}
+                if (unit.planPolygonPoints?.length) {
+                  return unit.planPolygonPoints.map((points, index) => {
+                    const displayPoints = stringifyPoints(
+                      offsetPoints(scalePoints(parsePolygonPoints(points), trimmedHotspotScale), trimmedHotspotOffsetX),
+                    );
+
+                    return (
+                        <polygon
+                          key={`${unit.id}-polygon-${index}`}
+                          points={displayPoints}
+                          role="button"
+                          aria-label={index === 0 ? `${ui.apartmentsLabel} ${unit.code}` : undefined}
+                          aria-hidden={index > 0 ? true : undefined}
+                          tabIndex={index === 0 ? 0 : -1}
+                          onMouseEnter={() => setActiveUnitId(unit.id)}
+                          onFocus={() => setActiveUnitId(unit.id)}
+                          onClick={() => router.push(`/unit/${unit.slug}`)}
+                          onKeyDown={(event) => handleUnitKeyDown(event, unit.slug, unit.id)}
+                          className="cursor-pointer outline-none transition-all duration-200"
+                          fill={isActive ? theme.fill : "rgba(255,255,255,0.01)"}
+                          stroke={isActive ? theme.border : "rgba(255,255,255,0.02)"}
+                          strokeWidth={isActive ? 0.65 : 0.35}
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      );
+                  });
+                }
+
+                  const regions = unit.planRegions?.length ? unit.planRegions : [unit.planArea];
+                  return regions.map((region, index) => (
+                    <rect
+                      key={`${unit.id}-rect-${index}`}
+                      x={region.x}
+                      y={region.y}
+                      width={region.width}
+                      height={region.height}
+                      rx={1.2}
+                      role="button"
+                      aria-label={index === 0 ? `${ui.apartmentsLabel} ${unit.code}` : undefined}
+                      aria-hidden={index > 0 ? true : undefined}
+                      tabIndex={index === 0 ? 0 : -1}
+                      onMouseEnter={() => setActiveUnitId(unit.id)}
+                      onFocus={() => setActiveUnitId(unit.id)}
+                      onClick={() => router.push(`/unit/${unit.slug}`)}
+                      onKeyDown={(event) => handleUnitKeyDown(event, unit.slug, unit.id)}
+                      className="cursor-pointer outline-none transition-all duration-200"
+                      fill={isActive ? theme.fill : "rgba(255,255,255,0.01)"}
+                      stroke={isActive ? theme.border : "rgba(255,255,255,0.02)"}
+                      strokeWidth={isActive ? 0.65 : 0.35}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ));
+                })}
+              </svg>
             </div>
           </div>
 
-          {activeUnit && activeTheme ? (
-            <div
-              className={cn(
-                "mt-4 flex flex-col gap-4 rounded-[1.4rem] border px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6",
-                activeTheme.panel,
-              )}
-            >
-              <div className="min-w-0">
-                <span
-                  className={cn(
-                    "inline-flex rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.22em]",
-                    activeTheme.panelTag,
-                  )}
-                >
-                  {getStatusLabel(locale, activeUnit.status)}
-                </span>
-                <h4 className="mt-3 font-serif text-[2.35rem] leading-none text-[color:var(--ink)]">{activeUnit.code}</h4>
-                <p className="mt-2 text-[1.02rem] text-[color:var(--muted)]">
-                  {getResidenceLabel(locale, activeUnit.rooms)} . {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => router.push(`/unit/${activeUnit.slug}`)}
-                className="rounded-full border border-[color:var(--line-strong)] bg-white/86 px-7 py-3.5 text-sm font-semibold text-[color:var(--ink)] shadow-[0_10px_24px_rgba(18,19,20,0.06)]"
-              >
-                {ui.details}
-              </button>
-            </div>
-          ) : null}
         </div>
       </div>
     </div>

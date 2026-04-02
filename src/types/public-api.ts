@@ -72,6 +72,7 @@ export interface PublicUnit {
   features: string[];
   planArea: UnitPlanArea;
   planRegions: UnitPlanArea[] | null;
+  planPolygonPoints: readonly string[] | null;
   digitalTwinId: string | null;
   seoTitle: string;
   seoDescription: string;

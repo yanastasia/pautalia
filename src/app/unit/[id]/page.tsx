@@ -7,8 +7,9 @@ import { LeadForm } from "@/components/forms/lead-form";
 import { UnitCard } from "@/components/apartments/unit-card";
 import { StatusPill } from "@/components/ui/status-pill";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { UnitFloorplanSection } from "@/components/units/unit-floorplan-section";
 import { getBuildingLabel, getFloorLabel, getMessages } from "@/lib/i18n/messages";
-import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaUnit } from "@/lib/public-api";
+import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaBuilding, fetchPautaliaUnit } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
 import { getUnitJsonLd } from "@/lib/json-ld";
 import { formatCurrency, titleCase } from "@/lib/utils";
@@ -52,6 +53,9 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
 
     throw error;
   }
+
+  const buildingResponse = await fetchPautaliaBuilding(locale, unit.building?.slug ?? unit.buildingId);
+  const currentFloor = buildingResponse.floors.find((candidate) => candidate.number === unit.floor);
 
   const relatedUnits = (await fetchAllPautaliaUnits(locale, {
     building: unit.building?.slug,
@@ -120,24 +124,19 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
         </div>
       </section>
 
-      <section className="section-space">
-        <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[0.88fr_1.12fr] lg:px-8">
-          <div>
-            <SectionHeading eyebrow={messages.unit.floorplanEyebrow} title={messages.unit.floorplanTitle} copy={messages.unit.floorplanCopy} />
-            <div className="page-line-list mt-10">
-              {unit.features.map((feature) => (
-                <div key={feature} className="page-line-item text-lg text-[color:var(--ink)]">
-                  {feature}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="page-image-block bg-[color:var(--surface-dark)]">
-            <Image src={unit.floorplan} alt={`Floorplan for unit ${unit.code}`} fill className="object-contain p-6" sizes="(max-width: 1024px) 100vw, 55vw" />
-          </div>
-        </div>
-      </section>
+      {currentFloor ? (
+        <UnitFloorplanSection
+          eyebrow={messages.unit.floorplanEyebrow}
+          title={messages.unit.floorplanTitle}
+          copy={messages.unit.floorplanCopy}
+          features={unit.features}
+          unitCode={unit.code}
+          unitFloorplan={unit.floorplan}
+          floorLabel={currentFloor.label}
+          floorPlanImage={currentFloor.floorplanImage}
+          locale={locale}
+        />
+      ) : null}
 
       <section className="section-space bg-white/34">
         <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">

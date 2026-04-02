@@ -26,6 +26,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: #211d1b;
 }
 
 body {
@@ -47,7 +48,7 @@ body::before {
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 28%),
+    linear-gradient(180deg, transparent 0%, transparent 18%, rgba(255, 255, 255, 0.16) 36%, transparent 52%),
     radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.66), transparent 18%);
   content: "";
   pointer-events: none;
@@ -369,7 +370,7 @@ a {
 
 .home-hero-media {
   position: absolute;
-  inset: 0;
+  inset: -1.5rem 0 -1.5rem;
   overflow: hidden;
 }
 

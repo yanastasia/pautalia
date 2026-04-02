@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { defaultLocale, localeCookieName, locales, type Locale } from "@/lib/i18n/config";
+import { localeCookieName, locales, type Locale } from "@/lib/i18n/config";
 import { useLocale } from "@/components/providers/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ export function LanguageSwitcher({ variant = "dark" }: { variant?: "dark" | "lig
   const locale = useLocale();
   const router = useRouter();
   const darkSurface = variant === "dark";
+  const orderedLocales = [...locales].reverse();
 
   return (
     <div
@@ -23,7 +24,7 @@ export function LanguageSwitcher({ variant = "dark" }: { variant?: "dark" | "lig
       )}
     >
       <div className="flex items-center gap-1">
-        {locales.map((option) => (
+        {orderedLocales.map((option) => (
           <button
             key={option}
             type="button"

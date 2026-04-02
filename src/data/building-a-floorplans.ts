@@ -9,18 +9,45 @@ export const buildingAFloorPlanImages = {
   4: "/assets/floorplans/fourth_floor.png",
 } as const;
 
+const buildingAUnitFloorplanImages = {
+  "AP.01": "/assets/floorplans/AP.01.png",
+  "AP.02": "/assets/floorplans/AP.02.png",
+  "AP.03": "/assets/floorplans/AP.03.png",
+  "AP.04": "/assets/floorplans/AP.04.png",
+  "AP.05": "/assets/floorplans/AP.05.png",
+  "AP.06": "/assets/floorplans/AP.06.png",
+  "AP.07": "/assets/floorplans/AP.07.png",
+  "AP.08": "/assets/floorplans/AP.08.png",
+  "AP.09": "/assets/floorplans/AP.09.png",
+  "AP.10": "/assets/floorplans/AP.10.png",
+  "AP.11": "/assets/floorplans/AP.11.png",
+  "AP.12": "/assets/floorplans/AP.12.png",
+  "AP.13": "/assets/floorplans/AP.13.png",
+  "AP.14": "/assets/floorplans/AP.14.png",
+} as const;
+
+const buildingAUnitPolygonPoints = {
+  "AP.01": ["13,31 26,31 26,27 37.2,27 37.2,41 27,41 27,70 13,70"],
+  "AP.02": ["27,41.3 49,41.3 49,70 27,70"],
+  "AP.03": ["49,42 70,42 70,70 49,70"],
+  "AP.04": ["60,28 71,28 71,32 85,32 85,70 70,70 70,50 70,50 70,42.5 60,42.5"],
+  "AP.05": ["3.8,19.2 22.3,19.2 22.3,8.0 35.5,8.0 35.5,40.2 22.8,40.2 22.8,87.3 6.0,87.3 6.0,46.5 3.8,46.5"],
+  "AP.06": ["22.8,40.2 49.2,40.2 49.2,87.3 22.8,87.3"],
+  "AP.07": ["49.2,40.2 76.0,40.2 76.0,87.3 49.2,87.3"],
+  "AP.08": ["63.8,19.0 77.2,19.0 77.2,40.2 94.5,40.2 94.5,87.3 76.0,87.3 76.0,40.2 63.8,40.2"],
+  "AP.09": ["3.8,19.2 22.3,19.2 22.3,8.0 35.5,8.0 35.5,40.2 22.8,40.2 22.8,87.3 6.0,87.3 6.0,46.5 3.8,46.5"],
+  "AP.10": ["22.8,40.2 49.2,40.2 49.2,87.3 22.8,87.3"],
+  "AP.11": ["49.2,40.2 76.0,40.2 76.0,87.3 49.2,87.3"],
+  "AP.12": ["63.8,19.0 77.2,19.0 77.2,40.2 94.5,40.2 94.5,87.3 76.0,87.3 76.0,40.2 63.8,40.2"],
+  "AP.13": ["4.8,17.2 47.8,17.2 47.8,85.5 4.8,85.5 4.8,41.8 10.0,41.8 10.0,24.0 4.8,24.0"],
+  "AP.14": ["52.2,17.2 95.2,17.2 95.2,85.5 52.2,85.5 52.2,41.8 90.0,41.8 90.0,24.0 52.2,24.0"],
+} as const;
+
 export const buildingAFloorPlanMediaIds = {
   1: "media-floorplan-a-1",
   2: "media-floorplan-a-2",
   3: "media-floorplan-a-3",
   4: "media-floorplan-a-4",
-} as const;
-
-const buildingAFloorPlanAspectRatios = {
-  1: "1 / 1",
-  2: "1000 / 634",
-  3: "1000 / 634",
-  4: "1 / 1",
 } as const;
 
 type BuildingAFloorNumber = keyof typeof buildingAFloorPlanImages;
@@ -31,8 +58,7 @@ export const buildingAFloorOverrides: Record<string, Partial<Floor>> = Object.fr
     {
       floorplanImage: image,
       floorplanImageId: buildingAFloorPlanMediaIds[Number(floor) as keyof typeof buildingAFloorPlanMediaIds],
-      mapAspectRatio:
-        buildingAFloorPlanAspectRatios[Number(floor) as keyof typeof buildingAFloorPlanAspectRatios],
+      mapAspectRatio: "1 / 1",
     },
   ]),
 );
@@ -64,6 +90,7 @@ export type BuildingAParsedUnit = Pick<
   | "features"
   | "planArea"
   | "planRegions"
+  | "planPolygonPoints"
   | "seoTitle"
   | "seoDescription"
 >;
@@ -79,9 +106,10 @@ function createParsedUnit({
   return {
     ...unit,
     floor,
-    floorplan: buildingAFloorPlanImages[floor],
+    floorplan: buildingAUnitFloorplanImages[unit.code as keyof typeof buildingAUnitFloorplanImages] ?? buildingAFloorPlanImages[floor],
     floorplanImageId: buildingAFloorPlanMediaIds[floor],
     planArea,
+    planPolygonPoints: buildingAUnitPolygonPoints[unit.code as keyof typeof buildingAUnitPolygonPoints],
   };
 }
 
@@ -221,13 +249,11 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a balcony.",
     description: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Balcony"],
-    planArea: { x: 66.1, y: 18.45, width: 31.6, height: 71.29 },
+    planArea: { x: 74.43, y: 28.89, width: 25.45, height: 46.8 },
     planRegions: [
-      { x: 78.7, y: 56.47, width: 9.9, height: 23.82 },
-      { x: 92.1, y: 74.45, width: 5.6, height: 15.3 },
-      { x: 82.4, y: 27.13, width: 8.8, height: 12.15 },
-      { x: 66.1, y: 18.45, width: 9.0, height: 11.51 },
-      { x: 86.6, y: 42.59, width: 7.3, height: 7.1 },
+      { x: 74.43, y: 28.89, width: 25.45, height: 16.9 },
+      { x: 74.43, y: 42.1, width: 16.8, height: 24.8 },
+      { x: 82.55, y: 46.2, width: 17.33, height: 20.5 },
     ],
     seoTitle: "Building A AP.05 | Three-room apartment",
     seoDescription: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
@@ -254,14 +280,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Two-room apartment with one bedroom and a balcony.",
     description: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
-    planArea: { x: 51.7, y: 44.16, width: 24.3, height: 43.85 },
-    planRegions: [
-      { x: 51.7, y: 47.32, width: 10.0, height: 32.97 },
-      { x: 66.7, y: 54.73, width: 8.4, height: 20.82 },
-      { x: 65.8, y: 82.65, width: 10.0, height: 5.36 },
-      { x: 70.0, y: 64.98, width: 4.6, height: 7.89 },
-      { x: 71.5, y: 44.16, width: 4.5, height: 6.47 },
-    ],
+    planArea: { x: 60.31, y: 27.06, width: 24.85, height: 29.54 },
     seoTitle: "Building A AP.06 | Two-room apartment",
     seoDescription: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
@@ -287,14 +306,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Two-room apartment with one bedroom and a balcony.",
     description: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
-    planArea: { x: 23.6, y: 42.27, width: 24.6, height: 43.85 },
-    planRegions: [
-      { x: 38.1, y: 45.43, width: 10.1, height: 34.86 },
-      { x: 24.8, y: 53.15, width: 7.8, height: 20.5 },
-      { x: 25.2, y: 63.41, width: 4.7, height: 7.89 },
-      { x: 23.6, y: 42.27, width: 4.5, height: 10.09 },
-      { x: 27.4, y: 82.65, width: 6.1, height: 3.47 },
-    ],
+    planArea: { x: 34.14, y: 25.88, width: 24.85, height: 29.67 },
     seoTitle: "Building A AP.07 | Two-room apartment",
     seoDescription: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
@@ -320,13 +332,11 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a balcony.",
     description: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Balcony"],
-    planArea: { x: 2.0, y: 15.46, width: 31.6, height: 73.34 },
+    planArea: { x: 14.11, y: 27.71, width: 30.76, height: 46.8 },
     planRegions: [
-      { x: 11.2, y: 53.47, width: 9.7, height: 26.81 },
-      { x: 7.1, y: 25.55, width: 10.2, height: 12.3 },
-      { x: 2.0, y: 72.24, width: 5.7, height: 16.56 },
-      { x: 24.8, y: 15.46, width: 8.8, height: 12.78 },
-      { x: 25.2, y: 17.67, width: 4.7, height: 8.04 },
+      { x: 14.11, y: 27.71, width: 30.76, height: 17.1 },
+      { x: 14.11, y: 46.0, width: 17.4, height: 21.0 },
+      { x: 28.7, y: 41.9, width: 16.17, height: 24.9 },
     ],
     seoTitle: "Building A AP.08 | Three-room apartment",
     seoDescription: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
@@ -353,13 +363,11 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a balcony.",
     description: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Balcony"],
-    planArea: { x: 66.3, y: 17.82, width: 33.7, height: 71.77 },
+    planArea: { x: 74.43, y: 28.89, width: 25.45, height: 46.8 },
     planRegions: [
-      { x: 79.2, y: 55.36, width: 10.2, height: 26.34 },
-      { x: 93.5, y: 57.26, width: 6.5, height: 32.33 },
-      { x: 83.0, y: 26.97, width: 10.7, height: 12.78 },
-      { x: 66.3, y: 17.82, width: 9.2, height: 12.15 },
-      { x: 87.3, y: 42.74, width: 7.5, height: 7.41 },
+      { x: 74.43, y: 28.89, width: 25.45, height: 16.9 },
+      { x: 74.43, y: 42.1, width: 16.8, height: 24.8 },
+      { x: 82.55, y: 46.2, width: 17.33, height: 20.5 },
     ],
     seoTitle: "Building A AP.09 | Three-room apartment",
     seoDescription: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
@@ -386,14 +394,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Two-room apartment with one bedroom and a balcony.",
     description: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
-    planArea: { x: 51.4, y: 44.16, width: 25.2, height: 45.11 },
-    planRegions: [
-      { x: 51.4, y: 47.48, width: 10.4, height: 34.23 },
-      { x: 66.9, y: 55.21, width: 8.6, height: 21.45 },
-      { x: 65.8, y: 83.75, width: 10.4, height: 5.52 },
-      { x: 70.1, y: 65.62, width: 4.9, height: 8.52 },
-      { x: 71.8, y: 44.16, width: 4.8, height: 10.57 },
-    ],
+    planArea: { x: 60.31, y: 27.06, width: 24.85, height: 29.54 },
     seoTitle: "Building A AP.10 | Two-room apartment",
     seoDescription: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
@@ -419,14 +420,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Two-room apartment with one bedroom and a balcony.",
     description: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
-    planArea: { x: 22.7, y: 42.43, width: 25.3, height: 45.27 },
-    planRegions: [
-      { x: 37.5, y: 45.74, width: 10.5, height: 35.96 },
-      { x: 23.8, y: 53.47, width: 8.2, height: 21.45 },
-      { x: 24.3, y: 63.88, width: 5.0, height: 8.52 },
-      { x: 22.7, y: 42.43, width: 4.8, height: 10.57 },
-      { x: 23.1, y: 83.75, width: 10.0, height: 3.94 },
-    ],
+    planArea: { x: 34.14, y: 25.88, width: 24.85, height: 29.67 },
     seoTitle: "Building A AP.11 | Two-room apartment",
     seoDescription: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
@@ -452,13 +446,11 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a balcony.",
     description: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Balcony"],
-    planArea: { x: 0.0, y: 14.98, width: 33.0, height: 72.24 },
+    planArea: { x: 14.11, y: 27.71, width: 30.76, height: 46.8 },
     planRegions: [
-      { x: 10.0, y: 53.63, width: 10.1, height: 28.08 },
-      { x: 0.0, y: 73.19, width: 5.7, height: 14.04 },
-      { x: 5.7, y: 25.39, width: 10.7, height: 12.62 },
-      { x: 23.8, y: 14.98, width: 9.2, height: 13.25 },
-      { x: 24.3, y: 17.19, width: 5.0, height: 8.36 },
+      { x: 14.11, y: 27.71, width: 30.76, height: 17.1 },
+      { x: 14.11, y: 46.0, width: 17.4, height: 21.0 },
+      { x: 28.7, y: 41.9, width: 16.17, height: 24.9 },
     ],
     seoTitle: "Building A AP.12 | Three-room apartment",
     seoDescription: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
@@ -485,13 +477,13 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a panoramic terrace.",
     description: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Panoramic terrace"],
-    planArea: { x: 50.2, y: 36.3, width: 45.2, height: 37.4 },
+    planArea: { x: 61.4, y: 27.06, width: 38.48, height: 39.87 },
     planRegions: [
-      { x: 50.3, y: 37.1, width: 39.3, height: 28.9 },
-      { x: 50.2, y: 66.6, width: 33.2, height: 7.1 },
-      { x: 83.5, y: 52.2, width: 11.7, height: 21.5 },
-      { x: 90.3, y: 36.3, width: 5.1, height: 15.4 },
-      { x: 50.3, y: 63.4, width: 10.1, height: 1.9 },
+      { x: 61.4, y: 19.8, width: 38.48, height: 10.8 },
+      { x: 92.1, y: 27.2, width: 7.78, height: 11.1 },
+      { x: 61.4, y: 30.6, width: 38.48, height: 14.1 },
+      { x: 61.4, y: 44.3, width: 27.2, height: 14.1 },
+      { x: 85.4, y: 37.2, width: 14.48, height: 20.3 },
     ],
     seoTitle: "Building A AP.13 | Three-room apartment",
     seoDescription: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",
@@ -518,14 +510,13 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     highlight: "Three-room apartment with two bedrooms and a panoramic terrace.",
     description: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",
     features: ["Two bedrooms", "One bathroom", "Separate WC", "Panoramic terrace"],
-    planArea: { x: 3.3, y: 28.7, width: 45.0, height: 45.3 },
+    planArea: { x: 14.11, y: 25.88, width: 44.87, height: 40 },
     planRegions: [
-      { x: 12.6, y: 38.8, width: 8.9, height: 24.5 },
-      { x: 38.0, y: 48.1, width: 10.3, height: 13.8 },
-      { x: 24.9, y: 65.7, width: 23.1, height: 4.9 },
-      { x: 18.3, y: 28.7, width: 17.2, height: 6.5 },
-      { x: 3.3, y: 64.4, width: 6.2, height: 9.6 },
-      { x: 25.5, y: 55.4, width: 11.2, height: 6.9 },
+      { x: 14.11, y: 19.8, width: 46.19, height: 10.8 },
+      { x: 6.0, y: 27.2, width: 8.11, height: 11.2 },
+      { x: 14.11, y: 30.8, width: 31.6, height: 27.8 },
+      { x: 44.2, y: 30.8, width: 16.1, height: 13.7 },
+      { x: 33.4, y: 41.5, width: 17.8, height: 10.1 },
     ],
     seoTitle: "Building A AP.14 | Three-room apartment",
     seoDescription: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",

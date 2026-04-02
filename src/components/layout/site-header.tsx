@@ -15,6 +15,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   const messages = getMessages(locale);
   const isHome = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const links = [
     { href: "/", label: messages.header.nav.home },
     { href: "/project", label: messages.header.nav.project },
@@ -25,8 +26,23 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   ];
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+      const isNearTop = currentScrollY < 32;
+      const scrollingDown = currentScrollY > lastScrollY;
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+
+      setIsScrolled(currentScrollY > 50);
+
+      if (isNearTop) {
+        setIsHidden(false);
+      } else if (scrollDelta > 0) {
+        setIsHidden(scrollingDown);
+      }
+
+      lastScrollY = currentScrollY;
     };
 
     onScroll();
@@ -38,7 +54,12 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   const transparent = isHome && !isScrolled;
 
   return (
-    <header className="sticky top-0 z-50">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-transform duration-300 ease-out",
+        isHidden ? "-translate-y-full" : "translate-y-0",
+      )}
+    >
       <div
         className={cn(
           "w-full border-b transition-all duration-500",
@@ -51,12 +72,12 @@ export function SiteHeader({ brandName }: { brandName: string }) {
           <div className={cn("flex items-center justify-between gap-4 transition-all duration-500", transparent ? "py-5" : "py-4")}>
             <Link href="/" className="flex min-w-0 items-center sm:shrink-0">
               <span className="sr-only">{brandName}</span>
-              <span className="relative block h-[4.35rem] w-[4.35rem] sm:h-[5rem] sm:w-[5rem]">
+              <span className="relative block h-[4.35rem] w-[4.35rem] overflow-visible sm:h-[5rem] sm:w-[5rem]">
                 <Image
                   src="/assets/branding/pautalia-logo.png"
                   alt={brandName}
                   fill
-                  className="object-contain object-center"
+                  className="object-contain object-center scale-[1.95]"
                   sizes="80px"
                   priority
                 />
