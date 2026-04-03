@@ -1,77 +1,74 @@
-import Image from "next/image";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { UnitPlanGallery } from "@/components/units/unit-plan-gallery";
+import { buildUnitPlanGalleryContent } from "@/components/units/unit-plan-gallery-content";
+import type { UnitStatus } from "@/types/domain";
 
 type UnitFloorplanSectionProps = {
-  eyebrow: string;
-  title: string;
-  copy: string;
   features: string[];
   unitCode: string;
   unitFloorplan: string;
-  floorLabel: string;
   floorPlanImage: string;
+  floorNumber: number;
+  rooms: number;
+  bedrooms: number | null;
+  bathrooms: number;
+  areaInternalSqm: number;
+  areaTotalSqm: number;
+  outdoorType: "yard" | "terrace" | "balcony" | null;
+  terraceSqm: number;
+  priceLabel: string;
+  statusLabel: string;
+  status: UnitStatus;
   locale: "bg" | "en";
 };
 
 export function UnitFloorplanSection({
-  eyebrow,
-  title,
-  copy,
   features,
   unitCode,
   unitFloorplan,
-  floorLabel,
   floorPlanImage,
+  floorNumber,
+  rooms,
+  bedrooms,
+  bathrooms,
+  areaInternalSqm,
+  areaTotalSqm,
+  outdoorType,
+  terraceSqm,
+  priceLabel,
+  statusLabel,
+  status,
   locale,
 }: UnitFloorplanSectionProps) {
-  const unitPlanLabel = locale === "bg" ? `План на апартамент ${unitCode}` : `Apartment ${unitCode} plan`;
-  const floorPlanLabel = locale === "bg" ? `${floorLabel} план` : `${floorLabel} plan`;
+  const areaUnitLabel = locale === "bg" ? "кв.м" : "sq m";
+  const { galleryItems, detailRows } = buildUnitPlanGalleryContent({
+    locale,
+    unitCode,
+    unitFloorplan,
+    floorPlanImage,
+    floorNumber,
+    rooms,
+    bedrooms,
+    bathrooms,
+    areaInternalSqm,
+    areaTotalSqm,
+    outdoorType,
+    terraceSqm,
+    areaUnitLabel,
+    priceLabel,
+  });
 
   return (
     <section className="section-space">
-      <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[0.88fr_1.12fr] lg:px-8">
-        <div>
-          <SectionHeading eyebrow={eyebrow} title={title} copy={copy} />
-          <div className="page-line-list mt-10">
-            {features.map((feature) => (
-              <div key={feature} className="page-line-item text-lg text-[color:var(--ink)]">
-                {feature}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-6">
-          <div className="rounded-[1.8rem] bg-[color:var(--surface-dark)] p-4 sm:p-6">
-            <p className="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
-              {unitPlanLabel}
-            </p>
-            <div className="page-image-block min-h-[20rem] bg-[color:var(--surface-dark)]">
-              <Image
-                src={unitFloorplan}
-                alt={`Floorplan for unit ${unitCode}`}
-                fill
-                className="object-contain p-4 sm:p-6"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
-            </div>
-          </div>
-
-          <div className="rounded-[1.8rem] bg-[color:var(--surface-dark)] p-4 sm:p-6">
-            <p className="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
-              {floorPlanLabel}
-            </p>
-            <div className="page-image-block min-h-[20rem] bg-[color:var(--surface-dark)]">
-              <Image
-                src={floorPlanImage}
-                alt={`Floorplan for ${floorLabel}`}
-                fill
-                className="object-contain p-4 sm:p-6"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
-            </div>
-          </div>
-        </div>
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <UnitPlanGallery
+          items={galleryItems}
+          detailRows={detailRows}
+          unitCode={unitCode}
+          features={features}
+          locale={locale}
+          statusLabel={statusLabel}
+          status={status}
+        />
       </div>
     </section>
   );

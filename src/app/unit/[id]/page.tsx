@@ -1,14 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
 import Script from "next/script";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Compass, Layers3, Maximize2 } from "lucide-react";
+import { Compass, Layers3, Maximize2 } from "lucide-react";
 import { LeadForm } from "@/components/forms/lead-form";
 import { UnitCard } from "@/components/apartments/unit-card";
-import { StatusPill } from "@/components/ui/status-pill";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { UnitFloorplanSection } from "@/components/units/unit-floorplan-section";
-import { getBuildingLabel, getFloorLabel, getMessages } from "@/lib/i18n/messages";
+import { UnitPageHero } from "@/components/units/unit-page-hero";
+import { UnitPageSectionHeading } from "@/components/units/unit-page-section-heading";
+import { getBuildingLabel, getFloorLabel, getMessages, getStatusLabel } from "@/lib/i18n/messages";
 import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaBuilding, fetchPautaliaUnit } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
 import { getUnitJsonLd } from "@/lib/json-ld";
@@ -62,6 +61,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
   }))
     .filter((candidate) => candidate.id !== unit.id)
     .slice(0, 2);
+  const unitPriceLabel = unit.isPriceVisible && unit.price !== null ? formatCurrency(unit.price) : messages.common.priceOnRequest;
 
   return (
     <>
@@ -71,33 +71,16 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getUnitJsonLd(unit)) }}
       />
 
-      <section className="page-cover">
-        <div className="page-cover-media">
-          <Image src={unit.gallery[0]} alt={`Unit ${unit.code}`} fill className="object-cover" sizes="100vw" />
-        </div>
-        <div className="page-cover-inner">
-          <div className="page-cover-copy">
-            <Link href={`/building/${unit.building?.slug ?? unit.buildingId}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
-              <ArrowLeft className="size-4" />
-              {messages.unit.backToBuilding} {unit.buildingId.toUpperCase()}
-            </Link>
-            <div className="mt-8 flex items-center gap-4">
-              <StatusPill status={unit.status} />
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/62">
-                {getBuildingLabel(locale, unit.buildingId)}
-              </span>
-            </div>
-            <h1 className="mt-8 font-serif text-[3.4rem] leading-[0.9] text-white sm:text-[4.8rem] lg:text-[6rem]">Unit {unit.code}</h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-white/74">{unit.highlight}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-3 border-t border-white/12 pt-5">
-            <Link href={`/building/${unit.building?.slug ?? unit.buildingId}/floor/${unit.floor}`} className="rounded-full border border-white/12 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/82">
-              {messages.unit.viewFloorOverlay}
-            </Link>
-          </div>
-        </div>
-      </section>
+      <UnitPageHero
+        buildingId={unit.buildingId}
+        buildingSlug={unit.building?.slug ?? unit.buildingId}
+        buildingLabel={getBuildingLabel(locale, unit.buildingId)}
+        backToBuildingLabel={messages.unit.backToBuilding}
+        highlight={unit.highlight}
+        image={unit.gallery[0]}
+        status={unit.status}
+        unitCode={unit.code}
+      />
 
       <section className="page-stat-band page-stat-band-dark">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
@@ -126,14 +109,21 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
 
       {currentFloor ? (
         <UnitFloorplanSection
-          eyebrow={messages.unit.floorplanEyebrow}
-          title={messages.unit.floorplanTitle}
-          copy={messages.unit.floorplanCopy}
           features={unit.features}
           unitCode={unit.code}
           unitFloorplan={unit.floorplan}
-          floorLabel={currentFloor.label}
           floorPlanImage={currentFloor.floorplanImage}
+          floorNumber={unit.floor}
+          rooms={unit.rooms}
+          bedrooms={unit.bedrooms}
+          bathrooms={unit.bathrooms}
+          areaInternalSqm={unit.areaInternalSqm}
+          areaTotalSqm={unit.areaTotalSqm}
+          outdoorType={unit.outdoorType}
+          terraceSqm={unit.terraceSqm}
+          priceLabel={unitPriceLabel}
+          statusLabel={getStatusLabel(locale, unit.status)}
+          status={unit.status}
           locale={locale}
         />
       ) : null}
@@ -141,7 +131,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
       <section className="section-space bg-white/34">
         <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
           <div>
-            <SectionHeading eyebrow={messages.unit.galleryEyebrow} title={messages.unit.galleryTitle} />
+            <UnitPageSectionHeading eyebrow={messages.unit.galleryEyebrow} title={messages.unit.galleryTitle} />
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
               {unit.gallery.map((image, index) => (
                 <div key={image} className={`page-image-block ${index === 0 ? "sm:col-span-2 min-h-[22rem]" : "min-h-[18rem]"}`}>
@@ -158,10 +148,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
       <section className="section-space">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-4 border-t border-[color:var(--line)] pt-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">{messages.unit.relatedEyebrow}</p>
-              <h2 className="mt-3 font-serif text-4xl text-[color:var(--ink)]">{messages.unit.relatedTitle}</h2>
-            </div>
+            <UnitPageSectionHeading eyebrow={messages.unit.relatedEyebrow} title={messages.unit.relatedTitle} />
             <div className="flex flex-wrap gap-x-6 gap-y-3 text-[0.74rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--muted)]">
               <span className="inline-flex items-center gap-2">
                 <Layers3 className="size-4 text-[color:var(--ink)]" />

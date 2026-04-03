@@ -1,7 +1,5 @@
-import Link from "next/link";
 import Script from "next/script";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 import { BuildingInventorySelector } from "@/components/buildings/building-inventory-selector";
 import { LeadForm } from "@/components/forms/lead-form";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -131,28 +129,6 @@ export default async function BuildingPage({
               <div key={amenity} className="page-line-item text-lg text-[color:var(--ink)]">
                 {amenity}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="floors" className="section-space">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <SectionHeading eyebrow={messages.building.floors} title={messages.building.floorsTitle} copy={messages.building.floorsCopy} align="center" />
-
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {buildingFloors.map((floor) => (
-              <Link key={floor.id} href={`/building/${building.slug}/floor/${floor.number}`} className="page-simple-card block">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">
-                  {locale === "bg" ? `Етаж ${floor.number}` : `Floor ${floor.number}`}
-                </p>
-                <h3 className="mt-4 font-serif text-4xl leading-[0.98] text-[color:var(--ink)]">{floor.label}</h3>
-                <p className="mt-4 text-[color:var(--muted)]">{floor.description}</p>
-                <span className="mt-6 inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--ink)]">
-                  {messages.common.openFloor}
-                  <ChevronRight className="size-4" />
-                </span>
-              </Link>
             ))}
           </div>
         </div>
