@@ -28,7 +28,17 @@ describe("Bulgarian localization", () => {
     expect(unit.features).toEqual(["Две спални", "Една баня", "Отделна тоалетна", "Балкон"]);
   });
 
-  it("defaults requests to Bulgarian regardless of headers and cookies", () => {
+  it("defaults requests to Bulgarian regardless of Accept-Language", () => {
+    const request = new Request("https://pautalia.bg/api/pautalia/units", {
+      headers: {
+        "accept-language": "en-US,en;q=0.9",
+      },
+    });
+
+    expect(getRequestLocale(request)).toBe("bg");
+  });
+
+  it("honors an explicit locale cookie after the user switches language", () => {
     const request = new Request("https://pautalia.bg/api/pautalia/units", {
       headers: {
         "accept-language": "en-US,en;q=0.9",
@@ -36,7 +46,7 @@ describe("Bulgarian localization", () => {
       },
     });
 
-    expect(getRequestLocale(request)).toBe("bg");
+    expect(getRequestLocale(request)).toBe("en");
   });
 
   it("still allows an explicit locale query override for request handlers", () => {

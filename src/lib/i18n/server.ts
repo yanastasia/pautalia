@@ -1,7 +1,10 @@
-import { defaultLocale, normalizeLocale, type Locale } from "@/lib/i18n/config";
+import { cookies } from "next/headers";
+import { defaultLocale, localeCookieName, normalizeLocale, type Locale } from "@/lib/i18n/config";
 
 export async function getLocale(): Promise<Locale> {
-  return defaultLocale;
+  const cookieStore = await cookies();
+
+  return normalizeLocale(cookieStore.get(localeCookieName)?.value) ?? defaultLocale;
 }
 
 export function getRequestLocale(request: Request): Locale {
@@ -11,5 +14,6 @@ export function getRequestLocale(request: Request): Locale {
     return queryLocale;
   }
 
-  return defaultLocale;
+  const cookieLocale = normalizeLocale(request.headers.get("cookie")?.match(/pautalia_locale=([^;]+)/)?.[1] ?? null);
+  return cookieLocale ?? defaultLocale;
 }
