@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { StatusPill } from "@/components/ui/status-pill";
+import type { Locale } from "@/lib/i18n/config";
 import type { UnitStatus } from "@/types/domain";
 
 type UnitPageHeroProps = {
@@ -11,6 +12,7 @@ type UnitPageHeroProps = {
   backToBuildingLabel: string;
   highlight: string;
   image: string;
+  locale: Locale;
   status: UnitStatus;
   unitCode: string;
 };
@@ -22,13 +24,14 @@ export function UnitPageHero({
   backToBuildingLabel,
   highlight,
   image,
+  locale,
   status,
   unitCode,
 }: UnitPageHeroProps) {
   return (
     <section className="page-cover">
       <div className="page-cover-media">
-        <Image src={image} alt={`Unit ${unitCode}`} fill className="object-cover" sizes="100vw" />
+        <Image src={image} alt={locale === "bg" ? `Апартамент ${unitCode}` : `Unit ${unitCode}`} fill className="object-cover" sizes="100vw" />
       </div>
       <div className="page-cover-inner">
         <div className="page-cover-copy">
@@ -40,7 +43,9 @@ export function UnitPageHero({
             <StatusPill status={status} />
             <span className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-white/62">{buildingLabel}</span>
           </div>
-          <h1 className="mt-7 font-serif text-[2rem] leading-[0.98] text-white sm:text-[2.6rem] lg:text-[3.35rem] xl:text-[3.7rem]">Unit {unitCode}</h1>
+          <h1 className="mt-7 font-serif text-[2rem] leading-[0.98] text-white sm:text-[2.6rem] lg:text-[3.35rem] xl:text-[3.7rem]">
+            {locale === "bg" ? `Апартамент ${unitCode}` : `Unit ${unitCode}`}
+          </h1>
           <p className="mt-4 max-w-2xl text-[0.98rem] leading-7 text-white/74">{highlight}</p>
         </div>
       </div>

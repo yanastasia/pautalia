@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { fetchAllPautaliaUnits } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
 
 function normalizeUnitSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const normalized: Record<string, string> = {};
@@ -40,13 +41,17 @@ function normalizeUnitSearchParams(searchParams: Record<string, string | string[
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
-  return {
-    title: locale === "bg" ? "Търсачка на апартаменти" : "Apartment finder",
+  return buildPageMetadata({
+    locale,
+    pathname: "/apartments",
+    title: locale === "bg" ? "Свободни апартаменти в Кюстендил" : "Available apartments in Kyustendil",
     description:
       locale === "bg"
         ? "Филтрирай апартаменти по стаи, етаж, цена, изложение и наличност."
         : "Filter units by rooms, floor, price, orientation, and availability.",
-  };
+    imagePath: "/assets/gallery/living-entry.jpg",
+    imageAlt: locale === "bg" ? "Интериор на апартамент в Pautalia" : "Pautalia apartment interior",
+  });
 }
 
 export default async function ApartmentsPage({

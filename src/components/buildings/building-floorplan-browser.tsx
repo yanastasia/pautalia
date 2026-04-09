@@ -312,7 +312,7 @@ export function BuildingFloorplanBrowser({
             >
               <Image
                 src={selectedFloor.floorplanImage}
-                alt={`${selectedFloor.label} floor plan`}
+                alt={locale === "bg" ? `План на ${selectedFloor.label}` : `${selectedFloor.label} floor plan`}
                 fill
                 className={cn("object-contain", floorplanFrame.imageClassName)}
                 sizes="(max-width: 1024px) 100vw, 960px"

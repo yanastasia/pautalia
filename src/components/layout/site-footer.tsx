@@ -18,12 +18,12 @@ export function SiteFooter({
   const messages = getMessages(locale);
 
   return (
-    <footer className="mt-20 bg-[color:var(--surface-dark)] text-white">
+    <footer className="mt-16 bg-[color:var(--surface-dark)] text-white sm:mt-20">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 py-16 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-10 py-12 sm:py-14 md:grid-cols-2 md:gap-12 xl:grid-cols-4">
           <div className="max-w-sm space-y-5">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-white/42">{messages.footer.badge}</p>
-            <h2 className="font-serif text-4xl leading-tight text-white sm:text-[2.8rem]">{messages.footer.title}</h2>
+            <h2 className="font-serif text-[2rem] leading-tight text-white sm:text-[2.8rem]">{messages.footer.title}</h2>
             <p className="text-base leading-7 text-white/64">{messages.footer.copy}</p>
           </div>
 
@@ -81,7 +81,7 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/8 py-5 text-sm text-white/44 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/8 py-5 text-sm text-white/44 md:flex-row md:items-center md:justify-between">
           <p>{messages.footer.bottomLine}</p>
           <p>{new Date().getFullYear()}</p>
         </div>

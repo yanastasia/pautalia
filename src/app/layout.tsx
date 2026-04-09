@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { getLocale } from "@/lib/i18n/server";
 import { getProjectJsonLd } from "@/lib/json-ld";
+import { buildRootMetadata } from "@/lib/metadata";
 import "./globals.css";
 
 const serif = Prata({
@@ -22,8 +23,6 @@ const sans = Onest({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const ogImage = new URL("/assets/exterior/exterior-front.jpg", siteUrl).toString();
-
 export const viewport: Viewport = {
   colorScheme: "light",
   themeColor: [
@@ -34,64 +33,7 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-  const siteCopy = getSiteCopy(locale);
-
-  return {
-    metadataBase: new URL(siteUrl),
-    applicationName: siteCopy.name,
-    title: {
-      default: siteCopy.name,
-      template: `%s | ${siteCopy.name}`,
-    },
-    description: siteCopy.tagline,
-    keywords:
-      locale === "bg"
-        ? ["апартаменти Кюстендил", "ново строителство Кюстендил", "жилища в Кюстендил", "апартаменти за продажба", "сграда ново строителство"]
-        : ["apartments in Kyustendil", "new homes in Kyustendil", "apartments for sale", "homes in Bulgaria", "new building homes"],
-    formatDetection: {
-      email: false,
-      address: false,
-      telephone: false,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1,
-      },
-    },
-    icons: {
-      icon: "/icon.svg",
-      shortcut: "/icon.svg",
-      apple: "/icon.svg",
-    },
-    openGraph: {
-      title: siteCopy.name,
-      description: siteCopy.heroText,
-      url: siteUrl,
-      siteName: siteCopy.name,
-      type: "website",
-      locale: locale === "bg" ? "bg_BG" : "en_US",
-      images: [
-        {
-          url: ogImage,
-          width: 1600,
-          height: 900,
-          alt: locale === "bg" ? "Екстериор на сградата" : "Building exterior",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: siteCopy.name,
-      description: siteCopy.heroText,
-      images: [ogImage],
-    },
-  };
+  return buildRootMetadata({ locale });
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

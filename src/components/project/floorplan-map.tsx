@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useLocale } from "@/components/providers/locale-provider";
 import { formatCurrency } from "@/lib/utils";
 import { getMessages } from "@/lib/i18n/messages";
+import { getOrientationLabel } from "@/lib/i18n/property";
 import { StatusPill } from "@/components/ui/status-pill";
 import type { PublicUnit } from "@/types/public-api";
 
@@ -33,7 +34,13 @@ export function FloorplanMap({
         </div>
 
         <div className="relative overflow-hidden rounded-[1.45rem] border border-white/8 bg-[#0b0c0e]" style={{ aspectRatio }}>
-          <Image src={image} alt="Floor plan" fill className="object-contain" sizes="(max-width: 1024px) 100vw, 66vw" />
+          <Image
+            src={image}
+            alt={locale === "bg" ? "План на етажа" : "Floor plan"}
+            fill
+            className="object-contain"
+            sizes="(max-width: 1024px) 100vw, 66vw"
+          />
           <div className="absolute inset-0">
             {units.map((unit) => {
               const regions = unit.planRegions?.length ? unit.planRegions : [unit.planArea];
@@ -42,7 +49,7 @@ export function FloorplanMap({
                 <button
                   key={`${unit.id}-${index}`}
                   type="button"
-                  aria-label={index === 0 ? `Open unit ${unit.code}` : undefined}
+                  aria-label={index === 0 ? (locale === "bg" ? `Отвори апартамент ${unit.code}` : `Open unit ${unit.code}`) : undefined}
                   aria-hidden={index > 0 ? true : undefined}
                   tabIndex={index === 0 ? 0 : -1}
                   onMouseEnter={() => setActiveUnitId(unit.id)}
@@ -88,7 +95,7 @@ export function FloorplanMap({
             </div>
             <div className="inset-panel rounded-[1.15rem] p-4">
               <p className="text-xs uppercase tracking-[0.18em]">{messages.common.orientation}</p>
-              <p className="mt-2 text-xl font-semibold capitalize text-[color:var(--ink)]">{activeUnit.orientation}</p>
+              <p className="mt-2 text-xl font-semibold text-[color:var(--ink)]">{getOrientationLabel(locale, activeUnit.orientation)}</p>
             </div>
             <div className="inset-panel rounded-[1.15rem] p-4">
               <p className="text-xs uppercase tracking-[0.18em]">{messages.common.price}</p>

@@ -265,6 +265,12 @@ const messages = {
         "No active internal interface is shipped here today.",
       ],
     },
+    error: {
+      eyebrow: "Data unavailable",
+      title: "We could not load the latest data.",
+      copy: "Try again. If the issue continues, the public API may be temporarily unavailable.",
+      retry: "Retry",
+    },
     status: {
       available: "available",
       reserved: "reserved",
@@ -527,13 +533,19 @@ const messages = {
       copy: "Оперативни инструменти могат да бъдат добавени тук по-късно при нужда.",
       payloadEyebrow: "Бъдещи операции",
       collectionsDefined: "Запазена зона",
-      collectionsCopy: "Текущият production обхват е фокусиран върху публичния сайт и стандартизирания public API.",
+      collectionsCopy: "Текущият обхват за продукционна среда е фокусиран върху публичния сайт и стандартизирания публичен API.",
       features: [
         "В текущата версия се доставя само публичният сайт.",
         "Наличности, запитвания и събития се обработват през API.",
         "Оперативни инструменти могат да бъдат добавени по-късно при нужда.",
         "В момента тук не се доставя активен вътрешен интерфейс.",
       ],
+    },
+    error: {
+      eyebrow: "Данните не са налични",
+      title: "Не успяхме да заредим най-актуалните данни.",
+      copy: "Опитайте отново. Ако проблемът продължи, публичният API може временно да е недостъпен.",
+      retry: "Опитай отново",
     },
     status: {
       available: "свободен",

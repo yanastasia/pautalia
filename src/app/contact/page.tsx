@@ -6,17 +6,22 @@ import { LeadForm } from "@/components/forms/lead-form";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
-  return {
-    title: locale === "bg" ? "Контакт" : "Contact",
+  return buildPageMetadata({
+    locale,
+    pathname: "/contact",
+    title: locale === "bg" ? "Контакт с търговския екип" : "Contact the sales team",
     description:
       locale === "bg"
         ? "Свържете се с нас за наличности, цени и оглед."
         : "Contact us about availability, pricing, and viewings.",
-  };
+    imagePath: "/assets/gallery/living-entry.jpg",
+    imageAlt: locale === "bg" ? "Свържете се с екипа на Pautalia" : "Contact the Pautalia sales team",
+  });
 }
 
 export default async function ContactPage() {

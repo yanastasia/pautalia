@@ -11,6 +11,8 @@ export type BuildingPresentation = {
   amenities: Record<Locale, string[]>;
   coordinates: [number, number, number];
   tagline: Record<Locale, string>;
+  shortDescription: Record<Locale, string>;
+  description: Record<Locale, string>;
 };
 
 export const buildingPresentation: Record<string, BuildingPresentation> = {
@@ -43,6 +45,14 @@ export const buildingPresentation: Record<string, BuildingPresentation> = {
     tagline: {
       en: "Larger homes with open views and private outdoor space on the ground floor.",
       bg: "По-просторни жилища с открити гледки и частни дворове на първия етаж.",
+    },
+    shortDescription: {
+      en: "Spacious homes with broad outlooks, practical layouts, and private yards on floor one.",
+      bg: "Просторни жилища с широки гледки, практични разпределения и частни дворове на първия етаж.",
+    },
+    description: {
+      en: "Building A offers larger homes, private outdoor space on the ground floor, and broad views from the upper levels.",
+      bg: "Сграда A предлага по-просторни жилища, частни външни пространства на първия етаж и широки гледки от горните нива.",
     },
   },
 };

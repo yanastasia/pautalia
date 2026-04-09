@@ -7,6 +7,7 @@ import { getMessages } from "@/lib/i18n/messages";
 import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaBuilding } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
 import { getBuildingJsonLd } from "@/lib/json-ld";
+import { buildPageMetadata } from "@/lib/metadata";
 
 function normalizeUnitSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const normalized: Record<string, string> = {};
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     buildingResponse = await fetchPautaliaBuilding(locale, id);
   } catch (error) {
     if (error instanceof PublicApiError && error.status === 404) {
-      return { title: "Building not found" };
+      return { title: locale === "bg" ? "Сградата не е намерена" : "Building not found" };
     }
 
     throw error;
@@ -56,13 +57,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const building = buildingResponse.item;
 
   if (!building) {
-    return { title: "Building not found" };
+    return { title: locale === "bg" ? "Сградата не е намерена" : "Building not found" };
   }
 
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: `/building/${building.slug}`,
     title: building.name,
-    description: building.description,
-  };
+    description: building.fullDescription,
+    imagePath: building.heroImage,
+    imageAlt: locale === "bg" ? `Изглед към ${building.name}` : `${building.name} exterior view`,
+  });
 }
 
 export default async function BuildingPage({

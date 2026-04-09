@@ -7,6 +7,7 @@ import { Link2, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { useLocale } from "@/components/providers/locale-provider";
 import { UnitCard } from "@/components/apartments/unit-card";
 import { getFloorLabel, getMessages } from "@/lib/i18n/messages";
+import { getOrientationLabel } from "@/lib/i18n/property";
 import type { PublicUnit } from "@/types/public-api";
 
 type FinderProps = {
@@ -182,7 +183,7 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
               <option value="">{messages.apartments.any}</option>
               {orientationOptions.map((orientation) => (
                 <option key={orientation} value={orientation}>
-                  {orientation}
+                  {getOrientationLabel(locale, orientation)}
                 </option>
               ))}
             </select>

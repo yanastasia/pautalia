@@ -11,6 +11,7 @@ import {
 } from "@/data/site";
 import type { Locale } from "@/lib/i18n/config";
 import { getBuildingLabel, getFloorLabel, getResidenceLabel } from "@/lib/i18n/messages";
+import { getFeatureLabel, getOutdoorTypeLabel } from "@/lib/i18n/property";
 import { notFoundError, validationError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
 import type { Building as StaticBuilding, Floor as StaticFloor, Unit as StaticUnit, UnitPlanArea } from "@/types/domain";
@@ -102,6 +103,8 @@ function getBuildingPresentation(slug: string) {
       amenities: { en: [], bg: [] },
       coordinates: [0, 0, 0] as [number, number, number],
       tagline: { en: "", bg: "" },
+      shortDescription: { en: "", bg: "" },
+      description: { en: "", bg: "" },
     }
   );
 }
@@ -136,7 +139,7 @@ function parsePlanRegions(value: Prisma.JsonValue | null): UnitPlanArea[] | null
 
 function buildUnitFeatures(locale: Locale, unit: UnitFeatureRecord) {
   if (unit.features.length > 0) {
-    return unit.features;
+    return unit.features.map((feature) => getFeatureLabel(locale, feature));
   }
 
   const features = [
@@ -164,6 +167,53 @@ function buildUnitFeatures(locale: Locale, unit: UnitFeatureRecord) {
   return features as string[];
 }
 
+function buildUnitDescription(
+  locale: Locale,
+  unit: Pick<StaticUnit, "rooms" | "floor" | "outdoorType" | "description"> | Pick<UnitRecord, "rooms" | "outdoorType" | "description"> & { floor: { number: number } | number },
+) {
+  if (locale === "en" && unit.description) {
+    return unit.description;
+  }
+
+  const floorNumber = typeof unit.floor === "number" ? unit.floor : unit.floor.number;
+  const outdoorCopy = getOutdoorTypeLabel(locale, unit.outdoorType);
+  const fragments = [
+    getResidenceLabel(locale, unit.rooms),
+    locale === "bg" ? `на ${getFloorLabel(locale, floorNumber).toLowerCase()}` : `on ${getFloorLabel(locale, floorNumber).toLowerCase()}`,
+    outdoorCopy ? locale === "bg" ? `с ${outdoorCopy.toLowerCase()}` : `with ${outdoorCopy.toLowerCase()}` : null,
+  ].filter(Boolean);
+
+  return `${fragments.join(" ")}.`;
+}
+
+function buildUnitHighlight(
+  locale: Locale,
+  unit: Pick<StaticUnit, "rooms" | "bedrooms" | "bathrooms" | "outdoorType" | "highlight"> | Pick<UnitRecord, "rooms" | "bedrooms" | "bathrooms" | "outdoorType" | "highlight">,
+) {
+  if (locale === "en" && unit.highlight) {
+    return unit.highlight;
+  }
+
+  const parts = [
+    getResidenceLabel(locale, unit.rooms),
+    unit.bedrooms
+      ? locale === "bg"
+        ? `с ${unit.bedrooms} ${unit.bedrooms === 1 ? "спалня" : "спални"}`
+        : `with ${unit.bedrooms} ${unit.bedrooms === 1 ? "bedroom" : "bedrooms"}`
+      : null,
+    locale === "bg"
+      ? `и ${unit.bathrooms} ${unit.bathrooms === 1 ? "баня" : "бани"}`
+      : `and ${unit.bathrooms} ${unit.bathrooms === 1 ? "bathroom" : "bathrooms"}`,
+  ].filter(Boolean);
+  const outdoorCopy = getOutdoorTypeLabel(locale, unit.outdoorType);
+
+  if (outdoorCopy) {
+    parts.push(locale === "bg" ? `и ${outdoorCopy.toLowerCase()}` : `and ${outdoorCopy.toLowerCase()}`);
+  }
+
+  return `${parts.join(" ")}.`;
+}
+
 function mapStaticPublicBuilding(locale: Locale, building: StaticBuilding): PublicBuilding {
   const presentation = getBuildingPresentation(building.slug);
   const publicUnits = getStaticPublicUnits().filter((unit) => unit.buildingId === building.id);
@@ -173,9 +223,9 @@ function mapStaticPublicBuilding(locale: Locale, building: StaticBuilding): Publ
     slug: building.slug,
     name: localizeBuildingName(locale, building),
     tagline: presentation.tagline[locale] || building.tagline,
-    shortDescription: building.shortDescription,
-    description: building.description,
-    fullDescription: building.description,
+    shortDescription: presentation.shortDescription[locale] || building.shortDescription,
+    description: presentation.description[locale] || building.description,
+    fullDescription: presentation.description[locale] || building.description,
     heroImage: presentation.heroImage || building.heroImage,
     status: building.status,
     displayOrder: building.displayOrder,
@@ -210,21 +260,6 @@ function mapStaticPublicUnit(locale: Locale, unit: StaticUnit): PublicUnit {
   const building = staticBuildings.find((candidate) => candidate.id === unit.buildingId) ?? null;
   const floor = staticFloors.find((candidate) => candidate.id === unit.floorId) ?? null;
   const typology = getStaticTypology(unit.typologyId);
-  const outdoorCopy =
-    unit.outdoorType === "yard"
-      ? locale === "bg"
-        ? "Частен двор"
-        : "Private yard"
-      : unit.outdoorType === "terrace"
-        ? locale === "bg"
-          ? "Тераса"
-          : "Terrace"
-        : unit.outdoorType === "balcony"
-          ? locale === "bg"
-            ? "Балкон"
-            : "Balcony"
-          : null;
-
   return {
     id: unit.id,
     slug: unit.slug,
@@ -270,24 +305,8 @@ function mapStaticPublicUnit(locale: Locale, unit: StaticUnit): PublicUnit {
     status: unit.status,
     isPublished: unit.isPublished,
     isPriceVisible: unit.isPriceVisible,
-    description:
-      unit.description ||
-      [
-        getResidenceLabel(locale, unit.rooms),
-        locale === "bg" ? `на ${getFloorLabel(locale, unit.floor).toLowerCase()}` : `on ${getFloorLabel(locale, unit.floor).toLowerCase()}`,
-        outdoorCopy ? locale === "bg" ? `с ${outdoorCopy.toLowerCase()}` : `with ${outdoorCopy.toLowerCase()}` : null,
-      ]
-        .filter(Boolean)
-        .join(" "),
-    highlight:
-      unit.highlight ||
-      [
-        getResidenceLabel(locale, unit.rooms),
-        locale === "bg" ? `${unit.areaTotalSqm} кв.м` : `${unit.areaTotalSqm} sq m`,
-        outdoorCopy,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+    description: buildUnitDescription(locale, unit),
+    highlight: buildUnitHighlight(locale, unit),
     floorplan: unit.floorplan,
     gallery: unit.gallery,
     panoramaImage: unit.panoramaImage ?? unit.gallery[0] ?? unit.floorplan,
@@ -425,9 +444,9 @@ function mapPublicBuilding(locale: Locale, building: BuildingRecord): PublicBuil
     slug: building.slug,
     name: localizeBuildingName(locale, building),
     tagline: presentation.tagline[locale],
-    shortDescription: building.shortDescription,
-    description: building.fullDescription,
-    fullDescription: building.fullDescription,
+    shortDescription: presentation.shortDescription[locale] || building.shortDescription,
+    description: presentation.description[locale] || building.fullDescription,
+    fullDescription: presentation.description[locale] || building.fullDescription,
     heroImage: presentation.heroImage,
     status: building.status,
     displayOrder: building.displayOrder,
@@ -459,21 +478,6 @@ function mapPublicFloor(locale: Locale, floor: FloorRecord): PublicFloor {
 }
 
 function mapPublicUnit(locale: Locale, unit: UnitRecord): PublicUnit {
-  const outdoorCopy =
-    unit.outdoorType === "yard"
-      ? locale === "bg"
-        ? "Частен двор"
-        : "Private yard"
-      : unit.outdoorType === "terrace"
-        ? locale === "bg"
-          ? "Тераса"
-          : "Terrace"
-        : unit.outdoorType === "balcony"
-          ? locale === "bg"
-            ? "Балкон"
-            : "Balcony"
-          : null;
-
   return {
     id: unit.id,
     slug: unit.slug,
@@ -515,24 +519,8 @@ function mapPublicUnit(locale: Locale, unit: UnitRecord): PublicUnit {
     status: unit.status,
     isPublished: unit.isPublished,
     isPriceVisible: unit.isPriceVisible,
-    description:
-      unit.description ||
-      [
-        getResidenceLabel(locale, unit.rooms),
-        locale === "bg" ? `на ${getFloorLabel(locale, unit.floor.number).toLowerCase()}` : `on ${getFloorLabel(locale, unit.floor.number).toLowerCase()}`,
-        outdoorCopy ? locale === "bg" ? `с ${outdoorCopy.toLowerCase()}` : `with ${outdoorCopy.toLowerCase()}` : null,
-      ]
-        .filter(Boolean)
-        .join(" "),
-    highlight:
-      unit.highlight ||
-      [
-        getResidenceLabel(locale, unit.rooms),
-        locale === "bg" ? `${unit.areaTotalSqm} кв.м` : `${unit.areaTotalSqm} sq m`,
-        outdoorCopy,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+    description: buildUnitDescription(locale, unit),
+    highlight: buildUnitHighlight(locale, unit),
     floorplan: unit.floorplan,
     gallery: unit.gallery,
     panoramaImage: unit.panoramaImage ?? unit.gallery[0] ?? unit.floorplan,

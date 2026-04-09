@@ -8,10 +8,12 @@ import { UnitFloorplanSection } from "@/components/units/unit-floorplan-section"
 import { UnitPageHero } from "@/components/units/unit-page-hero";
 import { UnitPageSectionHeading } from "@/components/units/unit-page-section-heading";
 import { getBuildingLabel, getFloorLabel, getMessages, getStatusLabel } from "@/lib/i18n/messages";
+import { getOrientationLabel } from "@/lib/i18n/property";
 import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaBuilding, fetchPautaliaUnit } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
 import { getUnitJsonLd } from "@/lib/json-ld";
-import { formatCurrency, titleCase } from "@/lib/utils";
+import { buildPageMetadata } from "@/lib/metadata";
+import { formatCurrency } from "@/lib/utils";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,20 +24,30 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     unit = await fetchPautaliaUnit(locale, id);
   } catch (error) {
     if (error instanceof PublicApiError && error.status === 404) {
-      return { title: "Unit not found" };
+      return { title: locale === "bg" ? "Жилището не е намерено" : "Unit not found" };
     }
 
     throw error;
   }
 
   if (!unit) {
-    return { title: "Unit not found" };
+    return { title: locale === "bg" ? "Жилището не е намерено" : "Unit not found" };
   }
 
-  return {
-    title: `Unit ${unit.code}`,
-    description: `${unit.code} in building ${unit.buildingId.toUpperCase()} on floor ${unit.floor}.`,
-  };
+  const title = locale === "bg" ? `Апартамент ${unit.code}` : unit.seoTitle || `Unit ${unit.code}`;
+  const description =
+    locale === "bg"
+      ? `${unit.code} в ${getBuildingLabel(locale, unit.buildingId).toLowerCase()} на ${getFloorLabel(locale, unit.floor).toLowerCase()} с площ ${unit.size} кв.м.`
+      : unit.seoDescription || `${unit.code} in building ${unit.buildingId.toUpperCase()} on floor ${unit.floor}.`;
+
+  return buildPageMetadata({
+    locale,
+    pathname: `/unit/${unit.slug}`,
+    title,
+    description,
+    imagePath: unit.gallery[0] ?? unit.panoramaImage ?? unit.floorplan,
+    imageAlt: locale === "bg" ? `Изглед към апартамент ${unit.code}` : `Unit ${unit.code} preview`,
+  });
 }
 
 export default async function UnitPage({ params }: { params: Promise<{ id: string }> }) {
@@ -68,7 +80,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
       <Script
         id={`unit-jsonld-${unit.id}`}
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(getUnitJsonLd(unit)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getUnitJsonLd(unit, locale)) }}
       />
 
       <UnitPageHero
@@ -78,6 +90,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
         backToBuildingLabel={messages.unit.backToBuilding}
         highlight={unit.highlight}
         image={unit.gallery[0]}
+        locale={locale}
         status={unit.status}
         unitCode={unit.code}
       />
@@ -100,7 +113,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
               <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/54">{messages.common.rooms}</p>
             </div>
             <div className="page-stat-cell px-6 py-8 text-white sm:px-8">
-              <p className="font-serif text-5xl leading-none">{titleCase(unit.orientation)}</p>
+              <p className="font-serif text-5xl leading-none">{getOrientationLabel(locale, unit.orientation)}</p>
               <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/54">{messages.common.orientation}</p>
             </div>
           </div>
@@ -135,7 +148,13 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
               {unit.gallery.map((image, index) => (
                 <div key={image} className={`page-image-block ${index === 0 ? "sm:col-span-2 min-h-[22rem]" : "min-h-[18rem]"}`}>
-                  <Image src={image} alt={`${unit.code} gallery image ${index + 1}`} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 40vw" />
+                  <Image
+                    src={image}
+                    alt={locale === "bg" ? `Изображение ${index + 1} за ${unit.code}` : `${unit.code} gallery image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                  />
                 </div>
               ))}
             </div>
@@ -156,7 +175,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
               </span>
               <span className="inline-flex items-center gap-2">
                 <Compass className="size-4 text-[color:var(--ink)]" />
-                {titleCase(unit.orientation)}
+                {getOrientationLabel(locale, unit.orientation)}
               </span>
               <span className="inline-flex items-center gap-2">
                 <Maximize2 className="size-4 text-[color:var(--ink)]" />

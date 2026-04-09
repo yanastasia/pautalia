@@ -6,7 +6,8 @@ import { ArrowRight } from "lucide-react";
 import { useLocale } from "@/components/providers/locale-provider";
 import { StatusPill } from "@/components/ui/status-pill";
 import { getFloorLabel, getMessages, getResidenceLabel } from "@/lib/i18n/messages";
-import { formatCurrency, titleCase } from "@/lib/utils";
+import { getOrientationLabel } from "@/lib/i18n/property";
+import { formatCurrency } from "@/lib/utils";
 import type { PublicUnit } from "@/types/public-api";
 
 export function UnitCard({ unit }: { unit: PublicUnit }) {
@@ -43,7 +44,7 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
             <span>{unit.buildingId.toUpperCase()}</span>
             <span>{getFloorLabel(locale, unit.floor)}</span>
-            <span>{titleCase(unit.orientation)}</span>
+            <span>{getOrientationLabel(locale, unit.orientation)}</span>
             <span>{unit.typologyId.replace("typology-", "").toUpperCase()}</span>
           </div>
           <p className="mt-6 max-w-2xl text-xl leading-9 text-[color:var(--muted)]">{unit.highlight}</p>
@@ -61,7 +62,7 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
             </div>
             <div>
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">{messages.common.orientation}</p>
-              <p className="mt-3 font-serif text-[2.2rem] leading-none text-[color:var(--ink)]">{titleCase(unit.orientation)}</p>
+              <p className="mt-3 font-serif text-[2.2rem] leading-none text-[color:var(--ink)]">{getOrientationLabel(locale, unit.orientation)}</p>
             </div>
           </div>
         </div>

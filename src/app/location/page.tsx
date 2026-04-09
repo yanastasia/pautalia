@@ -4,17 +4,22 @@ import { getNearbyPlaces, getSiteCopy } from "@/content/site-content";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
-  return {
-    title: locale === "bg" ? "Локация" : "Location",
+  return buildPageMetadata({
+    locale,
+    pathname: "/location",
+    title: locale === "bg" ? "Локация в Кюстендил" : "Kyustendil location",
     description:
       locale === "bg"
         ? "Локацията, достъпът и ежедневната среда около сградата."
         : "The location, access, and everyday setting around the building.",
-  };
+    imagePath: "/assets/location/location-hero.jpg",
+    imageAlt: locale === "bg" ? "Локация на проекта Pautalia в Кюстендил" : "Pautalia project location in Kyustendil",
+  });
 }
 
 export default async function LocationPage() {

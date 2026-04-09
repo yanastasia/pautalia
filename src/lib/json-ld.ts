@@ -69,11 +69,14 @@ export function getBuildingJsonLd(building: Pick<PublicBuilding, "name" | "descr
   };
 }
 
-export function getUnitJsonLd(unit: Pick<PublicUnit, "code" | "floor" | "rooms" | "size" | "status" | "price">) {
+export function getUnitJsonLd(
+  unit: Pick<PublicUnit, "code" | "floor" | "rooms" | "size" | "status" | "price">,
+  locale: Locale,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Apartment",
-    name: `Unit ${unit.code}`,
+    name: locale === "bg" ? `Апартамент ${unit.code}` : `Unit ${unit.code}`,
     floorLevel: unit.floor,
     numberOfRooms: unit.rooms,
     floorSize: {

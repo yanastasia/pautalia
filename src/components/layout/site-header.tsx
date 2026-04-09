@@ -24,6 +24,13 @@ export function SiteHeader({ brandName }: { brandName: string }) {
     { href: "/location", label: messages.header.nav.location },
     { href: "/contact", label: messages.header.nav.contact },
   ];
+  const mobileLinks = [
+    { href: "/project", label: messages.header.mobile.project },
+    { href: "/apartments", label: messages.header.mobile.units },
+    { href: "/gallery", label: messages.header.mobile.gallery },
+    { href: "/location", label: messages.header.mobile.location },
+    { href: "/contact", label: messages.header.mobile.lead },
+  ];
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -69,16 +76,16 @@ export function SiteHeader({ brandName }: { brandName: string }) {
         )}
       >
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex items-center justify-between gap-4 transition-all duration-500", transparent ? "py-5" : "py-4")}>
+          <div className={cn("flex items-center justify-between gap-3 transition-all duration-500", transparent ? "py-3.5 sm:py-5" : "py-3 sm:py-4")}>
             <Link href="/" className="flex min-w-0 items-center sm:shrink-0">
               <span className="sr-only">{brandName}</span>
-              <span className="relative block h-[4.35rem] w-[4.35rem] overflow-visible sm:h-[5rem] sm:w-[5rem]">
+              <span className="relative block h-[3.5rem] w-[3.5rem] overflow-visible sm:h-[4.35rem] sm:w-[4.35rem] lg:h-[5rem] lg:w-[5rem]">
                 <Image
                   src="/assets/branding/pautalia-logo.png"
                   alt={brandName}
                   fill
                   className="object-contain object-center scale-[1.95]"
-                  sizes="80px"
+                  sizes="(max-width: 640px) 56px, 80px"
                   priority
                 />
               </span>
@@ -116,31 +123,35 @@ export function SiteHeader({ brandName }: { brandName: string }) {
               })}
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="md:hidden">
+                <LanguageSwitcher variant={transparent ? "dark" : "light"} />
+              </div>
               <div className="hidden md:block">
                 <LanguageSwitcher variant={transparent ? "dark" : "light"} />
               </div>
               <Link
                 href="/contact"
                 className={cn(
-                  "inline-flex items-center justify-center rounded-full px-4 py-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] shadow-[0_12px_26px_rgba(18,15,14,0.08)]",
+                  "inline-flex min-h-11 items-center justify-center rounded-full px-3.5 py-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] shadow-[0_12px_26px_rgba(18,15,14,0.08)] sm:px-4 sm:py-2.5 sm:text-[0.72rem] sm:tracking-[0.22em]",
                   transparent
                     ? "border border-white/12 bg-white/6 text-white/82 shadow-none hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
                     : "border border-[color:var(--accent)]/28 bg-[rgba(178,147,102,0.14)] text-[color:var(--ink)] hover:border-[color:var(--accent)]/42 hover:bg-[rgba(178,147,102,0.22)] hover:translate-y-[-1px]",
                 )}
               >
-                {messages.header.callback}
+                <span className="sm:hidden">{messages.header.mobile.lead}</span>
+                <span className="hidden sm:inline">{messages.header.callback}</span>
               </Link>
             </div>
           </div>
 
           <div
             className={cn(
-              "flex items-center gap-5 overflow-x-auto border-t py-3 lg:hidden",
+              "grid grid-cols-5 items-center gap-2 border-t py-2.5 sm:gap-3 lg:hidden",
               transparent ? "border-white/10" : "border-[color:var(--line)]",
             )}
           >
-            {links.map((link) => {
+            {mobileLinks.map((link) => {
               const active = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
               return (
@@ -148,7 +159,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "whitespace-nowrap text-[0.68rem] font-semibold uppercase tracking-[0.22em]",
+                    "text-center text-[0.58rem] font-semibold uppercase tracking-[0.14em] sm:text-[0.64rem] sm:tracking-[0.18em]",
                     transparent
                       ? active
                         ? "text-white"
@@ -162,9 +173,6 @@ export function SiteHeader({ brandName }: { brandName: string }) {
                 </Link>
               );
             })}
-            <div className="ml-auto shrink-0 md:hidden">
-              <LanguageSwitcher variant={transparent ? "dark" : "light"} />
-            </div>
           </div>
         </div>
       </div>

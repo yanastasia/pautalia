@@ -5,9 +5,10 @@ import { ArrowRight, ArrowUpRight, Building2, Compass, Layers3, Sparkles } from 
 import { getHomeJournalItems, getHomeStorySections, getSiteCopy } from "@/content/site-content";
 import { HomeHero } from "@/components/home/home-hero";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { getPublicBuildings as getStaticPublicBuildings, getPublicUnits as getStaticPublicUnits } from "@/data/site";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
+import { fetchAllPautaliaUnits, fetchPautaliaBuildings } from "@/lib/public-api";
 import { cn } from "@/lib/utils";
 
 const featureImages = {
@@ -19,29 +20,15 @@ const statIcons = [Building2, Compass, Layers3, Sparkles] as const;
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const siteCopy = getSiteCopy(locale);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const ogImage = new URL("/assets/exterior/exterior-front.jpg", siteUrl).toString();
 
-  return {
-    title: locale === "bg" ? "Луксозни жилища в Кюстендил" : "Premium homes in Kyustendil",
+  return buildPageMetadata({
+    locale,
+    pathname: "/",
+    title: locale === "bg" ? "Нови апартаменти в Кюстендил" : "New apartments in Kyustendil",
     description: siteCopy.tagline,
-    alternates: {
-      canonical: "/",
-    },
-    openGraph: {
-      title: siteCopy.name,
-      description: siteCopy.heroText,
-      url: siteUrl,
-      images: [
-        {
-          url: ogImage,
-          width: 1600,
-          height: 900,
-          alt: locale === "bg" ? "Екстериор на сградата" : "Building exterior",
-        },
-      ],
-    },
-  };
+    imagePath: "/assets/exterior/exterior-front.jpg",
+    imageAlt: locale === "bg" ? "Екстериор на сградата Pautalia" : "Pautalia building exterior",
+  });
 }
 
 export default async function HomePage() {
@@ -50,8 +37,10 @@ export default async function HomePage() {
   const siteCopy = getSiteCopy(locale);
   const storySections = getHomeStorySections(locale);
   const journalItems = getHomeJournalItems(locale);
-  const buildings = getStaticPublicBuildings();
-  const units = getStaticPublicUnits();
+  const [buildings, units] = await Promise.all([
+    fetchPautaliaBuildings(locale),
+    fetchAllPautaliaUnits(locale),
+  ]);
   const stats = [
     {
       label: locale === "bg" ? (buildings.length === 1 ? "Сграда" : "Сгради") : buildings.length === 1 ? "Building" : "Buildings",
@@ -86,15 +75,15 @@ export default async function HomePage() {
 
       <section className="home-stats-band">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 xl:grid-cols-4">
             {stats.map((stat, index) => {
               const Icon = statIcons[index] ?? Building2;
 
               return (
                 <div key={stat.label} className="home-stat-cell motion-fade-up px-6 py-8 text-white sm:px-8" style={{ animationDelay: `${120 + index * 110}ms` }}>
                   <Icon className="size-5 text-white/56" />
-                  <p className="mt-5 font-serif text-5xl leading-none sm:text-6xl">{stat.value}</p>
-                  <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/52">{stat.label}</p>
+                  <p className="mt-5 font-serif text-4xl leading-none sm:text-5xl xl:text-6xl">{stat.value}</p>
+                  <p className="mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/52 sm:text-[0.78rem] sm:tracking-[0.24em]">{stat.label}</p>
                 </div>
               );
             })}

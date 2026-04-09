@@ -11,12 +11,12 @@ export function SectionHeading({ eyebrow, title, copy, align = "left" }: Section
   return (
     <div className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       {eyebrow ? (
-        <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-[color:var(--muted)] ${align === "center" ? "text-center" : ""}`}>
+        <p className={`text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)] sm:text-[0.72rem] sm:tracking-[0.34em] ${align === "center" ? "text-center" : ""}`}>
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="mt-4 font-serif text-5xl leading-[0.96] text-[color:var(--ink)] sm:text-6xl">{title}</h2>
-      {copy ? <div className="mt-5 text-[1.02rem] leading-8 text-[color:var(--muted)]">{copy}</div> : null}
+      <h2 className="mt-4 font-serif text-[2.15rem] leading-[0.98] text-[color:var(--ink)] sm:text-5xl sm:leading-[0.96] lg:text-6xl">{title}</h2>
+      {copy ? <div className="mt-5 text-base leading-7 text-[color:var(--muted)] sm:text-[1.02rem] sm:leading-8">{copy}</div> : null}
     </div>
   );
 }

@@ -4,17 +4,22 @@ import { getGalleryAssets } from "@/content/site-content";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
-  return {
-    title: locale === "bg" ? "Галерия" : "Gallery",
+  return buildPageMetadata({
+    locale,
+    pathname: "/gallery",
+    title: locale === "bg" ? "Галерия на Pautalia" : "Pautalia gallery",
     description:
       locale === "bg"
         ? "Екстериорни и интериорни визии от сградата и жилищата."
         : "Exterior and interior visuals from the building and homes.",
-  };
+    imagePath: "/assets/gallery/exterior-front.jpg",
+    imageAlt: locale === "bg" ? "Галерия с екстериор на Pautalia" : "Pautalia exterior gallery preview",
+  });
 }
 
 export default async function GalleryPage() {

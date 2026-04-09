@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { fetchAllPautaliaUnits, fetchPautaliaBuildings } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
 
 const buildingVisuals = {
@@ -18,13 +19,17 @@ const buildingVisuals = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
-  return {
-    title: locale === "bg" ? "Сграда" : "Building",
+  return buildPageMetadata({
+    locale,
+    pathname: "/project",
+    title: locale === "bg" ? "Сграда и прогрес на строителството" : "Building and construction progress",
     description:
       locale === "bg"
         ? "Разгледайте сградата в строеж, вижте степента на завършеност и отворете свободните жилища в нея."
         : "Review the building under construction, its completion progress, and the available homes inside it.",
-  };
+    imagePath: "/assets/gallery/exterior-front.jpg",
+    imageAlt: locale === "bg" ? "Сграда Pautalia в строеж" : "Pautalia building under construction",
+  });
 }
 
 export default async function ProjectPage() {
