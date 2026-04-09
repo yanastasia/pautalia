@@ -17,8 +17,23 @@ type SiteJsonLdInput = {
 export function getProjectJsonLd({ locale, siteCopy, siteUrl }: SiteJsonLdInput) {
   const imageUrl = new URL("/assets/exterior/exterior-front.jpg", siteUrl).toString();
   const [city] = siteCopy.locationLabel.split(",").map((value) => value.trim());
+  const agencyId = `${siteUrl}#eryze-agency`;
 
   return [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": agencyId,
+      name: "Eryze Agency",
+      email: "anastasia@eryze.com",
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "development",
+          email: "anastasia@eryze.com",
+        },
+      ],
+    },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -26,6 +41,8 @@ export function getProjectJsonLd({ locale, siteCopy, siteUrl }: SiteJsonLdInput)
       url: siteUrl,
       inLanguage: locale,
       description: siteCopy.tagline,
+      creator: { "@id": agencyId },
+      publisher: { "@id": agencyId },
     },
     {
       "@context": "https://schema.org",
@@ -54,6 +71,7 @@ export function getProjectJsonLd({ locale, siteCopy, siteUrl }: SiteJsonLdInput)
       telephone: siteCopy.contactPhone,
       areaServed: city || "Kyustendil",
       availableLanguage: ["bg", "en"],
+      creator: { "@id": agencyId },
     },
   ];
 }

@@ -150,12 +150,12 @@ a {
 }
 
 .section-space {
-  padding-block: 4rem;
+  padding-block: 3.25rem;
 }
 
 @media (min-width: 640px) {
   .section-space {
-    padding-block: 5.5rem;
+    padding-block: 4.75rem;
   }
 }
 
@@ -540,16 +540,16 @@ a {
   z-index: 1;
   margin: 0 auto;
   display: flex;
-  min-height: 34rem;
+  min-height: 23.5rem;
   max-width: 1200px;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 2rem;
-  padding: 9rem 1rem 4rem;
+  gap: 1.25rem;
+  padding: 6.25rem 1rem 2.5rem;
 }
 
 .page-cover-copy {
-  max-width: 44rem;
+  max-width: 34rem;
   color: white;
 }
 
@@ -592,7 +592,7 @@ a {
 
 .page-image-block {
   position: relative;
-  min-height: 30rem;
+  min-height: 22rem;
   overflow: hidden;
 }
 
@@ -847,11 +847,13 @@ a {
 
 @media (min-width: 768px) {
   .page-cover-inner {
-    padding-inline: 1.5rem;
+    min-height: 31rem;
+    gap: 1.75rem;
+    padding: 8rem 1.5rem 3.5rem;
   }
 
   .section-space {
-    padding-block: 7.5rem;
+    padding-block: 6.75rem;
   }
 }
 

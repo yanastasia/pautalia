@@ -71,21 +71,21 @@ export function LeadForm({ unitId, buildingId, source, heading = "Request inform
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[color:var(--surface-dark)] px-6 py-8 text-white sm:px-8">
-      <div className="flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-start md:justify-between">
+    <form onSubmit={handleSubmit} className="bg-[color:var(--surface-dark)] px-5 py-6 text-white sm:px-8 sm:py-8">
+      <div className="flex flex-col gap-3 border-b border-white/10 pb-5 md:flex-row md:items-start md:justify-between md:gap-4 md:pb-6">
         <div className="max-w-xl">
           <p className="font-sans text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">{messages.leadForm.eyebrow}</p>
-          <h3 className="mt-2 font-serif text-4xl text-white">{heading}</h3>
-          <p className="mt-3 text-sm leading-7 text-white/62">
+          <h3 className="mt-2 font-serif text-[2.15rem] leading-[0.98] text-white sm:text-4xl">{heading}</h3>
+          <p className="mt-2 text-sm leading-6 text-white/62 sm:mt-3 sm:leading-7">
             {messages.leadForm.copy}
           </p>
         </div>
-        <div className="border border-white/10 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/54">
+        <div className="inline-flex items-center rounded-full border border-white/10 bg-white/6 px-3.5 py-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-white/58 md:mt-1">
           {messages.leadForm.responsePledge}
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 md:mt-6 md:grid-cols-2">
         <label className="block">
           <span className="premium-label text-white/54">{messages.leadForm.fullName}</span>
           <input
@@ -117,12 +117,14 @@ export function LeadForm({ unitId, buildingId, source, heading = "Request inform
             className="premium-input mt-2 border-white/8 bg-white/8 text-white placeholder:text-white/34"
           />
         </label>
-        <div className="border-t border-white/10 pt-4 text-sm leading-7 text-white/58">{messages.leadForm.contextCopy}</div>
+        <div className="rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-4 text-sm leading-6 text-white/58">
+          {messages.leadForm.contextCopy}
+        </div>
         <label className="block md:col-span-2">
           <span className="premium-label text-white/54">{messages.leadForm.message}</span>
           <textarea
             placeholder={messages.leadForm.messagePlaceholder}
-            rows={5}
+            rows={4}
             value={form.message}
             onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
             className="premium-textarea mt-2 border-white/8 bg-white/8 text-white placeholder:text-white/34"
@@ -147,8 +149,8 @@ export function LeadForm({ unitId, buildingId, source, heading = "Request inform
         </label>
       </div>
 
-      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm leading-7 text-white/52">{messages.leadForm.rateLimited}</p>
+      <div className="mt-5 flex flex-col gap-4 md:mt-6 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm leading-6 text-white/52">{messages.leadForm.rateLimited}</p>
         <button
           type="submit"
           disabled={status === "submitting" || !form.consent}

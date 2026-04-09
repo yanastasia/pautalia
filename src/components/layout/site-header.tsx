@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { SiteHeaderMobileMenu } from "@/components/layout/site-header-mobile-menu";
 import { useLocale } from "@/components/providers/locale-provider";
 import { getMessages } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   const isHome = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const links = [
     { href: "/", label: messages.header.nav.home },
     { href: "/project", label: messages.header.nav.project },
@@ -36,6 +38,11 @@ export function SiteHeader({ brandName }: { brandName: string }) {
     let lastScrollY = window.scrollY;
 
     const onScroll = () => {
+      if (isMobileMenuOpen) {
+        setIsHidden(false);
+        return;
+      }
+
       const currentScrollY = window.scrollY;
       const isNearTop = currentScrollY < 32;
       const scrollingDown = currentScrollY > lastScrollY;
@@ -56,7 +63,23 @@ export function SiteHeader({ brandName }: { brandName: string }) {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const transparent = isHome && !isScrolled;
 
@@ -64,7 +87,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
     <header
       className={cn(
         "sticky top-0 z-50 transition-transform duration-300 ease-out",
-        isHidden ? "-translate-y-full" : "translate-y-0",
+        isHidden && !isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
       )}
     >
       <div
@@ -124,55 +147,32 @@ export function SiteHeader({ brandName }: { brandName: string }) {
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="md:hidden">
+              <SiteHeaderMobileMenu
+                links={mobileLinks}
+                pathname={pathname}
+                transparent={transparent}
+                contactLabel={messages.header.callback}
+                isOpen={isMobileMenuOpen}
+                onToggle={() => setIsMobileMenuOpen((current) => !current)}
+                onClose={() => setIsMobileMenuOpen(false)}
+              />
+              <div className="hidden lg:block">
                 <LanguageSwitcher variant={transparent ? "dark" : "light"} />
               </div>
-              <div className="hidden md:block">
-                <LanguageSwitcher variant={transparent ? "dark" : "light"} />
-              </div>
-              <Link
-                href="/contact"
-                className={cn(
-                  "inline-flex min-h-11 items-center justify-center rounded-full px-3.5 py-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] shadow-[0_12px_26px_rgba(18,15,14,0.08)] sm:px-4 sm:py-2.5 sm:text-[0.72rem] sm:tracking-[0.22em]",
-                  transparent
-                    ? "border border-white/12 bg-white/6 text-white/82 shadow-none hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
-                    : "border border-[color:var(--accent)]/28 bg-[rgba(178,147,102,0.14)] text-[color:var(--ink)] hover:border-[color:var(--accent)]/42 hover:bg-[rgba(178,147,102,0.22)] hover:translate-y-[-1px]",
-                )}
-              >
-                <span className="sm:hidden">{messages.header.mobile.lead}</span>
-                <span className="hidden sm:inline">{messages.header.callback}</span>
-              </Link>
-            </div>
-          </div>
-
-          <div
-            className={cn(
-              "grid grid-cols-5 items-center gap-2 border-t py-2.5 sm:gap-3 lg:hidden",
-              transparent ? "border-white/10" : "border-[color:var(--line)]",
-            )}
-          >
-            {mobileLinks.map((link) => {
-              const active = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
-
-              return (
+              <div className="hidden lg:block">
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  href="/contact"
                   className={cn(
-                    "text-center text-[0.58rem] font-semibold uppercase tracking-[0.14em] sm:text-[0.64rem] sm:tracking-[0.18em]",
+                    "inline-flex min-h-11 items-center justify-center rounded-full px-3.5 py-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] shadow-[0_12px_26px_rgba(18,15,14,0.08)] sm:px-4 sm:py-2.5 sm:text-[0.72rem] sm:tracking-[0.22em]",
                     transparent
-                      ? active
-                        ? "text-white"
-                        : "text-white/62"
-                      : active
-                        ? "text-[color:var(--ink)]"
-                        : "text-[color:var(--muted)]",
+                      ? "border border-white/12 bg-white/6 text-white/82 shadow-none hover:bg-white/10 hover:text-white hover:translate-y-[-1px]"
+                      : "border border-[color:var(--accent)]/28 bg-[rgba(178,147,102,0.14)] text-[color:var(--ink)] hover:border-[color:var(--accent)]/42 hover:bg-[rgba(178,147,102,0.22)] hover:translate-y-[-1px]",
                   )}
                 >
-                  {link.label}
+                  {messages.header.callback}
                 </Link>
-              );
-            })}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getOrientationLabel } from "@/lib/i18n/property";
+import { getRequestLocale } from "@/lib/i18n/server";
 import { getPublicBuilding, getPublicUnit } from "@/lib/pautalia-data";
 
 describe("Bulgarian localization", () => {
@@ -25,5 +26,26 @@ describe("Bulgarian localization", () => {
     expect(unit.description).toContain("на етаж 2");
     expect(unit.description).toContain("балкон");
     expect(unit.features).toEqual(["Две спални", "Една баня", "Отделна тоалетна", "Балкон"]);
+  });
+
+  it("defaults requests to Bulgarian regardless of headers and cookies", () => {
+    const request = new Request("https://pautalia.bg/api/pautalia/units", {
+      headers: {
+        "accept-language": "en-US,en;q=0.9",
+        cookie: "pautalia_locale=en",
+      },
+    });
+
+    expect(getRequestLocale(request)).toBe("bg");
+  });
+
+  it("still allows an explicit locale query override for request handlers", () => {
+    const request = new Request("https://pautalia.bg/api/pautalia/units?lang=en", {
+      headers: {
+        "accept-language": "bg-BG,bg;q=0.9",
+      },
+    });
+
+    expect(getRequestLocale(request)).toBe("en");
   });
 });

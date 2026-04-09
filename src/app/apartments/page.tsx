@@ -77,15 +77,15 @@ export default async function ApartmentsPage({
         <div className="page-cover-inner">
           <div className="page-cover-copy">
             <span className="eyebrow-chip">{messages.apartments.heroEyebrow}</span>
-            <h1 className="mt-8 font-serif text-[3.4rem] leading-[0.9] text-white sm:text-[4.6rem] lg:text-[6rem]">
+            <h1 className="mt-6 max-w-[12ch] font-serif text-[2.6rem] leading-[0.92] text-white sm:text-[4.2rem] lg:text-[6rem]">
               {messages.apartments.heroTitle}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">{messages.apartments.heroCopy}</p>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/72 sm:mt-6 sm:text-lg sm:leading-8">{messages.apartments.heroCopy}</p>
           </div>
         </div>
       </section>
 
-      <section className="page-stat-band page-stat-band-dark">
+      <section className="page-stat-band page-stat-band-dark hidden md:block">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-3">
             <div className="page-stat-cell px-6 py-8 text-white sm:px-8">
@@ -121,7 +121,7 @@ export default async function ApartmentsPage({
             copy={messages.apartments.inventoryCopy}
           />
 
-          <div className="mt-12">
+          <div className="mt-8 sm:mt-12">
             <ApartmentFinder
               units={filteredUnits}
               allUnits={allUnits}

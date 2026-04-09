@@ -6,6 +6,8 @@ const fallbackSiteUrl = "http://localhost:3000";
 const defaultImagePath = "/assets/exterior/exterior-front.jpg";
 const imageWidth = 1600;
 const imageHeight = 900;
+const agencyName = "Eryze Agency";
+const agencyContactEmail = "anastasia@eryze.com";
 
 type PageMetadataInput = {
   locale: Locale;
@@ -41,6 +43,9 @@ export function buildRootMetadata({ locale }: { locale: Locale }): Metadata {
   return {
     metadataBase: new URL(siteUrl),
     applicationName: siteCopy.name,
+    authors: [{ name: agencyName }],
+    creator: agencyName,
+    publisher: agencyName,
     title: {
       default: siteCopy.name,
       template: `%s | ${siteCopy.name}`,
@@ -70,6 +75,10 @@ export function buildRootMetadata({ locale }: { locale: Locale }): Metadata {
       icon: "/icon.svg",
       shortcut: "/icon.svg",
       apple: "/icon.svg",
+    },
+    other: {
+      developer: agencyName,
+      "developer:contact": agencyContactEmail,
     },
     openGraph: {
       title: siteCopy.name,

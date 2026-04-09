@@ -37,13 +37,32 @@ export default async function LocationPage() {
         <div className="page-cover-inner">
           <div className="page-cover-copy">
             <span className="eyebrow-chip">{messages.location.heroEyebrow}</span>
-            <h1 className="mt-8 font-serif text-[3.4rem] leading-[0.9] text-white sm:text-[4.6rem] lg:text-[6rem]">{messages.location.heroTitle}</h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">{messages.location.heroCopy}</p>
+            <h1 className="mt-6 max-w-[12ch] font-serif text-[2.6rem] leading-[0.92] text-white sm:text-[4.2rem] lg:text-[6rem]">{messages.location.heroTitle}</h1>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/72 sm:mt-6 sm:text-lg sm:leading-8">{messages.location.heroCopy}</p>
           </div>
         </div>
       </section>
 
-      <section className="page-stat-band">
+      <section className="border-b border-[color:var(--line)] bg-[rgba(249,245,238,0.8)] md:hidden">
+        <div className="mx-auto max-w-[1200px] px-4 py-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2 rounded-[1.35rem] border border-[color:var(--line)] bg-white/82 px-4 py-4">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">{messages.location.project}</p>
+              <p className="mt-2 font-serif text-[1.75rem] leading-[1.02] text-[color:var(--ink)]">{siteCopy.locationLabel}</p>
+            </div>
+            <div className="rounded-[1.35rem] border border-[color:var(--line)] bg-white/82 px-4 py-4">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">{messages.location.access}</p>
+              <p className="mt-2 font-serif text-[1.5rem] leading-[1.02] text-[color:var(--ink)]">{messages.location.accessValue}</p>
+            </div>
+            <div className="rounded-[1.35rem] border border-[color:var(--line)] bg-white/82 px-4 py-4">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">{messages.location.tone}</p>
+              <p className="mt-2 font-serif text-[1.5rem] leading-[1.02] text-[color:var(--ink)]">{messages.location.toneValue}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="page-stat-band hidden md:block">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-3">
             <div className="page-stat-cell px-6 py-8 sm:px-8">
@@ -63,7 +82,7 @@ export default async function LocationPage() {
       </section>
 
       <section className="section-space">
-        <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[0.86fr_1.14fr] lg:px-8">
+        <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.86fr_1.14fr] lg:gap-12 lg:px-8">
           <div>
             <SectionHeading eyebrow={messages.location.contextEyebrow} title={messages.location.contextTitle} copy={messages.location.contextCopy} />
             <div className="page-line-list mt-10">
@@ -76,7 +95,7 @@ export default async function LocationPage() {
             </div>
           </div>
 
-          <div className="page-image-block">
+          <div className="page-image-block min-h-[19rem] sm:min-h-[30rem]">
             <Image
               src="/assets/location/location-preview.jpg"
               alt={messages.location.previewEyebrow}

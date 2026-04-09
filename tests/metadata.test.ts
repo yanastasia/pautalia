@@ -51,10 +51,17 @@ describe("metadata helpers", () => {
     const metadata = buildRootMetadata({ locale: "bg" });
 
     expect(metadata.applicationName).toBe("Pautalia");
+    expect(metadata.authors).toEqual([{ name: "Eryze Agency" }]);
+    expect(metadata.creator).toBe("Eryze Agency");
+    expect(metadata.publisher).toBe("Eryze Agency");
     expect(metadata.description).toBe("Съвременни жилища в Кюстендил с ясни разпределения и спокойна среда.");
     expect(metadata.title).toEqual({
       default: "Pautalia",
       template: "%s | Pautalia",
+    });
+    expect(metadata.other).toMatchObject({
+      developer: "Eryze Agency",
+      "developer:contact": "anastasia@eryze.com",
     });
     expect(metadata.openGraph).toMatchObject({
       title: "Pautalia",

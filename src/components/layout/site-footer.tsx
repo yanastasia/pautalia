@@ -20,7 +20,64 @@ export function SiteFooter({
   return (
     <footer className="mt-16 bg-[color:var(--surface-dark)] text-white sm:mt-20">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-10 py-12 sm:py-14 md:grid-cols-2 md:gap-12 xl:grid-cols-4">
+        <div className="py-10 md:hidden">
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-white/42">{messages.footer.badge}</p>
+              <h2 className="max-w-sm font-serif text-[2rem] leading-tight text-white">{messages.footer.title}</h2>
+              <p className="max-w-md text-sm leading-7 text-white/64">{messages.footer.copy}</p>
+              <Link
+                href="/contact"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/12 px-4 py-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/8"
+              >
+                {messages.footer.updatesCta}
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </div>
+
+            <div className="space-y-4 border-t border-white/8 pt-6">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-white/42">{messages.footer.explore}</p>
+              <div className="grid gap-3">
+                <Link href="/project" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                  <span>{messages.footer.projectOverview}</span>
+                  <ArrowUpRight className="size-4 text-white/46" />
+                </Link>
+                <Link href="/apartments" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                  <span>{messages.footer.apartmentFinder}</span>
+                  <ArrowUpRight className="size-4 text-white/46" />
+                </Link>
+                <Link href="/gallery" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                  <span>{messages.footer.gallery}</span>
+                  <ArrowUpRight className="size-4 text-white/46" />
+                </Link>
+                <Link href="/contact" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                  <span>{messages.footer.contact}</span>
+                  <ArrowUpRight className="size-4 text-white/46" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="space-y-4 border-t border-white/8 pt-6">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-white/42">{messages.footer.contact}</p>
+              <div className="space-y-4 text-sm text-white/68">
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 size-4 text-white/46" />
+                  <span>{locationLabel}</span>
+                </div>
+                <a href={`mailto:${contactEmail}`} className="flex items-center gap-3 hover:text-white">
+                  <Mail className="size-4 text-white/46" />
+                  {contactEmail}
+                </a>
+                <a href={`tel:${contactPhone}`} className="flex items-center gap-3 hover:text-white">
+                  <Phone className="size-4 text-white/46" />
+                  {contactPhone}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden gap-10 py-12 sm:py-14 md:grid md:grid-cols-2 md:gap-12 xl:grid-cols-4">
           <div className="max-w-sm space-y-5">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-white/42">{messages.footer.badge}</p>
             <h2 className="font-serif text-[2rem] leading-tight text-white sm:text-[2.8rem]">{messages.footer.title}</h2>

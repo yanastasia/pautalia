@@ -36,13 +36,13 @@ export default async function GalleryPage() {
         <div className="page-cover-inner">
           <div className="page-cover-copy">
             <span className="eyebrow-chip">{messages.gallery.heroEyebrow}</span>
-            <h1 className="mt-8 font-serif text-[3.4rem] leading-[0.9] text-white sm:text-[4.6rem] lg:text-[6rem]">{messages.gallery.heroTitle}</h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">{messages.gallery.heroCopy}</p>
+            <h1 className="mt-6 max-w-[12ch] font-serif text-[2.6rem] leading-[0.92] text-white sm:text-[4.2rem] lg:text-[6rem]">{messages.gallery.heroTitle}</h1>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/72 sm:mt-6 sm:text-lg sm:leading-8">{messages.gallery.heroCopy}</p>
           </div>
         </div>
       </section>
 
-      <section className="page-stat-band">
+      <section className="page-stat-band hidden md:block">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-3">
             <div className="page-stat-cell px-6 py-8 sm:px-8">
@@ -65,16 +65,16 @@ export default async function GalleryPage() {
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <SectionHeading eyebrow={messages.gallery.visualLibraryEyebrow} title={messages.gallery.visualLibraryTitle} copy={messages.gallery.visualLibraryCopy} />
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:mt-12 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
             {galleryAssets.map((asset, index) => (
               <article key={asset.id} className={index === 0 ? "sm:col-span-2" : ""}>
-                <div className={`page-image-block ${index === 0 ? "min-h-[24rem]" : "min-h-[20rem]"}`}>
+                <div className={`page-image-block ${index === 0 ? "min-h-[18rem] sm:min-h-[24rem]" : "min-h-[16rem] sm:min-h-[20rem]"}`}>
                   <Image src={asset.image} alt={asset.title} fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
                 </div>
-                <div className="page-simple-card">
+                <div className="page-simple-card pt-4 sm:pt-6">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">{asset.categoryLabel}</p>
-                  <h2 className="mt-4 font-serif text-3xl text-[color:var(--ink)]">{asset.title}</h2>
-                  <p className="mt-4 text-[color:var(--muted)]">{asset.caption}</p>
+                  <h2 className="mt-3 font-serif text-[2rem] leading-[0.98] text-[color:var(--ink)] sm:mt-4 sm:text-3xl">{asset.title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-[color:var(--muted)] sm:mt-4 sm:text-base">{asset.caption}</p>
                 </div>
               </article>
             ))}
