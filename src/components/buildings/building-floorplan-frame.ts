@@ -4,11 +4,12 @@ type FloorplanFrame = {
   imageClassName: string;
   hotspotScale: number;
   hotspotOffsetX: number;
+  hotspotOffsetY: number;
 };
 
 type FloorplanFrameConfig = Pick<
   FloorplanFrame,
-  "aspectRatio" | "imageWrapperClassName" | "hotspotScale" | "hotspotOffsetX"
+  "aspectRatio" | "imageWrapperClassName" | "hotspotScale" | "hotspotOffsetX" | "hotspotOffsetY"
 >;
 
 const DEFAULT_FLOORPLAN_FRAME: FloorplanFrame = {
@@ -17,32 +18,37 @@ const DEFAULT_FLOORPLAN_FRAME: FloorplanFrame = {
   imageClassName: "object-top",
   hotspotScale: 1,
   hotspotOffsetX: 0,
+  hotspotOffsetY: 0,
 };
 
 const FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
   "/assets/floorplans/first_floor.png": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
-    hotspotScale: 1.8,
-    hotspotOffsetX: 1.2,
+    hotspotScale: 1.88,
+    hotspotOffsetX: -0.3,
+    hotspotOffsetY: -1.6,
   },
   "/assets/floorplans/second_floor.png": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
-    hotspotScale: 1,
-    hotspotOffsetX: 0,
+    hotspotScale: 0.96,
+    hotspotOffsetX: 2.4,
+    hotspotOffsetY: -6.6,
   },
   "/assets/floorplans/third_floor.png": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
   },
   "/assets/floorplans/fourth_floor.png": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
   },
 };
 

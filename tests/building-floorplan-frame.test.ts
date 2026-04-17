@@ -26,6 +26,7 @@ describe("resolveFloorplanFrame", () => {
       imageClassName: "object-top",
       hotspotScale: 1,
       hotspotOffsetX: 0,
+      hotspotOffsetY: 0,
     });
   });
 });

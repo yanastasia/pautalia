@@ -150,6 +150,7 @@ export function BuildingFloorplanBrowser({
   const floorplanFrame = resolveFloorplanFrame(selectedFloor.floorplanImage, selectedFloor.mapAspectRatio);
   const trimmedHotspotScale = floorplanFrame.hotspotScale;
   const trimmedHotspotOffsetX = floorplanFrame.hotspotOffsetX;
+  const trimmedHotspotOffsetY = floorplanFrame.hotspotOffsetY;
   const mapAspectRatio = floorplanFrame.aspectRatio;
   const ui = locale === "bg"
     ? {
@@ -211,10 +212,11 @@ export function BuildingFloorplanBrowser({
     };
 
     if (activeUnit.planPolygonPoints?.length) {
-      const points = offsetPoints(
-        scalePoints(parsePolygonPoints(activeUnit.planPolygonPoints[0]), trimmedHotspotScale),
-        trimmedHotspotOffsetX,
-      );
+        const points = offsetPoints(
+          scalePoints(parsePolygonPoints(activeUnit.planPolygonPoints[0]), trimmedHotspotScale),
+          trimmedHotspotOffsetX,
+          trimmedHotspotOffsetY,
+        );
 
       if (points.length > 0) {
         const left = points.reduce((min, [x]) => Math.min(min, x), Number.POSITIVE_INFINITY);
@@ -226,7 +228,7 @@ export function BuildingFloorplanBrowser({
 
     const region = activeUnit.planRegions?.[0] ?? activeUnit.planArea;
     return getCalloutPosition(region.x, region.x + region.width, region.y);
-  }, [activeUnit, trimmedHotspotOffsetX, trimmedHotspotScale]);
+  }, [activeUnit, trimmedHotspotOffsetX, trimmedHotspotOffsetY, trimmedHotspotScale]);
 
   const handleUnitKeyDown = (event: KeyboardEvent<SVGPolygonElement | SVGRectElement>, slug: string, unitId: string) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -379,7 +381,11 @@ export function BuildingFloorplanBrowser({
                 if (unit.planPolygonPoints?.length) {
                   return unit.planPolygonPoints.map((points, index) => {
                     const displayPoints = stringifyPoints(
-                      offsetPoints(scalePoints(parsePolygonPoints(points), trimmedHotspotScale), trimmedHotspotOffsetX),
+                      offsetPoints(
+                        scalePoints(parsePolygonPoints(points), trimmedHotspotScale),
+                        trimmedHotspotOffsetX,
+                        trimmedHotspotOffsetY,
+                      ),
                     );
 
                     return (
