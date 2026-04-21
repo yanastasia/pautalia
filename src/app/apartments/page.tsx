@@ -2,41 +2,10 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { Compass, Link2, SlidersHorizontal } from "lucide-react";
 import { ApartmentFinder } from "@/components/apartments/apartment-finder";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { fetchAllPautaliaUnits } from "@/lib/public-api";
 import { getLocale } from "@/lib/i18n/server";
 import { buildPageMetadata } from "@/lib/metadata";
-
-function normalizeUnitSearchParams(searchParams: Record<string, string | string[] | undefined>) {
-  const normalized: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(searchParams)) {
-    const firstValue = Array.isArray(value) ? value[0] : value;
-    if (!firstValue) {
-      continue;
-    }
-
-    if (key === "price_min") {
-      normalized.minPrice = firstValue;
-      continue;
-    }
-
-    if (key === "price_max") {
-      normalized.maxPrice = firstValue;
-      continue;
-    }
-
-    if (key === "availability") {
-      normalized.status = firstValue;
-      continue;
-    }
-
-    normalized[key] = firstValue;
-  }
-
-  return normalized;
-}
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -54,18 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function ApartmentsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function ApartmentsPage() {
   const locale = await getLocale();
   const messages = getMessages(locale);
-  const normalizedSearchParams = normalizeUnitSearchParams(await searchParams);
-  const [allUnits, filteredUnits] = await Promise.all([
-    fetchAllPautaliaUnits(locale),
-    fetchAllPautaliaUnits(locale, normalizedSearchParams),
-  ]);
+  const allUnits = await fetchAllPautaliaUnits(locale);
   const visiblePrices = allUnits.filter((unit) => unit.isPriceVisible).length;
 
   return (
@@ -113,20 +74,11 @@ export default async function ApartmentsPage({
         </div>
       </section>
 
-      <section className="section-space">
+      <section className="pb-16 pt-8 sm:pb-20 sm:pt-10">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow={messages.apartments.inventoryEyebrow}
-            title={messages.apartments.inventoryTitle}
-            copy={messages.apartments.inventoryCopy}
+          <ApartmentFinder
+            allUnits={allUnits}
           />
-
-          <div className="mt-8 sm:mt-12">
-            <ApartmentFinder
-              units={filteredUnits}
-              allUnits={allUnits}
-            />
-          </div>
         </div>
       </section>
     </>

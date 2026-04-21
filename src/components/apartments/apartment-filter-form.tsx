@@ -2,19 +2,10 @@
 
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
+import type { FinderFilters } from "@/lib/apartment-finder-filters";
 import type { Locale } from "@/lib/i18n/config";
 import { getFloorLabel, getMessages } from "@/lib/i18n/messages";
 import { getOrientationLabel } from "@/lib/i18n/property";
-
-export type FinderFilters = {
-  building: string;
-  rooms: string;
-  floor: string;
-  minPrice: string;
-  maxPrice: string;
-  orientation: string;
-  status: string;
-};
 
 export type FinderOption = {
   value: string;
@@ -25,6 +16,7 @@ type ApartmentFilterFormProps = {
   locale: Locale;
   filters: FinderFilters;
   buildingOptions: FinderOption[];
+  roomOptions: number[];
   floorOptions: number[];
   orientationOptions: string[];
   onChange: (key: keyof FinderFilters, value: string) => void;
@@ -37,6 +29,7 @@ export function ApartmentFilterForm({
   locale,
   filters,
   buildingOptions,
+  roomOptions,
   floorOptions,
   orientationOptions,
   onChange,
@@ -58,13 +51,13 @@ export function ApartmentFilterForm({
             <SlidersHorizontal className="size-5 text-[color:var(--accent)]" />
           </div>
 
-          <div className="mt-4 border-t border-white/10 pt-4 text-sm leading-7 text-white/66">
+          <div className="mt-3 border-t border-white/10 pt-3 text-sm leading-7 text-white/66">
             {messages.apartments.finderCopy}
           </div>
         </>
       ) : null}
 
-      <div className={`${showHeader ? "mt-8" : ""} grid gap-4 ${compact ? "" : "sm:grid-cols-2 lg:grid-cols-1"}`}>
+      <div className={`${showHeader ? "mt-6" : ""} grid gap-3.5 ${compact ? "" : "sm:grid-cols-2 lg:grid-cols-1"}`}>
         <label className="block">
           <span className="premium-label text-white/54">{messages.apartments.building}</span>
           <select
@@ -89,9 +82,11 @@ export function ApartmentFilterForm({
             className="premium-select mt-2 border-white/8 bg-white/8 text-white"
           >
             <option value="">{messages.apartments.any}</option>
-            <option value="2">{locale === "bg" ? "2 стаи" : "2 rooms"}</option>
-            <option value="3">{locale === "bg" ? "3 стаи" : "3 rooms"}</option>
-            <option value="4">{locale === "bg" ? "4 стаи" : "4 rooms"}</option>
+            {roomOptions.map((rooms) => (
+              <option key={rooms} value={rooms}>
+                {locale === "bg" ? `${rooms} стаи` : `${rooms} rooms`}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -163,7 +158,7 @@ export function ApartmentFilterForm({
         </label>
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-3 border-t border-white/10 pt-6">
+      <div className="mt-6 flex flex-wrap gap-3 border-t border-white/10 pt-5">
         <button
           type="button"
           onClick={onReset}

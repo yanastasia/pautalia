@@ -2,40 +2,39 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useMemo, useState } from "react";
-import { Link2, ShieldCheck, SlidersHorizontal } from "lucide-react";
-import { ApartmentFilterForm, type FinderFilters } from "@/components/apartments/apartment-filter-form";
+import { Link2, ShieldCheck } from "lucide-react";
+import { ApartmentFilterForm } from "@/components/apartments/apartment-filter-form";
 import { ApartmentFilterSheet } from "@/components/apartments/apartment-filter-sheet";
+import { ApartmentFilterToolbar } from "@/components/apartments/apartment-filter-toolbar";
 import { UnitCard } from "@/components/apartments/unit-card";
 import { useLocale } from "@/components/providers/locale-provider";
+import {
+  createApartmentFinderSearchParams,
+  filterUnitsForApartmentFinder,
+  getApartmentFinderFilters,
+  type FinderFilters,
+} from "@/lib/apartment-finder-filters";
 import { getFloorLabel, getMessages } from "@/lib/i18n/messages";
 import { getOrientationLabel } from "@/lib/i18n/property";
 import type { PublicUnit } from "@/types/public-api";
 
 type FinderProps = {
-  units: PublicUnit[];
   allUnits: PublicUnit[];
 };
 
-function getFilters(searchParams: URLSearchParams): FinderFilters {
-  return {
-    building: searchParams.get("building") ?? "",
-    rooms: searchParams.get("rooms") ?? "",
-    floor: searchParams.get("floor") ?? "",
-    minPrice: searchParams.get("minPrice") ?? searchParams.get("price_min") ?? "",
-    maxPrice: searchParams.get("maxPrice") ?? searchParams.get("price_max") ?? "",
-    orientation: searchParams.get("orientation") ?? "",
-    status: searchParams.get("status") ?? searchParams.get("availability") ?? "",
-  };
-}
-
-export function ApartmentFinder({ units, allUnits }: FinderProps) {
+export function ApartmentFinder({ allUnits }: FinderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const locale = useLocale();
   const messages = getMessages(locale);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const filters = getFilters(searchParams);
+  const searchParamText = searchParams.toString();
+  const filters = useMemo(() => getApartmentFinderFilters(new URLSearchParams(searchParamText)), [searchParamText]);
+  const displayedUnits = useMemo(
+    () => filterUnitsForApartmentFinder(allUnits, filters),
+    [allUnits, filters],
+  );
 
   const buildingOptions = useMemo(
     () =>
@@ -50,6 +49,11 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
           ]),
         ).values(),
       ).sort((left, right) => left.label.localeCompare(right.label)),
+    [allUnits],
+  );
+
+  const roomOptions = useMemo(
+    () => Array.from(new Set(allUnits.map((unit) => unit.rooms))).sort((left, right) => left - right),
     [allUnits],
   );
 
@@ -93,21 +97,9 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
   }, [buildingOptions, filters, locale, messages.apartments.maxPrice, messages.apartments.minPrice]);
 
   function updateFilter(key: keyof FinderFilters, value: string) {
-    const nextParams = new URLSearchParams(searchParams.toString());
-
-    if (!value) {
-      nextParams.delete(key);
-    } else {
-      nextParams.set(key, value);
-    }
-
-    nextParams.delete("price_min");
-    nextParams.delete("price_max");
-    nextParams.delete("availability");
-    nextParams.delete("page");
+    const nextQuery = createApartmentFinderSearchParams(new URLSearchParams(searchParamText), key, value);
 
     startTransition(() => {
-      const nextQuery = nextParams.toString();
       router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
     });
   }
@@ -121,27 +113,29 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
   return (
     <>
       <div className="grid gap-12 lg:grid-cols-[minmax(22rem,25rem)_minmax(0,1fr)] xl:gap-16">
-        <aside className="hidden bg-[color:var(--surface-dark)] px-6 py-8 text-white sm:px-8 lg:sticky lg:top-28 lg:block lg:self-start">
+        <aside className="hidden bg-[color:var(--surface-dark)] px-6 py-7 text-white sm:px-8 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100svh-7rem)] lg:self-start lg:overflow-y-auto">
           <ApartmentFilterForm
             locale={locale}
             filters={filters}
             buildingOptions={buildingOptions}
+            roomOptions={roomOptions}
             floorOptions={floorOptions}
             orientationOptions={orientationOptions}
             onChange={updateFilter}
             onReset={reset}
+            showHeader={false}
           />
         </aside>
 
         <div className="min-w-0">
-          <div className="mb-8 border-t border-[color:var(--line)] pt-6 sm:mb-10 sm:pt-8">
+          <div className="mb-8 sm:mb-10">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="font-sans text-xs uppercase tracking-[0.24em] text-[color:var(--muted)]">
                   {messages.common.searchResults}
                 </p>
                 <h3 className="mt-2 font-serif text-3xl text-[color:var(--ink)] sm:text-4xl xl:text-5xl">
-                  {locale === "bg" ? `${units.length} жилища съвпадат` : `${units.length} homes match`}
+                  {locale === "bg" ? `${displayedUnits.length} жилища съвпадат` : `${displayedUnits.length} homes match`}
                 </h3>
               </div>
               <div className="hidden flex-wrap gap-3 lg:flex">
@@ -161,50 +155,17 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
             </p>
           </div>
 
-          <div className="sticky top-[4.75rem] z-20 -mx-4 mb-8 border-y border-[color:var(--line)] bg-[rgba(248,245,239,0.94)] px-4 py-4 backdrop-blur lg:hidden">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
-                  {messages.apartments.shortlist}
-                </p>
-                <p className="mt-1 text-sm text-[color:var(--ink)]">
-                  {locale === "bg" ? `${units.length} резултата` : `${units.length} results`}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsFilterSheetOpen(true)}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--line-strong)] bg-white px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink)] shadow-[0_16px_32px_rgba(12,13,15,0.08)]"
-              >
-                <SlidersHorizontal className="size-4" />
-                {messages.apartments.filters}
-              </button>
-            </div>
+          <ApartmentFilterToolbar
+            locale={locale}
+            resultCount={displayedUnits.length}
+            activeFilters={activeFilters}
+            onOpenFilters={() => setIsFilterSheetOpen(true)}
+            onReset={reset}
+          />
 
-            {activeFilters.length ? (
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                {activeFilters.map((filter) => (
-                  <span
-                    key={filter}
-                    className="rounded-full border border-[color:var(--line)] bg-white px-3 py-1.5 text-[0.72rem] font-semibold text-[color:var(--muted)]"
-                  >
-                    {filter}
-                  </span>
-                ))}
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink)]"
-                >
-                  {messages.apartments.reset}
-                </button>
-              </div>
-            ) : null}
-          </div>
-
-          {units.length ? (
+          {displayedUnits.length ? (
             <div className="grid gap-8 sm:gap-10">
-              {units.map((unit) => (
+              {displayedUnits.map((unit) => (
                 <UnitCard key={unit.id} unit={unit} />
               ))}
             </div>
@@ -222,6 +183,7 @@ export function ApartmentFinder({ units, allUnits }: FinderProps) {
           locale={locale}
           filters={filters}
           buildingOptions={buildingOptions}
+          roomOptions={roomOptions}
           floorOptions={floorOptions}
           orientationOptions={orientationOptions}
           onChange={updateFilter}
