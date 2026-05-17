@@ -1,0 +1,38 @@
+import type { CollectionConfig } from "payload/types";
+import { adminsOnly } from "./access";
+
+export const Units: CollectionConfig = {
+  slug: "units",
+  access: { read: () => true, create: adminsOnly, update: adminsOnly, delete: adminsOnly },
+  admin: { useAsTitle: "code", defaultColumns: ["code", "kind", "status", "price", "isPriceVisible"] },
+  fields: [
+    { name: "kind", type: "select", required: true, defaultValue: "apartment", options: ["apartment", "parking"] },
+    { name: "building", type: "relationship", relationTo: "buildings", required: true },
+    { name: "floor", type: "relationship", relationTo: "floors" },
+    { name: "typology", type: "relationship", relationTo: "typologies" },
+    { name: "code", type: "text", required: true, unique: true },
+    { name: "slug", type: "text", required: true, unique: true },
+    { name: "floorNumber", type: "number", required: true },
+    { name: "rooms", type: "number", defaultValue: 0 },
+    { name: "bedrooms", type: "number" },
+    { name: "bathrooms", type: "number", defaultValue: 0 },
+    { name: "areaLiving", type: "number" },
+    { name: "areaShared", type: "number" },
+    { name: "areaTerrace", type: "number" },
+    { name: "areaTotal", type: "number" },
+    { name: "commonPartsPercent", type: "number" },
+    { name: "landPercent", type: "number" },
+    { name: "landArea", type: "number" },
+    { name: "orientation", type: "text" },
+    { name: "price", type: "number" },
+    { name: "currency", type: "text", defaultValue: "EUR" },
+    { name: "status", type: "select", defaultValue: "available", options: ["available", "reserved", "sold", "hidden"] },
+    { name: "isPublished", type: "checkbox", defaultValue: true },
+    { name: "isPriceVisible", type: "checkbox", defaultValue: true },
+    { name: "floorplan", type: "upload", relationTo: "media" },
+    { name: "gallery", type: "upload", relationTo: "media", hasMany: true },
+    { name: "features", type: "array", fields: [{ name: "label", type: "text" }] },
+    { name: "internalNotes", type: "textarea", access: { read: adminsOnly, update: adminsOnly } },
+  ],
+};
+

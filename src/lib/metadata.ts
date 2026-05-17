@@ -3,7 +3,7 @@ import { getSiteCopy } from "@/content/site-content";
 import type { Locale } from "@/lib/i18n/config";
 
 const fallbackSiteUrl = "http://localhost:3000";
-const defaultImagePath = "/assets/exterior/exterior-front.jpg";
+const defaultImagePath = "/assets/buildings/residence/exterior/exterior-front.jpg";
 const imageWidth = 1600;
 const imageHeight = 900;
 const agencyName = "Eryze Agency";

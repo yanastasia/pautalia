@@ -384,6 +384,45 @@ a {
   transform: translate3d(0, -6px, 0) scale(1.12);
 }
 
+.home-hero-slide {
+  opacity: 0;
+  animation-name: home-hero-slide;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.home-hero-slide:first-child {
+  opacity: 1;
+}
+
+@keyframes home-hero-slide {
+  0% {
+    opacity: 1;
+  }
+
+  34% {
+    opacity: 1;
+  }
+
+  43% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-slide {
+    animation: none;
+  }
+
+  .home-hero-slide:not(:first-child) {
+    opacity: 0;
+  }
+}
+
 .home-hero-media::after {
   position: absolute;
   inset: 0;
@@ -506,8 +545,29 @@ a {
 
 .selector-shell {
   background:
-    radial-gradient(circle at top right, rgba(178, 147, 102, 0.12), transparent 24%),
-    linear-gradient(180deg, rgba(37, 33, 31, 0.98), rgba(28, 24, 23, 0.98));
+    radial-gradient(circle at top right, rgba(178, 147, 102, 0.14), transparent 24%),
+    linear-gradient(180deg, #f7f3ec, #ebe5da);
+}
+
+.selector-building-card::after {
+  content: none;
+}
+
+.selector-panel {
+  box-shadow: 0 26px 70px rgba(8, 10, 12, 0.2);
+}
+
+.selector-unit-link {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 78%, white);
+  padding: 1.25rem;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.selector-unit-link:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  background: white;
 }
 
 .journal-strip-card {

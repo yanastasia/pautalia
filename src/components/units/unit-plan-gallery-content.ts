@@ -19,10 +19,12 @@ type BuildUnitPlanGalleryContentInput = {
   rooms: number;
   bedrooms: number | null;
   bathrooms: number;
-  areaInternalSqm: number;
-  areaTotalSqm: number;
+  area?: UnitArea;
+  ownership?: UnitOwnership;
+  areaInternalSqm?: number;
+  areaTotalSqm?: number;
   outdoorType: "yard" | "terrace" | "balcony" | null;
-  terraceSqm: number;
+  terraceSqm?: number;
   areaUnitLabel: string;
   priceLabel: string;
 };
@@ -56,6 +58,8 @@ export function buildUnitPlanGalleryContent({
   rooms,
   bedrooms,
   bathrooms,
+  area,
+  ownership,
   areaInternalSqm,
   areaTotalSqm,
   outdoorType,
@@ -63,7 +67,23 @@ export function buildUnitPlanGalleryContent({
   areaUnitLabel,
   priceLabel,
 }: BuildUnitPlanGalleryContentInput) {
+  const resolvedArea = area ?? {
+    living: areaInternalSqm ?? 0,
+    shared: Math.max(0, Number(((areaTotalSqm ?? 0) - (areaInternalSqm ?? 0)).toFixed(2))),
+    ...(terraceSqm && terraceSqm > 0 ? { terrace: terraceSqm } : {}),
+    total: areaTotalSqm ?? areaInternalSqm ?? 0,
+  };
+  const resolvedOwnership = ownership ?? {
+    commonPartsPercent: 0,
+    landPercent: 0,
+    landArea: 0,
+  };
   const localizedFloorLabel = locale === "bg" ? `Етаж ${floorNumber}` : `Floor ${floorNumber}`;
+  const hasSharedArea = resolvedArea.shared > 0;
+  const hasOwnership =
+    resolvedOwnership.commonPartsPercent > 0 ||
+    resolvedOwnership.landPercent > 0 ||
+    resolvedOwnership.landArea > 0;
   const galleryItems: UnitPlanGalleryItem[] = [
     {
       id: "unit-plan",
@@ -86,12 +106,22 @@ export function buildUnitPlanGalleryContent({
     { label: locale === "bg" ? "Бани" : "Bathrooms", value: String(bathrooms) },
     {
       label: getOutdoorLabel(locale, outdoorType),
-      value: terraceSqm > 0 ? formatMeasure(terraceSqm, areaUnitLabel) : "\u2014",
+      value: resolvedArea.terrace && resolvedArea.terrace > 0 ? formatMeasure(resolvedArea.terrace, areaUnitLabel) : "\u2014",
     },
-    { label: locale === "bg" ? "Площ" : "Area", value: formatMeasure(areaInternalSqm, areaUnitLabel) },
-    { label: locale === "bg" ? "Обща площ" : "Total area", value: formatMeasure(areaTotalSqm, areaUnitLabel) },
+    { label: locale === "bg" ? "Жилищна площ" : "Living area", value: formatMeasure(resolvedArea.living, areaUnitLabel) },
+    ...(hasSharedArea
+      ? [{ label: locale === "bg" ? "Общи части" : "Shared parts", value: formatMeasure(resolvedArea.shared, areaUnitLabel) }]
+      : []),
+    { label: locale === "bg" ? "Обща площ" : "Total area", value: formatMeasure(resolvedArea.total, areaUnitLabel) },
+    ...(hasOwnership
+      ? [
+          { label: locale === "bg" ? "Идеални части" : "Common parts", value: `${resolvedOwnership.commonPartsPercent.toFixed(2)}%` },
+          { label: locale === "bg" ? "Земя" : "Land share", value: `${resolvedOwnership.landPercent.toFixed(2)}% / ${formatMeasure(resolvedOwnership.landArea, areaUnitLabel)}` },
+        ]
+      : []),
     { label: locale === "bg" ? "Цена" : "Price", value: priceLabel },
   ];
 
   return { galleryItems, detailRows };
 }
+import type { UnitArea, UnitOwnership } from "@/types/domain";

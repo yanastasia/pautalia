@@ -1,6 +1,6 @@
 import { UnitPlanGallery } from "@/components/units/unit-plan-gallery";
 import { buildUnitPlanGalleryContent } from "@/components/units/unit-plan-gallery-content";
-import type { UnitStatus } from "@/types/domain";
+import type { UnitArea, UnitOwnership, UnitStatus } from "@/types/domain";
 
 type UnitFloorplanSectionProps = {
   features: string[];
@@ -11,10 +11,9 @@ type UnitFloorplanSectionProps = {
   rooms: number;
   bedrooms: number | null;
   bathrooms: number;
-  areaInternalSqm: number;
-  areaTotalSqm: number;
+  area: UnitArea;
+  ownership: UnitOwnership;
   outdoorType: "yard" | "terrace" | "balcony" | null;
-  terraceSqm: number;
   priceLabel: string;
   statusLabel: string;
   status: UnitStatus;
@@ -30,10 +29,9 @@ export function UnitFloorplanSection({
   rooms,
   bedrooms,
   bathrooms,
-  areaInternalSqm,
-  areaTotalSqm,
+  area,
+  ownership,
   outdoorType,
-  terraceSqm,
   priceLabel,
   statusLabel,
   status,
@@ -49,10 +47,9 @@ export function UnitFloorplanSection({
     rooms,
     bedrooms,
     bathrooms,
-    areaInternalSqm,
-    areaTotalSqm,
+    area,
+    ownership,
     outdoorType,
-    terraceSqm,
     areaUnitLabel,
     priceLabel,
   });

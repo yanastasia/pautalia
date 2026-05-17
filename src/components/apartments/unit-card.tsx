@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useLocale } from "@/components/providers/locale-provider";
 import { StatusPill } from "@/components/ui/status-pill";
+import { sendAnalyticsEvent } from "@/lib/analytics-client";
 import { getFloorLabel, getMessages, getResidenceLabel } from "@/lib/i18n/messages";
 import { getOrientationLabel } from "@/lib/i18n/property";
 import { formatCurrency } from "@/lib/utils";
@@ -59,7 +60,7 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
             <div>
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--muted)]">{messages.common.area}</p>
               <p className="mt-2 font-serif text-[1.45rem] leading-none text-[color:var(--ink)] sm:mt-3 sm:text-[2.2rem]">
-                {unit.areaTotalSqm} {messages.common.sqm}
+                {unit.area.total} {messages.common.sqm}
               </p>
             </div>
             <div>
@@ -77,6 +78,16 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
 
         <Link
           href={`/unit/${unit.slug}`}
+          onClick={() => {
+            sendAnalyticsEvent("apartment_card_click", {
+              buildingId: unit.buildingId,
+              unitId: unit.id,
+              payload: {
+                unitCode: unit.code,
+                unitStatus: unit.status,
+              },
+            });
+          }}
           className="mt-6 inline-flex min-h-11 w-full items-center justify-between rounded-full border border-[color:var(--line-strong)] bg-white px-4 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink)] shadow-[0_16px_32px_rgba(12,13,15,0.05)] sm:mt-8 sm:w-auto sm:justify-start sm:gap-2 sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:shadow-none"
         >
           {messages.common.viewDetails}

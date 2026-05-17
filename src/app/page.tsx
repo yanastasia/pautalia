@@ -2,17 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, ArrowUpRight, Building2, Compass, Layers3, Sparkles } from "lucide-react";
+import { HomeBuildingSelectorSection } from "@/components/home/home-building-selector-section";
 import { getHomeJournalItems, getHomeStorySections, getSiteCopy } from "@/content/site-content";
 import { HomeHero } from "@/components/home/home-hero";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { homeHeroImages } from "@/data/home-hero-images";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+import { getHomeSelectorModel, getHomeStats } from "@/lib/homepage";
 import { buildPageMetadata } from "@/lib/metadata";
 import { fetchAllPautaliaUnits, fetchPautaliaBuildings } from "@/lib/public-api";
 import { cn } from "@/lib/utils";
 
 const featureImages = {
-  a: "/assets/gallery/exterior-front.jpg",
+  a: "/assets/buildings/residence/gallery/exterior-front.jpg",
 } as const;
 
 const statIcons = [Building2, Compass, Layers3, Sparkles] as const;
@@ -26,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     pathname: "/",
     title: locale === "bg" ? "Нови апартаменти в Кюстендил" : "New apartments in Kyustendil",
     description: siteCopy.tagline,
-    imagePath: "/assets/exterior/exterior-front.jpg",
+    imagePath: "/assets/buildings/residence/exterior/exterior-front.jpg",
     imageAlt: locale === "bg" ? "Екстериор на сградата Pautalia" : "Pautalia building exterior",
   });
 }
@@ -41,36 +44,21 @@ export default async function HomePage() {
     fetchPautaliaBuildings(locale),
     fetchAllPautaliaUnits(locale),
   ]);
-  const stats = [
-    {
-      label: locale === "bg" ? (buildings.length === 1 ? "Сграда" : "Сгради") : buildings.length === 1 ? "Building" : "Buildings",
-      value: String(buildings.length),
-    },
-    {
-      label: locale === "bg" ? "Жилища" : "Homes",
-      value: String(units.length),
-    },
-    {
-      label: locale === "bg" ? "Етажи" : "Floors",
-      value: String(buildings.reduce((sum, building) => sum + building.floorsCount, 0)),
-    },
-    {
-      label: locale === "bg" ? "Свободни" : "Available",
-      value: String(units.filter((unit) => unit.status === "available").length),
-    },
-  ];
+  const stats = getHomeStats(locale, buildings, units);
+  const selector = getHomeSelectorModel(locale, buildings, units);
 
   return (
     <>
       <HomeHero
         title={messages.home.title}
         copy={siteCopy.heroText}
-        primaryHref="/project"
+        primaryHref="/buildings"
         primaryLabel={messages.home.openProject}
         secondaryHref="/apartments"
         secondaryLabel={messages.home.jumpToFinder}
         locationLabel={siteCopy.locationLabel}
         imageAlt={locale === "bg" ? "Екстериор на сградата" : "Building exterior"}
+        images={homeHeroImages}
       />
 
       <section className="home-stats-band">
@@ -125,6 +113,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <HomeBuildingSelectorSection locale={locale} selector={selector} />
+
       <section className="section-space bg-white/44">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <SectionHeading
@@ -143,7 +133,7 @@ export default async function HomePage() {
                 style={{ animationDelay: `${140 + index * 120}ms` }}
               >
                 <Image
-                  src={featureImages[building.id as keyof typeof featureImages] ?? "/assets/gallery/exterior-front.jpg"}
+                  src={featureImages[building.id as keyof typeof featureImages] ?? "/assets/buildings/residence/gallery/exterior-front.jpg"}
                   alt={building.name}
                   fill
                   className="feature-grid-card-media object-cover"

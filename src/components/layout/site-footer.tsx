@@ -38,7 +38,7 @@ export function SiteFooter({
             <div className="space-y-4 border-t border-white/8 pt-6">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-white/42">{messages.footer.explore}</p>
               <div className="grid gap-3">
-                <Link href="/project" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                <Link href="/buildings" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
                   <span>{messages.footer.projectOverview}</span>
                   <ArrowUpRight className="size-4 text-white/46" />
                 </Link>
@@ -48,6 +48,10 @@ export function SiteFooter({
                 </Link>
                 <Link href="/gallery" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
                   <span>{messages.footer.gallery}</span>
+                  <ArrowUpRight className="size-4 text-white/46" />
+                </Link>
+                <Link href="/news" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                  <span>{locale === "bg" ? "Новини" : "News"}</span>
                   <ArrowUpRight className="size-4 text-white/46" />
                 </Link>
                 <Link href="/contact" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
@@ -87,7 +91,7 @@ export function SiteFooter({
           <div className="space-y-4">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-white/42">{messages.footer.explore}</p>
             <div className="space-y-3 text-sm text-white/68">
-              <Link href="/project" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+              <Link href="/buildings" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
                 <span>{messages.footer.projectOverview}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
@@ -97,6 +101,10 @@ export function SiteFooter({
               </Link>
               <Link href="/gallery" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
                 <span>{messages.footer.gallery}</span>
+                <ArrowUpRight className="size-4 text-white/46" />
+              </Link>
+              <Link href="/news" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+                <span>{locale === "bg" ? "Новини" : "News"}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
               <Link href="/contact" className="flex items-center justify-between hover:text-white">
@@ -138,9 +146,14 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-white/8 py-5 text-sm text-white/44 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 border-t border-white/8 py-5 text-sm text-white/44 md:flex-row md:items-center md:justify-between">
           <p>{messages.footer.bottomLine}</p>
-          <p>{new Date().getFullYear()}</p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/privacy" className="hover:text-white">{messages.footer.privacy}</Link>
+            <Link href="/cookies" className="hover:text-white">{messages.footer.cookies}</Link>
+            <Link href="/terms" className="hover:text-white">{messages.footer.terms}</Link>
+            <span>{new Date().getFullYear()}</span>
+          </div>
         </div>
       </div>
     </footer>

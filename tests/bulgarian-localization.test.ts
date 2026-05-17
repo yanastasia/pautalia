@@ -14,7 +14,7 @@ describe("Bulgarian localization", () => {
 
     expect(item.tagline).toContain("По-просторни жилища");
     expect(item.shortDescription).toContain("Просторни жилища");
-    expect(item.description).toContain("Сграда A предлага");
+    expect(item.description).toContain("Резиденс предлага");
     expect(item.amenities).toContain("Контролиран достъп и видеонаблюдение");
   });
 

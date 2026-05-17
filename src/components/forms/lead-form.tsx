@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "@/components/providers/locale-provider";
+import { sendAnalyticsEvent } from "@/lib/analytics-client";
 import { getMessages } from "@/lib/i18n/messages";
 
 type LeadFormProps = {
@@ -67,6 +68,13 @@ export function LeadForm({ unitId, buildingId, source, heading = "Request inform
     }
 
     setStatus("success");
+    sendAnalyticsEvent(unitId ? "request_viewing_submit" : "contact_form_submit", {
+      buildingId,
+      unitId,
+      payload: {
+        source,
+      },
+    });
     setForm(initialState);
   }
 

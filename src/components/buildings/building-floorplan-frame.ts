@@ -21,30 +21,58 @@ const DEFAULT_FLOORPLAN_FRAME: FloorplanFrame = {
   hotspotOffsetY: 0,
 };
 
-const FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
-  "/assets/floorplans/first_floor.png": {
+const RESIDENCE_FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
+  "floor-01": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
     hotspotScale: 1.88,
     hotspotOffsetX: -0.3,
     hotspotOffsetY: -1.6,
   },
-  "/assets/floorplans/second_floor.png": {
+  "floor-02": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
     hotspotScale: 0.96,
     hotspotOffsetX: 2.4,
     hotspotOffsetY: -6.6,
   },
-  "/assets/floorplans/third_floor.png": {
+  "floor-03": {
     aspectRatio: "1000 / 634",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
     hotspotOffsetY: 0,
   },
-  "/assets/floorplans/fourth_floor.png": {
+  "floor-04": {
     aspectRatio: "1000 / 634",
+    imageWrapperClassName: "",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
+  },
+};
+
+const FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
+  "/assets/buildings/residence/floors/floor-01.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-01"],
+  "/assets/buildings/residence/floors/floor-02.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-02"],
+  "/assets/buildings/residence/floors/floor-03.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-03"],
+  "/assets/buildings/residence/floors/floor-04.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-04"],
+  "/assets/buildings/park/floors/floor-01.png": {
+    aspectRatio: "18140 / 11336",
+    imageWrapperClassName: "",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
+  },
+  "/assets/buildings/park/floors/floor-02.png": {
+    aspectRatio: "13856 / 10667",
+    imageWrapperClassName: "",
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
+  },
+  "/assets/buildings/park/floors/floor-03.png": {
+    aspectRatio: "13701 / 10616",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,

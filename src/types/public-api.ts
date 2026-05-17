@@ -1,4 +1,4 @@
-import type { BuildingStatus, UnitPlanArea, UnitStatus } from "@/types/domain";
+import type { BuildingStatus, UnitArea, UnitKind, UnitOwnership, UnitPlanArea, UnitStatus } from "@/types/domain";
 
 export interface PublicBuilding {
   id: string;
@@ -36,6 +36,7 @@ export interface PublicFloor {
 }
 
 export interface PublicUnit {
+  kind: Extract<UnitKind, "apartment">;
   id: string;
   slug: string;
   externalCode: string;
@@ -51,9 +52,8 @@ export interface PublicUnit {
   bedrooms: number | null;
   rooms: number;
   bathrooms: number;
-  areaInternalSqm: number;
-  areaTotalSqm: number;
-  terraceSqm: number;
+  area: UnitArea;
+  ownership: UnitOwnership;
   hasYard: boolean;
   outdoorType: "yard" | "terrace" | "balcony" | null;
   size: number;
@@ -76,6 +76,20 @@ export interface PublicUnit {
   digitalTwinId: string | null;
   seoTitle: string;
   seoDescription: string;
+}
+
+export interface PublicParkingUnit {
+  kind: Extract<UnitKind, "parking">;
+  id: string;
+  code: string;
+  externalCode: string;
+  buildingId: string;
+  floor: number;
+  price: number | null;
+  currency: string | null;
+  status: UnitStatus;
+  isPublished: boolean;
+  isPriceVisible: boolean;
 }
 
 export interface PublicProjectOverview {

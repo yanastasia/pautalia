@@ -4,6 +4,7 @@ import { serviceUnavailableError, validationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { sendLeadEmails } from "@/lib/email";
 import { normalizeEmail, normalizePhone, sanitizeMultilineText, sanitizeSingleLineText } from "@/lib/security";
 import type { LeadInput } from "@/types/domain";
 
@@ -73,7 +74,7 @@ export async function storeLead(
 ) {
   const parsed = leadSchema.parse(input);
 
-  enforceRateLimit(`lead:${options.rateLimitKey}`, 5, 15 * 60 * 1000);
+  enforceRateLimit(`lead:${options.rateLimitKey}`, 3, 15 * 60 * 1000);
 
   const fullName = sanitizeSingleLineText(parsed.fullName);
   const email = normalizeEmail(parsed.email);
@@ -138,9 +139,28 @@ export async function storeLead(
         consentTimestamp: new Date(),
         status: "new",
       },
-      select: {
-        id: true,
+      include: {
+        unit: {
+          select: {
+            externalCode: true,
+          },
+        },
       },
+    });
+
+    sendLeadEmails({
+      leadId: lead.id,
+      fullName,
+      email,
+      phone: phone ?? null,
+      unitCode: lead.unit?.externalCode ?? null,
+      sourcePageUrl: parsed.sourcePageUrl,
+      message: message ?? null,
+    }).catch((emailError: unknown) => {
+      logger.error("leads.email_failed", {
+        leadId: lead.id,
+        error: emailError instanceof Error ? emailError.message : "unknown",
+      });
     });
 
     return { id: lead.id };

@@ -55,9 +55,8 @@ export function BuildingInventorySelector({
   const hasVisiblePrices = visiblePrices.length > 0;
   const minVisiblePrice = hasVisiblePrices ? Math.min(...visiblePrices.map((unit) => unit.price ?? 0)) : 0;
   const absoluteMaxPrice = hasVisiblePrices ? Math.max(...visiblePrices.map((unit) => unit.price ?? 0)) : 0;
-  const absoluteMaxArea = Math.max(...units.map((unit) => unit.areaTotalSqm), 0);
+  const absoluteMaxArea = Math.max(...units.map((unit) => unit.area.total), 0);
   const selectedFloor = filters.floor ? Number(filters.floor) : null;
-  const selectedRooms = filters.rooms ? Number(filters.rooms) : null;
   const selectedStatus = (filters.status || "all") as UnitStatus | "all";
   const maxPriceFilter = filters.maxPrice ? Number(filters.maxPrice) : absoluteMaxPrice;
   const maxAreaFilter = filters.maxArea ? Number(filters.maxArea) : absoluteMaxArea;
@@ -404,7 +403,7 @@ export function BuildingInventorySelector({
             </div>
             <input
               type="range"
-              min={units.length ? Math.min(...units.map((unit) => unit.areaTotalSqm)) : 0}
+              min={units.length ? Math.min(...units.map((unit) => unit.area.total)) : 0}
               max={absoluteMaxArea}
               step={1}
               value={maxAreaFilter}
@@ -434,7 +433,7 @@ export function BuildingInventorySelector({
                 </Link>
                 <span>{getResidenceLabel(locale, unit.rooms)}</span>
                 <span>{unit.floor}</span>
-                <span>{unit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}</span>
+                <span>{unit.area.total} {locale === "bg" ? "кв.м" : "sq m"}</span>
                 <span>{getStatusLabel(locale, unit.status)}</span>
                 <span>
                   {unit.isPriceVisible && unit.price !== null ? formatCurrency(unit.price) : ui.priceOnRequest}

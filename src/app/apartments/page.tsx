@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
       locale === "bg"
         ? "Филтрирай апартаменти по стаи, етаж, цена, изложение и наличност."
         : "Filter units by rooms, floor, price, orientation, and availability.",
-    imagePath: "/assets/gallery/living-entry.jpg",
+    imagePath: "/assets/buildings/residence/gallery/living-entry.jpg",
     imageAlt: locale === "bg" ? "Интериор на апартамент в Pautalia" : "Pautalia apartment interior",
   });
 }
@@ -33,7 +33,7 @@ export default async function ApartmentsPage() {
     <>
       <section className="page-cover">
         <div className="page-cover-media">
-          <Image src="/assets/gallery/living-entry.jpg" alt={messages.apartments.heroTitle} fill className="object-cover" sizes="100vw" />
+          <Image src="/assets/buildings/residence/gallery/living-entry.jpg" alt={messages.apartments.heroTitle} fill className="object-cover" sizes="100vw" />
         </div>
         <div className="page-cover-inner">
           <div className="page-cover-copy">

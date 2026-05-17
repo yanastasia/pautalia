@@ -1,4 +1,5 @@
 export type UnitStatus = "available" | "reserved" | "sold" | "hidden";
+export type UnitKind = "apartment" | "parking";
 export type BuildingStatus = "draft" | "published" | "archived";
 export type LeadStatus = "new" | "contacted" | "qualified" | "archived" | "spam";
 export type AdminRole = "super_admin" | "sales_admin" | "content_admin";
@@ -63,8 +64,22 @@ export interface UnitPlanArea {
   height: number;
 }
 
+export interface UnitArea {
+  living: number;
+  shared: number;
+  terrace?: number;
+  total: number;
+}
+
+export interface UnitOwnership {
+  commonPartsPercent: number;
+  landPercent: number;
+  landArea: number;
+}
+
 export interface Unit {
   id: string;
+  kind?: UnitKind;
   slug: string;
   externalCode: string;
   code: string;
@@ -76,6 +91,8 @@ export interface Unit {
   rooms: number;
   bedrooms?: number;
   bathrooms: number;
+  area: UnitArea;
+  ownership: UnitOwnership;
   areaInternalSqm: number;
   areaTotalSqm: number;
   terraceSqm: number;

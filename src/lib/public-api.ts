@@ -8,6 +8,8 @@ import {
   listPublicUnits,
 } from "@/lib/pautalia-data";
 import type { Locale } from "@/lib/i18n/config";
+import { getPublicPost, listPublicPosts } from "@/lib/posts";
+import type { PostListResponse, PublicPost } from "@/types/posts";
 import type { PublicBuilding, PublicFloor, PublicUnit } from "@/types/public-api";
 
 type NormalizedSearchParams = Record<string, string | string[] | undefined>;
@@ -122,6 +124,25 @@ export async function fetchPautaliaUnit(locale: Locale, slugOrId: string): Promi
   try {
     const response = await getPublicUnit(locale, slugOrId);
     return response.item;
+  } catch (error) {
+    wrapPublicDataError(error);
+  }
+}
+
+export async function fetchPautaliaPosts(
+  locale: Locale,
+  searchParams?: Record<string, string | undefined>,
+): Promise<PostListResponse> {
+  try {
+    return await listPublicPosts(locale, searchParams ?? {});
+  } catch (error) {
+    wrapPublicDataError(error);
+  }
+}
+
+export async function fetchPautaliaPost(locale: Locale, slug: string): Promise<PublicPost> {
+  try {
+    return await getPublicPost(locale, slug);
   } catch (error) {
     wrapPublicDataError(error);
   }

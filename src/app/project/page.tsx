@@ -11,8 +11,12 @@ import { cn } from "@/lib/utils";
 
 const buildingVisuals = {
   a: {
-    src: "/assets/gallery/exterior-front.jpg",
+    src: "/assets/buildings/residence/gallery/exterior-front.jpg",
     position: "object-[28%_center]",
+  },
+  b: {
+    src: "/assets/buildings/residence/exterior/exterior-front.jpg",
+    position: "object-[68%_center]",
   },
 } as const;
 
@@ -22,13 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale,
     pathname: "/project",
-    title: locale === "bg" ? "Сграда и прогрес на строителството" : "Building and construction progress",
+    title: locale === "bg" ? "Сгради и прогрес на строителството" : "Buildings and construction progress",
     description:
       locale === "bg"
-        ? "Разгледайте сградата в строеж, вижте степента на завършеност и отворете свободните жилища в нея."
-        : "Review the building under construction, its completion progress, and the available homes inside it.",
-    imagePath: "/assets/gallery/exterior-front.jpg",
-    imageAlt: locale === "bg" ? "Сграда Pautalia в строеж" : "Pautalia building under construction",
+        ? "Разгледайте сградите в строеж, вижте степента на завършеност и отворете свободните жилища във всяка сграда."
+        : "Review the buildings under construction, their completion progress, and the available homes inside each building.",
+    imagePath: "/assets/buildings/residence/gallery/exterior-front.jpg",
+    imageAlt: locale === "bg" ? "Сградите на Pautalia" : "Pautalia buildings",
   });
 }
 
@@ -105,9 +109,11 @@ export default async function ProjectPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#08111a]/70 via-[#08111a]/14 to-transparent" />
                       <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
                         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-white/70">{building.name}</p>
-                        <span className="rounded-full border border-white/14 bg-black/20 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/82">
-                          {building.deliveryQuarter}
-                        </span>
+                        {building.deliveryQuarter ? (
+                          <span className="rounded-full border border-white/14 bg-black/20 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/82">
+                            {building.deliveryQuarter}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
 
@@ -158,9 +164,11 @@ export default async function ProjectPage() {
                           </p>
                           <p className="mt-2 max-w-sm text-sm leading-7 text-white/70">{building.shortDescription}</p>
                         </div>
-                        <span className="rounded-full border border-white/14 bg-black/18 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/80">
-                          {building.deliveryQuarter}
-                        </span>
+                        {building.deliveryQuarter ? (
+                          <span className="rounded-full border border-white/14 bg-black/18 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/80">
+                            {building.deliveryQuarter}
+                          </span>
+                        ) : null}
                       </div>
 
                       <div className="mt-auto">

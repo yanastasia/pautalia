@@ -8,6 +8,7 @@ import { ApartmentFilterSheet } from "@/components/apartments/apartment-filter-s
 import { ApartmentFilterToolbar } from "@/components/apartments/apartment-filter-toolbar";
 import { UnitCard } from "@/components/apartments/unit-card";
 import { useLocale } from "@/components/providers/locale-provider";
+import { sendAnalyticsEvent } from "@/lib/analytics-client";
 import {
   createApartmentFinderSearchParams,
   filterUnitsForApartmentFinder,
@@ -98,6 +99,12 @@ export function ApartmentFinder({ allUnits }: FinderProps) {
 
   function updateFilter(key: keyof FinderFilters, value: string) {
     const nextQuery = createApartmentFinderSearchParams(new URLSearchParams(searchParamText), key, value);
+    sendAnalyticsEvent("filter_used", {
+      payload: {
+        filter: key,
+        value,
+      },
+    });
 
     startTransition(() => {
       router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });

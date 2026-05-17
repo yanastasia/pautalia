@@ -15,7 +15,7 @@ type SiteJsonLdInput = {
 };
 
 export function getProjectJsonLd({ locale, siteCopy, siteUrl }: SiteJsonLdInput) {
-  const imageUrl = new URL("/assets/exterior/exterior-front.jpg", siteUrl).toString();
+  const imageUrl = new URL("/assets/buildings/residence/exterior/exterior-front.jpg", siteUrl).toString();
   const [city] = siteCopy.locationLabel.split(",").map((value) => value.trim());
   const agencyId = `${siteUrl}#eryze-agency`;
 

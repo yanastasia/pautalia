@@ -1,0 +1,196 @@
+import { describe, expect, it } from "vitest";
+import { getHomeSelectorModel, getHomeStats } from "@/lib/homepage";
+import type { PublicBuilding, PublicUnit } from "@/types/public-api";
+
+const buildings: PublicBuilding[] = [
+  {
+    id: "a",
+    slug: "building-a",
+    name: "Residence",
+    tagline: "Larger homes with open views.",
+    shortDescription: "Spacious homes with broad outlooks.",
+    description: "Description",
+    fullDescription: "Full description",
+    heroImage: "/assets/buildings/residence/exterior/exterior-front.jpg",
+    status: "published",
+    displayOrder: 1,
+    modelColor: "#c77d4f",
+    sequence: 1,
+    floorsCount: 4,
+    totalUnits: 3,
+    availableUnits: 2,
+    completionPercent: 82,
+    deliveryQuarter: "Q4 2027",
+    floorplanImage: "/assets/buildings/residence/floors/floor-01.png",
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
+    amenities: ["Controlled access"],
+    coordinates: [-3.8, 0, 0],
+  },
+];
+
+const units: PublicUnit[] = [
+  {
+    id: "u-1",
+    slug: "unit-a101",
+    externalCode: "A-101",
+    code: "A-101",
+    unitNumber: "101",
+    buildingId: "a",
+    floorId: "a-1",
+    typologyId: "typology-2a",
+    building: { id: "a", slug: "building-a", name: "Residence" },
+    floor: 1,
+    floorMeta: { id: "a-1", number: 1, label: "Floor 1" },
+    typology: { id: "typology-2a", name: "2-room apartment", rooms: 2 },
+    bedrooms: 1,
+    rooms: 2,
+    bathrooms: 1,
+    areaInternalSqm: 61,
+    areaTotalSqm: 74,
+    terraceSqm: 13,
+    hasYard: false,
+    outdoorType: "balcony",
+    size: 74,
+    orientation: "south-east",
+    exposure: "south-east",
+    price: null,
+    currency: null,
+    status: "available",
+    isPublished: true,
+    isPriceVisible: false,
+    description: "Description",
+    highlight: "Highlight",
+    floorplan: "/assets/buildings/residence/apartments/A-AP.01.png",
+    gallery: [],
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
+    features: [],
+    planArea: { x: 0, y: 0, width: 0, height: 0 },
+    planRegions: null,
+    planPolygonPoints: null,
+    digitalTwinId: null,
+    seoTitle: "SEO",
+    seoDescription: "SEO",
+  },
+  {
+    id: "u-2",
+    slug: "unit-a201",
+    externalCode: "A-201",
+    code: "A-201",
+    unitNumber: "201",
+    buildingId: "a",
+    floorId: "a-2",
+    typologyId: "typology-3a",
+    building: { id: "a", slug: "building-a", name: "Residence" },
+    floor: 2,
+    floorMeta: { id: "a-2", number: 2, label: "Floor 2" },
+    typology: { id: "typology-3a", name: "3-room apartment", rooms: 3 },
+    bedrooms: 2,
+    rooms: 3,
+    bathrooms: 1,
+    areaInternalSqm: 82,
+    areaTotalSqm: 96,
+    terraceSqm: 14,
+    hasYard: false,
+    outdoorType: "balcony",
+    size: 96,
+    orientation: "south-west",
+    exposure: "south-west",
+    price: null,
+    currency: null,
+    status: "available",
+    isPublished: true,
+    isPriceVisible: false,
+    description: "Description",
+    highlight: "Highlight",
+    floorplan: "/assets/buildings/residence/apartments/A-AP.02.png",
+    gallery: [],
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
+    features: [],
+    planArea: { x: 0, y: 0, width: 0, height: 0 },
+    planRegions: null,
+    planPolygonPoints: null,
+    digitalTwinId: null,
+    seoTitle: "SEO",
+    seoDescription: "SEO",
+  },
+  {
+    id: "u-3",
+    slug: "unit-a301",
+    externalCode: "A-301",
+    code: "A-301",
+    unitNumber: "301",
+    buildingId: "a",
+    floorId: "a-3",
+    typologyId: "typology-3a",
+    building: { id: "a", slug: "building-a", name: "Residence" },
+    floor: 3,
+    floorMeta: { id: "a-3", number: 3, label: "Floor 3" },
+    typology: { id: "typology-3a", name: "3-room apartment", rooms: 3 },
+    bedrooms: 2,
+    rooms: 3,
+    bathrooms: 2,
+    areaInternalSqm: 90,
+    areaTotalSqm: 108,
+    terraceSqm: 18,
+    hasYard: false,
+    outdoorType: "terrace",
+    size: 108,
+    orientation: "east",
+    exposure: "east",
+    price: null,
+    currency: null,
+    status: "sold",
+    isPublished: true,
+    isPriceVisible: false,
+    description: "Description",
+    highlight: "Highlight",
+    floorplan: "/assets/buildings/residence/apartments/A-AP.03.png",
+    gallery: [],
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
+    features: [],
+    planArea: { x: 0, y: 0, width: 0, height: 0 },
+    planRegions: null,
+    planPolygonPoints: null,
+    digitalTwinId: null,
+    seoTitle: "SEO",
+    seoDescription: "SEO",
+  },
+];
+
+describe("homepage review readiness helpers", () => {
+  it("builds homepage stats from current public inventory", () => {
+    expect(getHomeStats("en", buildings, units)).toEqual([
+      { label: "Building", value: "1" },
+      { label: "Homes", value: "3" },
+      { label: "Floors", value: "4" },
+      { label: "Available", value: "2" },
+    ]);
+  });
+
+  it("builds selector cards and direct unit routes", () => {
+    const selector = getHomeSelectorModel("en", buildings, units);
+
+    expect(selector.buildingCards).toHaveLength(1);
+    expect(selector.buildingCards[0]?.href).toBe("/building/building-a");
+    expect(selector.highlightedUnits.map((unit) => unit.href)).toEqual([
+      "/unit/unit-a101",
+      "/unit/unit-a201",
+    ]);
+    expect(selector.highlightedUnits[0]).toMatchObject({
+      code: "A-101",
+      buildingName: "Residence",
+      floorLabel: "Floor 1",
+      areaLabel: "74 sq m",
+      statusLabel: "available",
+    });
+  });
+
+  it("localizes direct preview labels for Bulgarian", () => {
+    const selector = getHomeSelectorModel("bg", buildings, units);
+
+    expect(selector.highlightedUnits[0]).toMatchObject({
+      floorLabel: "Етаж 1",
+      statusLabel: "свободен",
+    });
+  });
+});

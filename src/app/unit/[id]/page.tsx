@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Compass, Layers3, Maximize2 } from "lucide-react";
 import { LeadForm } from "@/components/forms/lead-form";
 import { UnitCard } from "@/components/apartments/unit-card";
+import { UnitDetailTracker } from "@/components/analytics/unit-detail-tracker";
 import { UnitFloorplanSection } from "@/components/units/unit-floorplan-section";
 import { UnitPageHero } from "@/components/units/unit-page-hero";
 import { UnitPageSectionHeading } from "@/components/units/unit-page-section-heading";
@@ -82,6 +83,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getUnitJsonLd(unit, locale)) }}
       />
+      <UnitDetailTracker buildingId={unit.buildingId} unitId={unit.id} />
 
       <UnitPageHero
         buildingId={unit.buildingId}
@@ -105,7 +107,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
               <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/54">{messages.common.price}</p>
             </div>
             <div className="page-stat-cell px-6 py-8 text-white sm:px-8">
-              <p className="font-serif text-5xl leading-none">{unit.size} {messages.common.sqm}</p>
+              <p className="font-serif text-5xl leading-none">{unit.area.total} {messages.common.sqm}</p>
               <p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-white/54">{messages.common.area}</p>
             </div>
             <div className="page-stat-cell px-6 py-8 text-white sm:px-8">
@@ -130,10 +132,9 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
           rooms={unit.rooms}
           bedrooms={unit.bedrooms}
           bathrooms={unit.bathrooms}
-          areaInternalSqm={unit.areaInternalSqm}
-          areaTotalSqm={unit.areaTotalSqm}
+          area={unit.area}
+          ownership={unit.ownership}
           outdoorType={unit.outdoorType}
-          terraceSqm={unit.terraceSqm}
           priceLabel={unitPriceLabel}
           statusLabel={getStatusLabel(locale, unit.status)}
           status={unit.status}

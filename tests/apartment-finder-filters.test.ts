@@ -17,7 +17,7 @@ function createUnit(overrides: Partial<PublicUnit>): PublicUnit {
     floorId: "a-1",
     typologyId: "typology-2a",
     unitNumber: "01",
-    building: { id: "a", slug: "building-a", name: "Building A" },
+    building: { id: "a", slug: "building-a", name: "Residence" },
     floor: 1,
     floorMeta: { id: "a-1", number: 1, label: "Floor 1" },
     typology: { id: "typology-2a", name: "2-room apartment", rooms: 2 },
@@ -39,9 +39,9 @@ function createUnit(overrides: Partial<PublicUnit>): PublicUnit {
     isPriceVisible: true,
     description: "Compact two-room apartment.",
     highlight: "Two-room apartment.",
-    floorplan: "/assets/floorplans/AP.01.png",
-    gallery: ["/assets/gallery/living-entry.jpg"],
-    panoramaImage: "/assets/panoramas/living-panorama.jpg",
+    floorplan: "/assets/buildings/residence/apartments/A-AP.01.png",
+    gallery: ["/assets/buildings/residence/gallery/living-entry.jpg"],
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
     features: ["One bedroom"],
     planArea: { x: 0, y: 0, width: 1, height: 1 },
     planRegions: null,
@@ -127,5 +127,15 @@ describe("apartment finder filter state", () => {
     });
 
     expect(result.map((unit) => unit.id)).toEqual(["a-201"]);
+  });
+
+  it("filters units by Park slug or id", () => {
+    const units = [
+      createUnit({ id: "a-201", buildingId: "a", building: { id: "a", slug: "building-a", name: "Residence" } }),
+      createUnit({ id: "b-ap-01", buildingId: "b", building: { id: "b", slug: "building-b", name: "Park" } }),
+    ];
+
+    expect(filterUnitsForApartmentFinder(units, { ...getApartmentFinderFilters({}), building: "building-b" }).map((unit) => unit.id)).toEqual(["b-ap-01"]);
+    expect(filterUnitsForApartmentFinder(units, { ...getApartmentFinderFilters({}), building: "b" }).map((unit) => unit.id)).toEqual(["b-ap-01"]);
   });
 });

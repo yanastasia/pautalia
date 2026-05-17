@@ -28,6 +28,7 @@ const unitSortValues = [
 
 const preferStaticInventory = process.env.PAUTALIA_INVENTORY_SOURCE?.toLowerCase() !== "database";
 const PUBLIC_DATA_REVALIDATE_SECONDS = 300;
+type PriceVisibility = "visible" | "hidden" | "per_unit";
 
 export const pautaliaUnitsQuerySchema = z.object({
   building: z.string().trim().min(1).max(80).optional(),
@@ -49,6 +50,7 @@ type BuildingRecord = Prisma.BuildingGetPayload<{
     units: {
       select: {
         id: true;
+        kind: true;
         status: true;
         isPublished: true;
       };
@@ -79,27 +81,31 @@ type UnitFeatureRecord = {
 };
 
 function localizeBuildingName(locale: Locale, building: { id: string; name: string }) {
+  if (["a", "b"].includes(building.id.toLowerCase())) {
+    return getBuildingLabel(locale, building.id);
+  }
+
   if (/^building\s+/i.test(building.name)) {
     return locale === "bg"
-      ? building.name.replace(/^building/i, "Сграда")
+      ? getBuildingLabel(locale, building.id)
       : building.name;
   }
 
   return locale === "bg"
-    ? `Сграда ${building.id.toUpperCase()}`
+    ? getBuildingLabel(locale, building.id)
     : `Building ${building.id.toUpperCase()}`;
 }
 
 function getBuildingPresentation(slug: string) {
   return (
     buildingPresentation[slug] ?? {
-      heroImage: "/assets/exterior/exterior-front.jpg",
+      heroImage: "/assets/buildings/residence/exterior/exterior-front.jpg",
       modelColor: "#8c8f92",
       sequence: 1,
       completionPercent: 0,
       deliveryQuarter: { en: "TBC", bg: "Предстои" },
-      floorplanImage: "/assets/floorplans/first_floor.png",
-      panoramaImage: "/assets/gallery/exterior-front.jpg",
+      floorplanImage: "/assets/buildings/residence/floors/floor-01.png",
+      panoramaImage: "/assets/buildings/residence/gallery/exterior-front.jpg",
       amenities: { en: [], bg: [] },
       coordinates: [0, 0, 0] as [number, number, number],
       tagline: { en: "", bg: "" },
@@ -135,6 +141,21 @@ function parsePlanRegions(value: Prisma.JsonValue | null): UnitPlanArea[] | null
     .safeParse(value);
 
   return parsed.success ? parsed.data : null;
+}
+
+function resolvePublicPrice(
+  mode: PriceVisibility,
+  price: number | null,
+  currency: string,
+  isPriceVisible: boolean,
+) {
+  const visible = mode === "visible" || (mode === "per_unit" && isPriceVisible);
+
+  return {
+    price: visible ? price : null,
+    currency: visible ? currency : null,
+    isPriceVisible: visible,
+  };
 }
 
 function buildUnitFeatures(locale: Locale, unit: UnitFeatureRecord) {
@@ -256,18 +277,20 @@ function mapStaticPublicFloor(locale: Locale, floor: StaticFloor): PublicFloor {
   };
 }
 
-function mapStaticPublicUnit(locale: Locale, unit: StaticUnit): PublicUnit {
+function mapStaticPublicUnit(locale: Locale, unit: StaticUnit, priceVisibilityMode: PriceVisibility = "per_unit"): PublicUnit {
   const building = staticBuildings.find((candidate) => candidate.id === unit.buildingId) ?? null;
   const floor = staticFloors.find((candidate) => candidate.id === unit.floorId) ?? null;
   const typology = getStaticTypology(unit.typologyId);
+  const price = resolvePublicPrice(priceVisibilityMode, unit.price, unit.currency, unit.isPriceVisible);
   return {
+    kind: "apartment",
     id: unit.id,
     slug: unit.slug,
     externalCode: unit.externalCode,
     code: unit.code,
     buildingId: unit.buildingId,
-    floorId: unit.floorId,
-    typologyId: unit.typologyId,
+    floorId: unit.floorId ?? "",
+    typologyId: unit.typologyId ?? "",
     unitNumber: unit.unitNumber,
     building: building
       ? {
@@ -285,27 +308,26 @@ function mapStaticPublicUnit(locale: Locale, unit: StaticUnit): PublicUnit {
         }
       : null,
     typology: {
-      id: unit.typologyId,
+      id: unit.typologyId ?? "",
       name: getResidenceLabel(locale, typology?.rooms ?? unit.rooms),
       rooms: typology?.rooms ?? unit.rooms,
     },
     bedrooms: unit.bedrooms ?? Math.max(unit.rooms - 1, 1),
     rooms: unit.rooms,
     bathrooms: unit.bathrooms,
-    areaInternalSqm: unit.areaInternalSqm,
-    areaTotalSqm: unit.areaTotalSqm,
-    terraceSqm: unit.terraceSqm,
+    area: unit.area,
+    ownership: unit.ownership,
     hasYard: unit.hasYard ?? false,
     outdoorType: unit.outdoorType ?? null,
     size: unit.size,
     orientation: unit.orientation,
     exposure: unit.exposure,
-    price: unit.isPriceVisible ? unit.price : null,
-    currency: unit.isPriceVisible ? unit.currency : null,
+    price: price.price,
+    currency: price.currency,
     status: unit.status,
     isPublished: unit.isPublished,
-    isPriceVisible: unit.isPriceVisible,
-    description: buildUnitDescription(locale, unit),
+    isPriceVisible: price.isPriceVisible,
+    description: buildUnitDescription(locale, { ...unit, floor: unit.floor ?? { number: 0 } }),
     highlight: buildUnitHighlight(locale, unit),
     floorplan: unit.floorplan,
     gallery: unit.gallery,
@@ -437,7 +459,7 @@ function getStaticPublicUnit(locale: Locale, slugOrId: string) {
 
 function mapPublicBuilding(locale: Locale, building: BuildingRecord): PublicBuilding {
   const presentation = getBuildingPresentation(building.slug);
-  const publicUnits = building.units.filter((unit) => unit.isPublished && unit.status !== "hidden");
+  const publicUnits = building.units.filter((unit) => unit.kind === "apartment" && unit.isPublished && unit.status !== "hidden");
 
   return {
     id: building.id,
@@ -477,49 +499,61 @@ function mapPublicFloor(locale: Locale, floor: FloorRecord): PublicFloor {
   };
 }
 
-function mapPublicUnit(locale: Locale, unit: UnitRecord): PublicUnit {
+function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: PriceVisibility = "per_unit"): PublicUnit {
+  const price = resolvePublicPrice(priceVisibilityMode, unit.price ?? null, unit.currency, unit.isPriceVisible);
   return {
+    kind: "apartment",
     id: unit.id,
     slug: unit.slug,
     externalCode: unit.externalCode,
     code: unit.externalCode,
     buildingId: unit.buildingId,
-    floorId: unit.floorId,
-    typologyId: unit.typologyId,
+    floorId: unit.floorId ?? "",
+    typologyId: unit.typologyId ?? "",
     unitNumber: unit.unitNumber,
     building: {
       id: unit.building.id,
       slug: unit.building.slug,
       name: localizeBuildingName(locale, unit.building),
     },
-    floor: unit.floor.number,
-    floorMeta: {
-      id: unit.floor.id,
-      number: unit.floor.number,
-      label: getFloorLabel(locale, unit.floor.number),
-    },
+    floor: unit.floor?.number ?? 0,
+    floorMeta: unit.floor
+      ? {
+          id: unit.floor.id,
+          number: unit.floor.number,
+          label: getFloorLabel(locale, unit.floor.number),
+        }
+      : null,
     typology: {
-      id: unit.typologyId,
+      id: unit.typologyId ?? "",
       name: getResidenceLabel(locale, unit.rooms),
       rooms: unit.rooms,
     },
     bedrooms: unit.bedrooms ?? Math.max(unit.rooms - 1, 1),
     rooms: unit.rooms,
     bathrooms: unit.bathrooms,
-    areaInternalSqm: unit.areaInternalSqm,
-    areaTotalSqm: unit.areaTotalSqm,
-    terraceSqm: unit.terraceSqm,
+    area: {
+      living: unit.areaLivingSqm,
+      shared: unit.areaSharedSqm,
+      ...(unit.terraceSqm > 0 ? { terrace: unit.terraceSqm } : {}),
+      total: unit.areaTotalSqm,
+    },
+    ownership: {
+      commonPartsPercent: unit.commonPartsPercent,
+      landPercent: unit.landPercent,
+      landArea: unit.landAreaSqm,
+    },
     hasYard: unit.hasYard,
     outdoorType: (unit.outdoorType as PublicUnit["outdoorType"]) ?? null,
     size: unit.areaTotalSqm,
     orientation: unit.orientation,
     exposure: unit.exposure,
-    price: unit.isPriceVisible ? unit.price ?? null : null,
-    currency: unit.isPriceVisible ? unit.currency : null,
+    price: price.price,
+    currency: price.currency,
     status: unit.status,
     isPublished: unit.isPublished,
-    isPriceVisible: unit.isPriceVisible,
-    description: buildUnitDescription(locale, unit),
+    isPriceVisible: price.isPriceVisible,
+    description: buildUnitDescription(locale, { ...unit, floor: unit.floor ?? { number: 0 } }),
     highlight: buildUnitHighlight(locale, unit),
     floorplan: unit.floorplan,
     gallery: unit.gallery,
@@ -574,6 +608,7 @@ function getCachedBuildingsFromDb() {
           units: {
             select: {
               id: true,
+              kind: true,
               status: true,
               isPublished: true,
             },
@@ -611,6 +646,7 @@ function getCachedBuildingFromDb(slugOrId: string) {
           units: {
             select: {
               id: true,
+              kind: true,
               status: true,
               isPublished: true,
             },
@@ -667,6 +703,7 @@ function getCachedUnitsFromDb(
   return unstable_cache(
     async () => {
       const where: Prisma.UnitWhereInput = {
+        kind: "apartment",
         isPublished: true,
         status: parsed.status ? parsed.status : { not: "hidden" },
         ...(buildingId ? { buildingId } : {}),
@@ -709,11 +746,27 @@ function getCachedUnitsFromDb(
   )();
 }
 
+function getCachedSiteSettingsFromDb() {
+  return unstable_cache(
+    async () =>
+      prisma.siteSettings.findUnique({
+        where: { id: "default" },
+        select: { priceVisibilityMode: true },
+      }),
+    ["pautalia-site-settings"],
+    {
+      revalidate: PUBLIC_DATA_REVALIDATE_SECONDS,
+      tags: ["pautalia:inventory", "pautalia:settings"],
+    },
+  )();
+}
+
 function getCachedUnitFromDb(slugOrId: string) {
   return unstable_cache(
     async () =>
       prisma.unit.findFirst({
         where: {
+          kind: "apartment",
           isPublished: true,
           status: {
             not: "hidden",
@@ -807,8 +860,10 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
       }
     }
 
+    const settings = await getCachedSiteSettingsFromDb();
+
     return {
-      items: items.map((unit) => mapPublicUnit(locale, unit)),
+      items: items.map((unit) => mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit")),
       pagination: {
         page: parsed.page,
         limit: parsed.limit,
@@ -833,8 +888,10 @@ export async function getPublicUnit(locale: Locale, slugOrId: string) {
       return getStaticPublicUnit(locale, slugOrId);
     }
 
+    const settings = await getCachedSiteSettingsFromDb();
+
     return {
-      item: mapPublicUnit(locale, unit),
+      item: mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit"),
     };
   } catch {
     return getStaticPublicUnit(locale, slugOrId);

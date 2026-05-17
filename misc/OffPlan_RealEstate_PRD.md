@@ -1,6 +1,14 @@
 # Off-Plan Real Estate Sales Website with Digital Twin
 ## Product Requirements Document + Discovery + Strategy + Risk + Roadmap + Project Management Plan
 
+> Historical source document. The current Pautalia implementation has been
+> narrowed and updated in `docs/m3-prd-technical-spec.md`,
+> `docs/product-architecture.md`, and `docs/implementation-status.md`.
+> In particular, current v1 analytics uses first-party custom database events
+> with optional anonymous consented visitor/session IDs. Plausible, GA4,
+> Supabase, Vercel, Auth.js, and paid analytics services are not part of the
+> implemented v1 path.
+
 **Project Type:** Self-Hosted Real Estate Sales Platform with Digital Twin Walkthroughs  
 **Location:** Kyustendil, Bulgaria  
 **Status:** Pre-Discovery  
@@ -1953,7 +1961,7 @@ S3_BACKUP_SECRET=CHANGE_ME
 
 ## How to Use These Prompts
 
-Each prompt is written to be pasted directly into an AI coding assistant (Claude, Cursor, GitHub Copilot) or used as a detailed brief for a development session. They are ordered by sprint sequence. Always include the relevant context from this PRD when using them.
+Each prompt is written to be pasted directly into a coding assistant or used as a detailed brief for a development session. They are ordered by sprint sequence. Always include the relevant context from this PRD when using them.
 
 **Before each prompt, prepend this context block:**
 

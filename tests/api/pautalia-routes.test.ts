@@ -63,7 +63,7 @@ function jsonRequest(url: string, body: unknown, init?: RequestInit) {
 describe("pautalia api routes", () => {
   it("lists buildings through the standardized route", async () => {
     listPublicBuildings.mockResolvedValueOnce([
-      { id: "a", slug: "building-a", name: "Building A" },
+      { id: "a", slug: "building-a", name: "Residence" },
     ]);
 
     const response = await buildingsRoute(new Request("http://localhost:3000/api/pautalia/buildings"));
@@ -76,7 +76,7 @@ describe("pautalia api routes", () => {
 
   it("returns one building and its floors", async () => {
     getPublicBuilding.mockResolvedValueOnce({
-      item: { id: "a", slug: "building-a", name: "Building A" },
+      item: { id: "a", slug: "building-a", name: "Residence" },
       floors: [{ id: "a-1", number: 1, label: "Floor 1" }],
     });
 
@@ -150,15 +150,80 @@ describe("pautalia api routes", () => {
     prisma.event.create.mockResolvedValueOnce({ id: "event-1" });
 
     const response = await eventsRoute(
-      jsonRequest("http://localhost:3000/api/pautalia/events", {
-        eventType: "room_view",
-        sourcePageUrl: "/building/building-a",
-        unitId: "a-101",
-      }),
+      jsonRequest(
+        "http://localhost:3000/api/pautalia/events",
+        {
+          eventType: "apartment_detail_view",
+          sourcePageUrl: "/building/building-a",
+          unitId: "a-101",
+        },
+        { headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.10" } },
+      ),
     );
     const body = await response.json();
 
     expect(response.status).toBe(201);
     expect(body).toMatchObject({ ok: true, eventId: "event-1" });
+    expect(prisma.event.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          visitorIdHash: null,
+          sessionIdHash: null,
+          city: null,
+        }),
+      }),
+    );
+  });
+
+  it("rejects unknown analytics events", async () => {
+    const response = await eventsRoute(
+      jsonRequest("http://localhost:3000/api/pautalia/events", {
+        eventType: "room_view",
+        sourcePageUrl: "/building/building-a",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  it("stores anonymous analytics ids only after analytics consent", async () => {
+    prisma.building.findUnique.mockResolvedValueOnce({ id: "a" });
+    prisma.event.create.mockResolvedValueOnce({ id: "event-2" });
+
+    const response = await eventsRoute(
+      jsonRequest(
+        "http://localhost:3000/api/pautalia/events",
+        {
+          eventType: "page_view",
+          sourcePageUrl: "/apartments",
+          buildingId: "a",
+          visitorId: "visitor-123456",
+          sessionId: "session-123456",
+        },
+        {
+          headers: {
+            "content-type": "application/json",
+            cookie: "pautalia_cookie_consent=analytics",
+            "x-forwarded-for": "203.0.113.11",
+            "x-vercel-ip-country": "BG",
+            "x-vercel-ip-country-region": "Sofia City",
+            "x-vercel-ip-city": "Sofia",
+          },
+        },
+      ),
+    );
+
+    expect(response.status).toBe(201);
+    expect(prisma.event.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          visitorIdHash: expect.any(String),
+          sessionIdHash: expect.any(String),
+          country: "BG",
+          region: "Sofia City",
+          city: "Sofia",
+        }),
+      }),
+    );
   });
 });

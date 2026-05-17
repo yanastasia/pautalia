@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Onest, Prata } from "next/font/google";
 import { getSiteCopy } from "@/content/site-content";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { CookieConsent } from "@/components/layout/cookie-consent";
+import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
 import { getLocale } from "@/lib/i18n/server";
 import { getProjectJsonLd } from "@/lib/json-ld";
 import { buildRootMetadata } from "@/lib/metadata";
@@ -37,18 +38,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
-  const plausibleSrc = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC;
   const locale = await getLocale();
   const siteCopy = getSiteCopy(locale);
 
   return (
     <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
       <body>
-        {plausibleDomain && plausibleSrc ? (
-          <Script data-domain={plausibleDomain} defer src={plausibleSrc} />
-        ) : null}
-        <Script
+        <script
           id="project-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getProjectJsonLd({ locale, siteCopy, siteUrl })) }}
@@ -58,6 +54,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <SiteHeader brandName={siteCopy.name} />
             <main className="flex-1">{children}</main>
             <SiteFooter locationLabel={siteCopy.locationLabel} contactEmail={siteCopy.contactEmail} contactPhone={siteCopy.contactPhone} />
+            <AnalyticsTracker />
+            <CookieConsent />
           </div>
         </LocaleProvider>
       </body>

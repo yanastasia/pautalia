@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
       locale === "bg"
         ? "Локацията, достъпът и ежедневната среда около сградата."
         : "The location, access, and everyday setting around the building.",
-    imagePath: "/assets/location/location-hero.jpg",
+    imagePath: "/assets/buildings/residence/location/location-hero.jpg",
     imageAlt: locale === "bg" ? "Локация на проекта Pautalia в Кюстендил" : "Pautalia project location in Kyustendil",
   });
 }
@@ -32,7 +32,7 @@ export default async function LocationPage() {
     <>
       <section className="page-cover">
         <div className="page-cover-media">
-          <Image src="/assets/location/location-hero.jpg" alt={messages.location.heroTitle} fill className="object-cover" sizes="100vw" />
+          <Image src="/assets/buildings/residence/location/location-hero.jpg" alt={messages.location.heroTitle} fill className="object-cover" sizes="100vw" />
         </div>
         <div className="page-cover-inner">
           <div className="page-cover-copy">
@@ -97,7 +97,7 @@ export default async function LocationPage() {
 
           <div className="page-image-block min-h-[19rem] sm:min-h-[30rem]">
             <Image
-              src="/assets/location/location-preview.jpg"
+              src="/assets/buildings/residence/location/location-preview.jpg"
               alt={messages.location.previewEyebrow}
               fill
               className="object-cover"

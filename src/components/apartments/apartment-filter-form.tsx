@@ -65,7 +65,7 @@ export function ApartmentFilterForm({
             onChange={(event) => onChange("building", event.target.value)}
             className="premium-select mt-2 border-white/8 bg-white/8 text-white"
           >
-            <option value="">{messages.apartments.any}</option>
+            <option value="">{messages.apartments.allBuildings}</option>
             {buildingOptions.map((building) => (
               <option key={building.value} value={building.value}>
                 {building.label}

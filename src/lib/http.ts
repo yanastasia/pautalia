@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { AppError, isAppError, validationError } from "@/lib/errors";
+import { isAppError, validationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import { normalizeRequestId } from "@/lib/request-id";
 import { getClientIp, getUserAgent, hashSensitive } from "@/lib/security";

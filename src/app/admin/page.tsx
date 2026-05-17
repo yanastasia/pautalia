@@ -1,7 +1,29 @@
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
+import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { getAdminLeads, getAdminUnits } from "@/lib/admin-data";
+import { hasAdminSession, isAdminLoginConfigured } from "@/lib/admin-auth";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
+
+export const dynamic = "force-dynamic";
+
+async function getAdminDashboardData() {
+  const [leads, units] = await Promise.all([getAdminLeads(undefined, 12), getAdminUnits()]);
+  const apartmentUnits = units.filter((unit) => unit.kind === "apartment");
+  const soldUnits = apartmentUnits.filter((unit) => unit.status === "sold").length;
+  const availableUnits = apartmentUnits.filter((unit) => unit.status === "available").length;
+
+  return {
+    leads,
+    units: units.slice(0, 8),
+    leadCount: leads.length,
+    unitCount: soldUnits,
+    availableUnitCount: availableUnits,
+  };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -22,6 +44,28 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminPage() {
   const locale = await getLocale();
   const messages = getMessages(locale);
+  const isAuthenticated = hasAdminSession(await cookies());
+
+  if (isAuthenticated) {
+    const { leads, units, leadCount, unitCount, availableUnitCount } = await getAdminDashboardData();
+
+    return (
+      <section className="section-space">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <AdminDashboard
+            counts={{
+              leads: leadCount,
+              units: unitCount,
+              availableUnits: availableUnitCount,
+            }}
+            leads={leads}
+            units={units}
+            locale={locale}
+          />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section-space">
@@ -29,28 +73,9 @@ export default async function AdminPage() {
         <SectionHeading
           eyebrow={messages.admin.eyebrow}
           title={messages.admin.title}
-          copy={messages.admin.copy}
         />
 
-        <div className="mt-10 rounded-[var(--radius-xl)] card-surface p-8">
-          <div className="grid gap-8 md:grid-cols-2">
-            <div>
-              <p className="font-sans text-xs uppercase tracking-[0.24em] text-[color:var(--accent)]">{messages.admin.payloadEyebrow}</p>
-              <h2 className="mt-2 font-serif text-3xl text-[color:var(--ink)]">{messages.admin.collectionsDefined}</h2>
-              <p className="mt-4 text-[color:var(--muted)]">
-                {messages.admin.collectionsCopy}
-              </p>
-            </div>
-
-            <ul className="space-y-3 text-[color:var(--muted)]">
-              {messages.admin.features.map((feature) => (
-                <li key={feature} className="rounded-2xl bg-white/75 px-4 py-3">
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <AdminLoginForm isConfigured={isAdminLoginConfigured()} />
       </div>
     </section>
   );

@@ -14,7 +14,7 @@ type BuildingSelectorVisual = {
 
 export const buildingSelectorVisuals: Record<string, BuildingSelectorVisual> = {
   a: {
-    src: "/assets/buildings/building-a-selector.png",
+    src: "/assets/buildings/residence/selector/main.png",
     position: "object-center",
     aspectRatio: "1339 / 800",
     floorBands: {
@@ -25,9 +25,13 @@ export const buildingSelectorVisuals: Record<string, BuildingSelectorVisual> = {
     },
   },
   b: {
-    src: "/assets/exterior/exterior-front.jpg",
-    position: "object-[68%_center]",
-    aspectRatio: "16 / 9",
-    floorBands: null,
+    src: "/assets/buildings/park/selector/main.png",
+    position: "object-center",
+    aspectRatio: "1448 / 1086",
+    floorBands: {
+      3: { top: 18.4, height: 21.7, left: 10.6, right: 9.5 },
+      2: { top: 40.1, height: 22.4, left: 10.6, right: 9.5 },
+      1: { top: 62.5, height: 22.8, left: 10.6, right: 9.5 },
+    },
   },
 };

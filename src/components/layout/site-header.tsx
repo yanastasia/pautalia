@@ -20,16 +20,18 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const links = [
     { href: "/", label: messages.header.nav.home },
-    { href: "/project", label: messages.header.nav.project },
+    { href: "/buildings", label: messages.header.nav.project },
     { href: "/apartments", label: messages.header.nav.apartments },
     { href: "/gallery", label: messages.header.nav.gallery },
+    { href: "/news", label: locale === "bg" ? "Новини" : "News" },
     { href: "/location", label: messages.header.nav.location },
     { href: "/contact", label: messages.header.nav.contact },
   ];
   const mobileLinks = [
-    { href: "/project", label: messages.header.mobile.project },
+    { href: "/buildings", label: messages.header.mobile.project },
     { href: "/apartments", label: messages.header.mobile.units },
     { href: "/gallery", label: messages.header.mobile.gallery },
+    { href: "/news", label: locale === "bg" ? "Новини" : "News" },
     { href: "/location", label: messages.header.mobile.location },
     { href: "/contact", label: messages.header.mobile.lead },
   ];

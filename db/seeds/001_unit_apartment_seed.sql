@@ -41,21 +41,21 @@ values
     '550e8400-e29b-41d4-a716-446655440000',
     1,
     'Garden Residences',
-    '/assets/building-a/floorplans/floor-01.webp'
+    '/assets/buildings/residence/floors/floor-01.png'
   ),
   (
     '550e8400-e29b-41d4-a716-446655440102',
     '550e8400-e29b-41d4-a716-446655440000',
     2,
     'Mid-Level Collection',
-    '/assets/building-a/floorplans/floor-02.webp'
+    '/assets/buildings/residence/floors/floor-02.png'
   ),
   (
     '550e8400-e29b-41d4-a716-446655440104',
     '550e8400-e29b-41d4-a716-446655440000',
     4,
     'Top Floor Collection',
-    '/assets/building-a/floorplans/floor-04.webp'
+    '/assets/buildings/residence/floors/floor-04.png'
   )
 on conflict (id) do update
 set label = excluded.label,
@@ -109,7 +109,7 @@ values
     12342300,
     'EUR',
     'available',
-    '/assets/building-a/three-room/floor-plan.webp',
+    '/assets/buildings/residence/apartments/A-AP.01.png',
     'Ground-floor three-room apartment with two bedrooms and a private yard.',
     true,
     false
@@ -135,7 +135,7 @@ values
     15321200,
     'EUR',
     'available',
-    '/assets/building-a/three-room/floor-plan.webp',
+    '/assets/buildings/residence/apartments/A-AP.08.png',
     'Second-floor three-room apartment with two bedrooms and a balcony.',
     true,
     true
@@ -161,7 +161,7 @@ values
     null,
     'EUR',
     'available',
-    '/assets/building-a/three-room/floor-plan.webp',
+    '/assets/buildings/residence/apartments/A-AP.13.png',
     'Top-floor three-room apartment with two bedrooms and a panoramic terrace.',
     true,
     false

@@ -1,7 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, RotateCcw, X } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
 import type { UnitPlanGalleryItem } from "@/components/units/unit-plan-gallery-content";
 import { clamp, getDistance, getMidpoint, type PointerPosition } from "@/components/units/zoomable-plan-lightbox-helpers";
 
@@ -41,17 +49,17 @@ export function ZoomablePlanLightbox({ items, initialIndex, locale, onClose }: Z
     };
   }
 
-  function resetZoom() {
+  const resetZoom = useCallback(() => {
     setScale(1);
     setOffset({ x: 0, y: 0 });
     dragRef.current = null;
     pinchRef.current = null;
-  }
+  }, []);
 
-  function showImage(nextIndex: number) {
+  const showImage = useCallback((nextIndex: number) => {
     setActiveIndex((nextIndex + items.length) % items.length);
     resetZoom();
-  }
+  }, [items.length, resetZoom]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -71,7 +79,7 @@ export function ZoomablePlanLightbox({ items, initialIndex, locale, onClose }: Z
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeIndex, onClose, items.length]);
+  }, [activeIndex, onClose, showImage]);
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -166,9 +174,12 @@ export function ZoomablePlanLightbox({ items, initialIndex, locale, onClose }: Z
           onDoubleClick={() => (scale > 1 ? resetZoom() : setScale(2))}
           className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[2rem] border border-white/10 bg-[rgba(255,255,255,0.03)] touch-none"
         >
-          <img
+          <Image
             src={activeItem.src}
             alt={activeItem.alt}
+            width={1600}
+            height={1200}
+            unoptimized
             className="max-h-full max-w-full select-none object-contain"
             draggable={false}
             style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`, transformOrigin: "center center" }}

@@ -3,8 +3,8 @@ import { buildPageMetadata, buildRootMetadata, toAbsoluteUrl } from "@/lib/metad
 
 describe("metadata helpers", () => {
   it("resolves relative asset paths against the site URL", () => {
-    expect(toAbsoluteUrl("/assets/gallery/exterior-front.jpg")).toBe(
-      "http://localhost:3000/assets/gallery/exterior-front.jpg",
+    expect(toAbsoluteUrl("/assets/buildings/residence/gallery/exterior-front.jpg")).toBe(
+      "http://localhost:3000/assets/buildings/residence/gallery/exterior-front.jpg",
     );
   });
 
@@ -18,7 +18,7 @@ describe("metadata helpers", () => {
       pathname: "/contact",
       title: "Contact Pautalia",
       description: "Get in touch with the sales team.",
-      imagePath: "/assets/gallery/living-entry.jpg",
+      imagePath: "/assets/buildings/residence/gallery/living-entry.jpg",
       imageAlt: "Pautalia contact page hero image",
     });
 
@@ -33,7 +33,7 @@ describe("metadata helpers", () => {
     });
     expect(metadata.openGraph?.images).toEqual([
       {
-        url: "http://localhost:3000/assets/gallery/living-entry.jpg",
+        url: "http://localhost:3000/assets/buildings/residence/gallery/living-entry.jpg",
         width: 1600,
         height: 900,
         alt: "Pautalia contact page hero image",
@@ -43,7 +43,7 @@ describe("metadata helpers", () => {
       card: "summary_large_image",
       title: "Contact Pautalia",
       description: "Get in touch with the sales team.",
-      images: ["http://localhost:3000/assets/gallery/living-entry.jpg"],
+      images: ["http://localhost:3000/assets/buildings/residence/gallery/living-entry.jpg"],
     });
   });
 

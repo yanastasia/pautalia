@@ -343,7 +343,7 @@ export function BuildingFloorplanBrowser({
                       <div className="mt-0.5 flex items-end gap-1">
                         <span className="font-serif text-[1.15rem] leading-none sm:text-[1.35rem]">{activeUnit.code}</span>
                         <span className="pb-0.5 text-[0.62rem] opacity-75 sm:text-[0.68rem]">
-                          {activeUnit.areaTotalSqm} {locale === "bg" ? "кв.м" : "sq m"}
+                          {activeUnit.area.total} {locale === "bg" ? "кв.м" : "sq m"}
                         </span>
                       </div>
                     </div>

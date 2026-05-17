@@ -9,6 +9,10 @@ import type {
   UnitStatus,
 } from "@/types/domain";
 import { buildingAFloorOverrides, buildingAParsedUnits } from "@/data/building-a-floorplans";
+import { buildingBFloors, buildingBParkingUnits, buildingBSeed, buildingBTypologies } from "@/data/building-b";
+import { buildingBUnits } from "@/data/building-b-units";
+import { getOfficialApartmentValue } from "@/data/official-unit-values";
+import { getResidenceUnitGallery, parkGeneralGalleryImages } from "@/data/unit-gallery-assets";
 
 const nowIso = "2026-03-18T09:00:00.000Z";
 
@@ -16,12 +20,12 @@ const buildingSeeds = [
   {
     id: "a",
     slug: "building-a",
-    name: "Building A",
+    name: "Residence",
     tagline: "Larger homes with open views and private outdoor space on the ground floor.",
     shortDescription: "Spacious homes with broad outlooks, practical layouts, and private yards on floor one.",
     description:
-      "Building A offers larger homes, private outdoor space on the ground floor, and broad views from the upper levels.",
-    heroImage: "/assets/exterior/exterior-front.jpg",
+      "Residence offers larger homes, private outdoor space on the ground floor, and broad views from the upper levels.",
+    heroImage: "/assets/buildings/hero/residence_exterior-front.jpg",
     heroImageId: "media-exterior-front",
     coverRenderId: "media-exterior-front",
     status: "published" as const,
@@ -29,10 +33,10 @@ const buildingSeeds = [
     modelColor: "#c77d4f",
     sequence: 1,
     floorsCount: 4,
-    completionPercent: 82,
-    deliveryQuarter: "Q4 2027",
-    floorplanImage: "/assets/floorplans/first_floor.png",
-    panoramaImage: "/assets/panoramas/living-panorama.jpg",
+    completionPercent: 5,
+    deliveryQuarter: "",
+    floorplanImage: "/assets/buildings/residence/floors/floor-01.png",
+    panoramaImage: "/assets/buildings/residence/panoramas/living-panorama.jpg",
     amenities: [
       "Premium insulated facade",
       "Controlled access and CCTV",
@@ -41,6 +45,7 @@ const buildingSeeds = [
     ],
     coordinates: [-3.8, 0, 0] as [number, number, number],
   },
+  buildingBSeed,
 ] as const;
 
 const typologySeeds = [
@@ -88,21 +93,19 @@ const floorDescriptions = {
   4: "Top-floor homes with generous terraces and the broadest views.",
 } as const;
 
-const unitGallery = [
-  "/assets/gallery/living-entry.jpg",
-  "/assets/gallery/hall-entry.jpg",
-  "/assets/gallery/bedroom-entry.jpg",
-  "/assets/gallery/bathroom-entry.jpg",
+export const typologies: Typology[] = [
+  ...typologySeeds.map((typology) => ({
+    ...typology,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  })),
+  ...buildingBTypologies,
 ];
 
-export const typologies: Typology[] = typologySeeds.map((typology) => ({
-  ...typology,
-  createdAt: nowIso,
-  updatedAt: nowIso,
-}));
-
-export const floors: Floor[] = buildingSeeds.flatMap((building) =>
-  Array.from({ length: building.floorsCount }, (_, index) => {
+const buildingAFloors: Floor[] = buildingSeeds
+  .filter((building) => building.id === "a")
+  .flatMap((building) =>
+    Array.from({ length: building.floorsCount }, (_, index) => {
     const number = index + 1;
     const floorKey = `${building.id}-${number}`;
     const floorOverride = buildingAFloorOverrides[floorKey];
@@ -121,8 +124,10 @@ export const floors: Floor[] = buildingSeeds.flatMap((building) =>
       createdAt: nowIso,
       updatedAt: nowIso,
     };
-  }),
-);
+    }),
+  );
+
+export const floors: Floor[] = [...buildingAFloors, ...buildingBFloors];
 
 const buildingASeed = buildingSeeds.find((building) => building.id === "a");
 
@@ -132,26 +137,50 @@ function getBuildingAInternalPrice(areaTotalSqm: number, floor: number, outdoorT
 }
 
 const buildingAUnits: Unit[] = buildingASeed
-  ? buildingAParsedUnits.map((unit) => ({
-      ...unit,
-      buildingId: "a",
-      floorId: `a-${unit.floor}`,
-      price: getBuildingAInternalPrice(unit.areaTotalSqm, unit.floor, unit.outdoorType),
-      currency: "EUR",
-      status: "available",
-      isPublished: true,
-      isPriceVisible: false,
-      gallery: [...unitGallery],
-      panoramaImage: buildingASeed.panoramaImage,
-      features: [...unit.features],
-      digitalTwinId: `dt-${unit.typologyId}`,
-      updatedByUserId: "seed-admin",
-      createdAt: nowIso,
-      updatedAt: nowIso,
-    }))
+  ? buildingAParsedUnits.map((unit) => {
+      const official = getOfficialApartmentValue(unit.externalCode);
+      const living = official?.living ?? unit.areaInternalSqm;
+      const shared = official?.shared ?? Math.max(0, Number((unit.areaTotalSqm - unit.areaInternalSqm).toFixed(2)));
+      const terrace = official?.terrace ?? unit.terraceSqm;
+      const total = official?.total ?? unit.areaTotalSqm;
+
+      return {
+        ...unit,
+        kind: "apartment",
+        buildingId: "a",
+        floorId: `a-${unit.floor}`,
+        areaInternalSqm: living,
+        areaTotalSqm: total,
+        terraceSqm: terrace,
+        area: {
+          living,
+          shared,
+          ...(terrace > 0 ? { terrace } : {}),
+          total,
+        },
+        ownership: {
+          commonPartsPercent: official?.commonPartsPercent ?? 0,
+          landPercent: official?.landPercent ?? 0,
+          landArea: official?.landArea ?? 0,
+        },
+        size: total,
+        price: getBuildingAInternalPrice(unit.areaTotalSqm, unit.floor, unit.outdoorType),
+        currency: "EUR",
+        status: "available",
+        isPublished: true,
+        isPriceVisible: false,
+        gallery: getResidenceUnitGallery(unit.externalCode),
+        panoramaImage: buildingASeed.panoramaImage,
+        features: [...unit.features],
+        digitalTwinId: `dt-${unit.typologyId}`,
+        updatedByUserId: "seed-admin",
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+    })
   : [];
 
-export const units: Unit[] = [...buildingAUnits];
+export const units: Unit[] = [...buildingAUnits, ...buildingBUnits];
 
 export const buildings: Building[] = buildingSeeds.map((building) => {
   const buildingUnits = units.filter((unit) => unit.buildingId === building.id);
@@ -184,8 +213,8 @@ export const mediaAssets: MediaAsset[] = [
     fileSize: 900000,
     width: 1000,
     height: 1000,
-    storageKey: "assets/floorplans/first_floor.png",
-    altText: "Building A ground floor plan",
+    storageKey: "assets/buildings/residence/floors/floor-01.png",
+    altText: "Residence ground floor plan",
     createdAt: nowIso,
   },
   {
@@ -195,8 +224,8 @@ export const mediaAssets: MediaAsset[] = [
     fileSize: 320000,
     width: 1000,
     height: 1000,
-    storageKey: "assets/floorplans/first_floor.png",
-    altText: "Building A ground floor plan",
+    storageKey: "assets/buildings/residence/floors/floor-01.png",
+    altText: "Residence ground floor plan",
     createdAt: nowIso,
   },
   {
@@ -206,8 +235,8 @@ export const mediaAssets: MediaAsset[] = [
     fileSize: 320000,
     width: 1000,
     height: 1000,
-    storageKey: "assets/floorplans/second_floor.png",
-    altText: "Building A second floor plan",
+    storageKey: "assets/buildings/residence/floors/floor-02.png",
+    altText: "Residence second floor plan",
     createdAt: nowIso,
   },
   {
@@ -217,8 +246,8 @@ export const mediaAssets: MediaAsset[] = [
     fileSize: 320000,
     width: 1000,
     height: 1000,
-    storageKey: "assets/floorplans/third_floor.png",
-    altText: "Building A third floor plan",
+    storageKey: "assets/buildings/residence/floors/floor-03.png",
+    altText: "Residence third floor plan",
     createdAt: nowIso,
   },
   {
@@ -228,8 +257,8 @@ export const mediaAssets: MediaAsset[] = [
     fileSize: 320000,
     width: 1000,
     height: 1000,
-    storageKey: "assets/floorplans/fourth_floor.png",
-    altText: "Building A fourth floor plan",
+    storageKey: "assets/buildings/residence/floors/floor-04.png",
+    altText: "Residence fourth floor plan",
     createdAt: nowIso,
   },
   {
@@ -251,7 +280,7 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Street elevation",
     category: "exterior",
     categoryLabel: "exterior",
-    image: "/assets/gallery/exterior-front.jpg",
+    image: "/assets/buildings/residence/gallery/exterior-front.jpg",
     caption: "Main facade direction and arrival sequence from the primary street edge.",
   },
   {
@@ -259,7 +288,7 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Living room concept",
     category: "interior",
     categoryLabel: "interior",
-    image: "/assets/gallery/living-entry.jpg",
+    image: "/assets/buildings/residence/gallery/living-entry.jpg",
     caption: "Warm neutral material palette used across representative interiors.",
   },
   {
@@ -267,7 +296,7 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Entrance hall concept",
     category: "interior",
     categoryLabel: "interior",
-    image: "/assets/gallery/hall-entry.jpg",
+    image: "/assets/buildings/residence/gallery/hall-entry.jpg",
     caption: "Clean circulation, warm timber tones, and a calm neutral palette at entry.",
   },
   {
@@ -275,7 +304,7 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Bedroom concept",
     category: "interior",
     categoryLabel: "interior",
-    image: "/assets/gallery/bedroom-entry.jpg",
+    image: "/assets/buildings/residence/gallery/bedroom-entry.jpg",
     caption: "A bright bedroom with soft materials and a restrained palette.",
   },
   {
@@ -283,7 +312,7 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Bathroom concept",
     category: "interior",
     categoryLabel: "interior",
-    image: "/assets/gallery/bathroom-entry.jpg",
+    image: "/assets/buildings/residence/gallery/bathroom-entry.jpg",
     caption: "Bathroom detail with a restrained palette and clean built-in lines.",
   },
   {
@@ -291,8 +320,40 @@ export const galleryAssets: GalleryAsset[] = [
     title: "Walkthrough panorama",
     category: "panorama",
     categoryLabel: "panorama",
-    image: "/assets/panoramas/living-panorama.jpg",
+    image: "/assets/buildings/residence/panoramas/living-panorama.jpg",
     caption: "Panoramic view from a representative living space.",
+  },
+  {
+    id: "g7",
+    title: "Park exterior",
+    category: "exterior",
+    categoryLabel: "exterior",
+    image: parkGeneralGalleryImages.exterior,
+    caption: "Exterior render selected from the Park building media set.",
+  },
+  {
+    id: "g8",
+    title: "Park living room",
+    category: "interior",
+    categoryLabel: "interior",
+    image: parkGeneralGalleryImages.living,
+    caption: "Representative Park apartment living area from the unit render set.",
+  },
+  {
+    id: "g9",
+    title: "Park private yard",
+    category: "interior",
+    categoryLabel: "interior",
+    image: parkGeneralGalleryImages.yard,
+    caption: "Ground-floor Park apartment render showing private outdoor space.",
+  },
+  {
+    id: "g10",
+    title: "Park balcony",
+    category: "interior",
+    categoryLabel: "interior",
+    image: parkGeneralGalleryImages.balcony,
+    caption: "Upper-floor Park apartment balcony render.",
   },
 ];
 
@@ -321,8 +382,8 @@ export const nearbyPlaces = [
 export const projectStats = [
   { label: "Buildings", value: "2" },
   { label: "Homes", value: String(units.filter((unit) => unit.isPublished && unit.status !== "hidden").length) },
-  { label: "Layouts", value: "4" },
-  { label: "Parking bays", value: "28" },
+  { label: "Layouts", value: String(typologies.length) },
+  { label: "Parking bays", value: String(14 + buildingBParkingUnits.length) },
 ];
 
 export const siteCopy = {
@@ -330,8 +391,8 @@ export const siteCopy = {
   tagline: "Contemporary homes in Kyustendil, designed for light, calm, and everyday comfort.",
   heroTitle: "Contemporary homes in Kyustendil.",
   heroText: "View the buildings, browse the available homes, and contact us for current availability.",
-  contactEmail: "sales@pautalia.bg",
-  contactPhone: "+359 888 000 124",
+  contactEmail: "sales@pautalia.com",
+  contactPhone: "+359 877 909 010",
   locationLabel: "Kyustendil, Bulgaria",
 };
 

@@ -2,6 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 
+type HeroImage = {
+  src: string;
+  alt: string;
+};
+
 export function HomeHero({
   title,
   copy,
@@ -11,6 +16,7 @@ export function HomeHero({
   secondaryLabel,
   locationLabel,
   imageAlt,
+  images,
 }: {
   title: string;
   copy: string;
@@ -20,18 +26,29 @@ export function HomeHero({
   secondaryLabel: string;
   locationLabel: string;
   imageAlt: string;
+  images: readonly HeroImage[];
 }) {
+  const heroImages = images.length > 0 ? images : [{ src: "/assets/buildings/residence/exterior/exterior-front.jpg", alt: imageAlt }];
+  const durationSeconds = Math.max(heroImages.length * 6, 12);
+
   return (
     <section className="home-hero-shell relative min-h-[100svh] -mt-[9.4rem] overflow-hidden pt-[9.4rem] md:-mt-[7.1rem] md:pt-[7.1rem]">
       <div className="home-hero-media">
-        <Image
-          src="/assets/exterior/exterior-front.jpg"
-          alt={imageAlt}
-          fill
-          priority
-          className="home-hero-media-image object-cover object-top"
-          sizes="100vw"
-        />
+        {heroImages.map((image, index) => (
+          <Image
+            key={image.src}
+            src={image.src}
+            alt={image.alt}
+            fill
+            priority={index === 0}
+            className="home-hero-media-image home-hero-slide object-cover object-top"
+            sizes="100vw"
+            style={{
+              animationDelay: `${index * 6}s`,
+              animationDuration: `${durationSeconds}s`,
+            }}
+          />
+        ))}
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[calc(100svh-9.4rem)] max-w-[1200px] flex-col justify-end px-4 pb-10 pt-24 sm:min-h-[calc(100svh-9.4rem)] sm:px-6 sm:pb-16 sm:pt-36 md:min-h-[calc(100svh-7.1rem)] lg:px-8 lg:pb-24 lg:pt-52">

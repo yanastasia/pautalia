@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
       locale === "bg"
         ? "Екстериорни и интериорни визии от сградата и жилищата."
         : "Exterior and interior visuals from the building and homes.",
-    imagePath: "/assets/gallery/exterior-front.jpg",
+    imagePath: "/assets/buildings/residence/gallery/exterior-front.jpg",
     imageAlt: locale === "bg" ? "Галерия с екстериор на Pautalia" : "Pautalia exterior gallery preview",
   });
 }

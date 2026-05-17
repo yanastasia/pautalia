@@ -1,44 +1,47 @@
 import type { Floor, Unit, UnitPlanArea } from "@/types/domain";
 
-export const buildingAFacadePhoto = "/assets/buildings/building-a-selector.png";
+export const buildingAFacadePhoto = "/assets/buildings/residence/selector/main.png";
 
 export const buildingAFloorPlanImages = {
-  1: "/assets/floorplans/first_floor.png",
-  2: "/assets/floorplans/second_floor.png",
-  3: "/assets/floorplans/third_floor.png",
-  4: "/assets/floorplans/fourth_floor.png",
+  1: "/assets/buildings/residence/floors/floor-01.png",
+  2: "/assets/buildings/residence/floors/floor-02.png",
+  3: "/assets/buildings/residence/floors/floor-03.png",
+  4: "/assets/buildings/residence/floors/floor-04.png",
 } as const;
 
 const buildingAUnitFloorplanImages = {
-  "AP.01": "/assets/floorplans/AP.01.png",
-  "AP.02": "/assets/floorplans/AP.02.png",
-  "AP.03": "/assets/floorplans/AP.03.png",
-  "AP.04": "/assets/floorplans/AP.04.png",
-  "AP.05": "/assets/floorplans/AP.05.png",
-  "AP.06": "/assets/floorplans/AP.06.png",
-  "AP.07": "/assets/floorplans/AP.07.png",
-  "AP.08": "/assets/floorplans/AP.08.png",
-  "AP.09": "/assets/floorplans/AP.09.png",
-  "AP.10": "/assets/floorplans/AP.10.png",
-  "AP.11": "/assets/floorplans/AP.11.png",
-  "AP.12": "/assets/floorplans/AP.12.png",
-  "AP.13": "/assets/floorplans/AP.13.png",
-  "AP.14": "/assets/floorplans/AP.14.png",
+  "AP.01": "/assets/buildings/residence/apartments/A-AP.01.png",
+  "AP.02": "/assets/buildings/residence/apartments/A-AP.02.png",
+  "AP.03": "/assets/buildings/residence/apartments/A-AP.03.png",
+  "AP.04": "/assets/buildings/residence/apartments/A-AP.04.png",
+  "AP.05": "/assets/buildings/residence/apartments/A-AP.05.png",
+  "AP.06": "/assets/buildings/residence/apartments/A-AP.06.png",
+  "AP.07": "/assets/buildings/residence/apartments/A-AP.07.png",
+  "AP.08": "/assets/buildings/residence/apartments/A-AP.08.png",
+  "AP.09": "/assets/buildings/residence/apartments/A-AP.09.png",
+  "AP.10": "/assets/buildings/residence/apartments/A-AP.10.png",
+  "AP.11": "/assets/buildings/residence/apartments/A-AP.11.png",
+  "AP.12": "/assets/buildings/residence/apartments/A-AP.12.png",
+  "AP.13": "/assets/buildings/residence/apartments/A-AP.13.png",
+  "AP.14": "/assets/buildings/residence/apartments/A-AP.14.png",
 } as const;
 
 const buildingAUnitPolygonPoints = {
-  "AP.01": ["13,31 26,31 26,27 37.2,27 37.2,41 27,41 27,70 13,70"],
-  "AP.02": ["27,41.3 49,41.3 49,70 27,70"],
-  "AP.03": ["49,42 70,42 70,70 49,70"],
-  "AP.04": ["60,28 71,28 71,32 85,32 85,70 70,70 70,50 70,50 70,42.5 60,42.5"],
+  "AP.01": ["12.5,30.2 26.5,30.2 26.5,26.3 37.5,26.3 37.5,41.2 27.5,41.2 27.5,70.25 12.5,70.25"],
+  "AP.02": ["26.75,40.5 49.5,40.5 49.5,70.25 26.75,70.25"],
+  "AP.03": ["48.8,41.4 71.57,41.4 71.57,70.25 48.8,70.25"],
+  "AP.04": ["71.9,31.07 88.15,31.07 88.15,70.25 70.85,70.25 70.85,42.1 60.8,42.1 60.8,27.15 71.9,27.15"],
+
   "AP.05": ["-23.5,20.8 6,20.8 6,11.5 28,11.5 28,42 8,42 8,86 -26,86 -26,20.8"],
   "AP.06": ["6.7,40.5 50.3,40.5 50.3,88 6.7,88"],
   "AP.07": ["49,42 93,42 93,90 49,90"],
   "AP.08": ["120,22 93.9,22 93.9,12.9 72,12.9 72,44 92,44 92,89 126.7,89 126.7,22"],
+
   "AP.09": ["-23.5,20.8 6,20.8 6,11.5 28,11.5 28,42 8,42 8,86 -26,86 -26,20.8"],
   "AP.10": ["6.7,40.5 50.3,40.5 50.3,88 6.7,88"],
   "AP.11": ["49,42 93,42 93,90 49,90"],
   "AP.12": ["120,22 93.9,22 93.9,12.9 72,12.9 72,44 92,44 92,89 126.7,89 126.7,22"],
+
   "AP.13": ["6,25.5 28.5,25.5 28.5,41 50.7,41 50.7,86.8 -22.5,86.8 -22.5,25.5 6,25.5"],
   "AP.14": ["90,27 71.5,27 71.5,42.5 49.3,42.5 49.3,88.5 122.5,88.5 122.5,27 90,27"]
 } as const;
@@ -141,7 +144,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 74.8, y: 33, width: 24.2, height: 24.6 },
       { x: 62.4, y: 56.1, width: 36.6, height: 18.8 },
     ],
-    seoTitle: "Building A AP.01 | Three-room apartment",
+    seoTitle: "Residence AP.01 | Three-room apartment",
     seoDescription: "Ground-floor three-room apartment with two bedrooms, one bathroom, and a private yard.",
   }),
   createParsedUnit({
@@ -167,7 +170,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Ground-floor two-room apartment with one bedroom, one bathroom, and a private yard.",
     features: ["One bedroom", "One bathroom", "Private yard"],
     planArea: { x: 60.5, y: 33.5, width: 23, height: 23 },
-    seoTitle: "Building A AP.02 | Two-room apartment",
+    seoTitle: "Residence AP.02 | Two-room apartment",
     seoDescription: "Ground-floor two-room apartment with one bedroom, one bathroom, and a private yard.",
   }),
   createParsedUnit({
@@ -193,7 +196,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Ground-floor two-room apartment with one bedroom, one bathroom, and a private yard.",
     features: ["One bedroom", "One bathroom", "Private yard"],
     planArea: { x: 34.5, y: 32.5, width: 24, height: 23 },
-    seoTitle: "Building A AP.03 | Two-room apartment",
+    seoTitle: "Residence AP.03 | Two-room apartment",
     seoDescription: "Ground-floor two-room apartment with one bedroom, one bathroom, and a private yard.",
   }),
   createParsedUnit({
@@ -224,7 +227,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 17.5, y: 47.0, width: 27.6, height: 16.8 },
       { x: 28.8, y: 63.4, width: 16.3, height: 9.8 },
     ],
-    seoTitle: "Building A AP.04 | Three-room apartment",
+    seoTitle: "Residence AP.04 | Three-room apartment",
     seoDescription: "Ground-floor three-room apartment with two bedrooms, one bathroom, and a private yard.",
   }),
   createParsedUnit({
@@ -255,7 +258,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 74.43, y: 42.1, width: 16.8, height: 24.8 },
       { x: 82.55, y: 46.2, width: 17.33, height: 20.5 },
     ],
-    seoTitle: "Building A AP.05 | Three-room apartment",
+    seoTitle: "Residence AP.05 | Three-room apartment",
     seoDescription: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
   }),
   createParsedUnit({
@@ -281,7 +284,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
     planArea: { x: 60.31, y: 27.06, width: 24.85, height: 29.54 },
-    seoTitle: "Building A AP.06 | Two-room apartment",
+    seoTitle: "Residence AP.06 | Two-room apartment",
     seoDescription: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
   createParsedUnit({
@@ -307,7 +310,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
     planArea: { x: 34.14, y: 25.88, width: 24.85, height: 29.67 },
-    seoTitle: "Building A AP.07 | Two-room apartment",
+    seoTitle: "Residence AP.07 | Two-room apartment",
     seoDescription: "Second-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
   createParsedUnit({
@@ -338,7 +341,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 14.11, y: 46.0, width: 17.4, height: 21.0 },
       { x: 28.7, y: 41.9, width: 16.17, height: 24.9 },
     ],
-    seoTitle: "Building A AP.08 | Three-room apartment",
+    seoTitle: "Residence AP.08 | Three-room apartment",
     seoDescription: "Second-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
   }),
   createParsedUnit({
@@ -369,7 +372,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 74.43, y: 42.1, width: 16.8, height: 24.8 },
       { x: 82.55, y: 46.2, width: 17.33, height: 20.5 },
     ],
-    seoTitle: "Building A AP.09 | Three-room apartment",
+    seoTitle: "Residence AP.09 | Three-room apartment",
     seoDescription: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
   }),
   createParsedUnit({
@@ -395,7 +398,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
     planArea: { x: 60.31, y: 27.06, width: 24.85, height: 29.54 },
-    seoTitle: "Building A AP.10 | Two-room apartment",
+    seoTitle: "Residence AP.10 | Two-room apartment",
     seoDescription: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
   createParsedUnit({
@@ -421,7 +424,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
     description: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
     features: ["One bedroom", "One bathroom", "Balcony"],
     planArea: { x: 34.14, y: 25.88, width: 24.85, height: 29.67 },
-    seoTitle: "Building A AP.11 | Two-room apartment",
+    seoTitle: "Residence AP.11 | Two-room apartment",
     seoDescription: "Third-floor two-room apartment with one bedroom, one bathroom, and a balcony.",
   }),
   createParsedUnit({
@@ -452,7 +455,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 14.11, y: 46.0, width: 17.4, height: 21.0 },
       { x: 28.7, y: 41.9, width: 16.17, height: 24.9 },
     ],
-    seoTitle: "Building A AP.12 | Three-room apartment",
+    seoTitle: "Residence AP.12 | Three-room apartment",
     seoDescription: "Third-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a balcony.",
   }),
   createParsedUnit({
@@ -485,7 +488,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 61.4, y: 44.3, width: 27.2, height: 14.1 },
       { x: 85.4, y: 37.2, width: 14.48, height: 20.3 },
     ],
-    seoTitle: "Building A AP.13 | Three-room apartment",
+    seoTitle: "Residence AP.13 | Three-room apartment",
     seoDescription: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",
   }),
   createParsedUnit({
@@ -518,7 +521,7 @@ export const buildingAParsedUnits: BuildingAParsedUnit[] = [
       { x: 44.2, y: 30.8, width: 16.1, height: 13.7 },
       { x: 33.4, y: 41.5, width: 17.8, height: 10.1 },
     ],
-    seoTitle: "Building A AP.14 | Three-room apartment",
+    seoTitle: "Residence AP.14 | Three-room apartment",
     seoDescription: "Fourth-floor three-room apartment with two bedrooms, one bathroom, a separate WC, and a panoramic terrace.",
   }),
 ];

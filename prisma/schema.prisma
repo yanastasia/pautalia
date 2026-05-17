@@ -20,12 +20,26 @@ enum UnitStatus {
   hidden
 }
 
+enum UnitKind {
+  apartment
+  parking
+}
+
 enum LeadStatus {
   new
   contacted
   qualified
+  viewing_booked
+  reserved
+  closed
   archived
   spam
+}
+
+enum PriceVisibilityMode {
+  visible
+  hidden
+  per_unit
 }
 
 enum ParkingStatus {
@@ -50,6 +64,8 @@ model Building {
   parkingSpots     ParkingSpot[]
   leads            Lead[]
   events           Event[]
+  siteSettings     SiteSettings[]
+  legalPages       LegalPage[]
 }
 
 model Floor {
@@ -70,18 +86,24 @@ model Floor {
 
 model Unit {
   id              String     @id
+  kind            UnitKind   @default(apartment)
   externalCode    String     @unique
   slug            String     @unique
   buildingId      String
-  floorId         String
-  typologyId      String
+  floorId         String?
+  typologyId      String?
   unitNumber      String
   rooms           Int
   bedrooms        Int?
   bathrooms       Int
-  areaInternalSqm Float
-  areaTotalSqm    Float
+  areaLivingSqm   Float      @default(0)
+  areaSharedSqm   Float      @default(0)
+  areaTotalSqm    Float      @default(0)
   terraceSqm      Float      @default(0)
+  commonPartsPercent Float    @default(0)
+  landPercent     Float      @default(0)
+  landAreaSqm     Float      @default(0)
+  areaInternalSqm Float      @default(0)
   hasYard         Boolean    @default(false)
   outdoorType     String?
   orientation     String
@@ -104,11 +126,11 @@ model Unit {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   building        Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  floor           Floor      @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  floor           Floor?     @relation(fields: [floorId], references: [id], onDelete: SetNull)
   leads           Lead[]
   events          Event[]
 
-  @@index([buildingId, status, isPublished])
+  @@index([buildingId, kind, status, isPublished])
   @@index([slug])
 }
 
@@ -145,7 +167,9 @@ model Lead {
   ipHash           String?
   consentTimestamp DateTime
   createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   status           LeadStatus @default(new)
+  adminNotes       String?
   unit             Unit?      @relation(fields: [unitId], references: [id], onDelete: SetNull)
   building         Building?  @relation(fields: [buildingId], references: [id], onDelete: SetNull)
 
@@ -154,10 +178,67 @@ model Lead {
   @@index([email])
 }
 
+model SiteSettings {
+  id                  String              @id @default("default")
+  buildingId          String?
+  priceVisibilityMode PriceVisibilityMode @default(per_unit)
+  contactEmail        String?
+  contactPhone        String?
+  bookingUrl          String?
+  announcement        String?
+  analyticsEnabled    Boolean             @default(true)
+  cookieConsentMode   String              @default("explicit")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  building            Building?           @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+}
+
+model LegalPage {
+  id             String    @id @default(cuid())
+  buildingId     String?
+  slug           String
+  locale         String    @default("bg")
+  title          String
+  body           String
+  isPublished    Boolean   @default(true)
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  building       Building? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+
+  @@unique([slug, locale])
+  @@index([isPublished, slug])
+}
+
+model AdminUser {
+  id              String    @id @default(cuid())
+  username        String    @unique
+  passwordHash    String
+  role            String    @default("super_admin")
+  totpSecret      String?
+  totpEnabled     Boolean   @default(false)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
 model Event {
   id            String    @id @default(cuid())
   eventType     String
   sourcePageUrl String
+  referrer      String?
+  source        String?
+  medium        String?
+  campaign      String?
+  term          String?
+  content       String?
+  deviceType    String?
+  country       String?
+  region        String?
+  city          String?
+  durationMs    Int?
+  visitorIdHash String?
+  sessionIdHash String?
   buildingId    String?
   unitId        String?
   payload       Json?
@@ -169,6 +250,10 @@ model Event {
 
   @@index([createdAt])
   @@index([eventType])
+  @@index([country])
+  @@index([city])
   @@index([buildingId])
   @@index([unitId])
+  @@index([visitorIdHash])
+  @@index([sessionIdHash])
 }
