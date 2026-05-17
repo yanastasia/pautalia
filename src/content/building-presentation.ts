@@ -56,7 +56,7 @@ export const buildingPresentation: Record<string, BuildingPresentation> = {
     },
   },
   "building-b": {
-    heroImage: "/assets/buildings/park/selector/main.png",
+    heroImage: "/assets/buildings/park/hero/park_exterior-front.png",
     modelColor: "#7f988a",
     sequence: 2,
     completionPercent: 0,

@@ -15,8 +15,8 @@ const buildingVisuals = {
     position: "object-[28%_center]",
   },
   b: {
-    src: "/assets/buildings/residence/exterior/exterior-front.jpg",
-    position: "object-[68%_center]",
+    src: "/assets/buildings/park/hero/park_exterior-front.png",
+    position: "object-center",
   },
 } as const;
 

@@ -5,11 +5,13 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     formats: ["image/avif", "image/webp"],
   },
-  webpackDevMiddleware: (config) => {
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: ["**/.playwright-mcp/**", "**/.next_stale_*/**"],
-    };
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: ["**/.playwright-mcp/**", "**/.next_stale_*/**"],
+      };
+    }
 
     return config;
   },

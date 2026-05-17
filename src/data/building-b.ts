@@ -10,7 +10,7 @@ export const buildingBSeed: Omit<Building, "totalUnits" | "availableUnits" | "cr
   shortDescription: "Six apartments across three floors with private yards on the ground level and open balconies above.",
   description:
     "Park offers six apartments across three floors, each with a clear and practical layout. Ground-floor apartments have private yards, while upper-floor apartments feature two balconies and a dedicated dressing room.",
-  heroImage: "/assets/buildings/park/selector/main.png",
+  heroImage: "/assets/buildings/park/hero/park_exterior-front.png",
   heroImageId: "media-exterior-front",
   coverRenderId: "media-exterior-front",
   status: "published",

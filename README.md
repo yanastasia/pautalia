@@ -91,6 +91,7 @@ Required Render environment variables:
 
 - `DATABASE_URL`
 - `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_BOOKING_URL`
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 - `AUTH_HASH_SECRET`
@@ -109,6 +110,8 @@ Recommended:
   Blueprint tracks `main`, so merge this work before using it for production.
 - The checked-in production web domain is `https://pautalia.com`.
 - The checked-in production CMS domain is `https://cms.pautalia.com`.
+- Add `pautalia.com` and `www.pautalia.com` as custom domains on the
+  `pautalia-web` service. Add `cms.pautalia.com` on `pautalia-cms`.
 - Set `PAUTALIA_INVENTORY_SOURCE=database` for production CMS-backed inventory.
 - Set the same `REVALIDATE_SECRET` value on both `pautalia-web` and
   `pautalia-cms`.

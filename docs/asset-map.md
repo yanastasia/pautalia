@@ -28,6 +28,7 @@ Building-specific assets should live under `public/assets/buildings/[building-fo
 
 | Asset type | Residence path | Park path | Naming |
 | --- | --- | --- | --- |
+| Building hero/card image | `public/assets/buildings/residence/hero/` | `public/assets/buildings/park/hero/` | Public building cards and building metadata image. |
 | Building selector image | `public/assets/buildings/residence/selector/main.png` | `public/assets/buildings/park/selector/main.png` | One main exterior/selector image per building. |
 | Floor plans | `public/assets/buildings/residence/floors/` | `public/assets/buildings/park/floors/` | `floor-01.png`, `floor-02.png`, etc. |
 | Floor outline overlays | `public/assets/buildings/residence/floors/` | `public/assets/buildings/park/floors/` | `floor-01-outline.png`, `floor-02-outline.png`, etc. |
@@ -51,6 +52,7 @@ The old shared top-level folders were retired. New building-specific work should
 
 | File | Used for |
 | --- | --- |
+| `public/assets/buildings/park/hero/park_exterior-front.png` | Park public building card, `/buildings` overview card, homepage feature card, building metadata image. |
 | `public/assets/buildings/park/selector/main.png` | Park selector card, building selector visual, Park facade reference. |
 | `public/assets/buildings/park/floors/floor-01.png` through `floor-03.png` | Park floor pages, floor selector, unit plan gallery, inventory seed data. |
 | `src/data/building-selector-visuals.ts` Park floor bands | Park building facade floor selector overlays for floors 1-3. |
@@ -58,7 +60,7 @@ The old shared top-level folders were retired. New building-specific work should
 | `public/assets/buildings/park/exterior/park_exterior1.png` through `park_exterior4.png` | Park exterior render set and curated public gallery entries. |
 | `public/assets/buildings/park/gallery/apartment_renders/B-AP.01/` through `B-AP.06/` | Per-apartment Park render galleries used by unit cards, unit hero images, and unit detail gallery sections. |
 
-The Park `hero`, `location`, `panoramas`, and `floors/hotspots` folders are prepared for approved future media.
+The Park `location`, `panoramas`, and `floors/hotspots` folders are prepared for approved future media.
 
 ## Shared Site Assets
 

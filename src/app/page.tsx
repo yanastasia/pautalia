@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 const featureImages = {
   a: "/assets/buildings/residence/gallery/exterior-front.jpg",
+  b: "/assets/buildings/park/hero/park_exterior-front.png",
 } as const;
 
 const statIcons = [Building2, Compass, Layers3, Sparkles] as const;
