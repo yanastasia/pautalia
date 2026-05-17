@@ -28,8 +28,8 @@ export function HomeHero({
   imageAlt: string;
   images: readonly HeroImage[];
 }) {
-  const heroImages = images.length > 0 ? images : [{ src: "/assets/buildings/residence/exterior/exterior-front.jpg", alt: imageAlt }];
-  const durationSeconds = Math.max(heroImages.length * 6, 12);
+  const heroImages = images.length > 0 ? images : [{ src: "/assets/buildings/residence/hero/exterior-front.jpg", alt: imageAlt }];
+  const durationSeconds = 12;
 
   return (
     <section className="home-hero-shell relative min-h-[100svh] -mt-[9.4rem] overflow-hidden pt-[9.4rem] md:-mt-[7.1rem] md:pt-[7.1rem]">
