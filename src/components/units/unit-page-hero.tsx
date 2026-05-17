@@ -35,7 +35,7 @@ export function UnitPageHero({
           <div className="page-cover-copy">
             <Link href={`/building/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
               <ArrowLeft className="size-4" />
-              {backToBuildingLabel} {buildingId.toUpperCase()}
+              {backToBuildingLabel} {buildingLabel}
             </Link>
             <div className="mt-8 flex items-center gap-4">
               <StatusPill status={status} />
@@ -60,7 +60,7 @@ export function UnitPageHero({
         <div className="page-cover-copy">
           <Link href={`/building/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
             <ArrowLeft className="size-4" />
-            {backToBuildingLabel} {buildingId.toUpperCase()}
+            {backToBuildingLabel} {buildingLabel}
           </Link>
           <div className="mt-8 flex items-center gap-4">
             <StatusPill status={status} />

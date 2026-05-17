@@ -48,7 +48,7 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
       <div className="flex flex-col justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
-            <span>{unit.buildingId.toUpperCase()}</span>
+            <span>{unit.building?.name || unit.buildingId.toUpperCase()}</span>
             <span>{getFloorLabel(locale, unit.floor)}</span>
             <span>{getOrientationLabel(locale, unit.orientation)}</span>
             <span>{unit.typologyId.replace("typology-", "").toUpperCase()}</span>

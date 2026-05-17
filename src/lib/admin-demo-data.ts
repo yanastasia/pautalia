@@ -19,7 +19,7 @@ export function getDemoLead(): AdminLead {
     sourcePageUrl: "/unit/unit-a208",
     createdAt: new Date(),
     unit: { id: "a-204", externalCode: "A-AP.08", kind: "apartment" },
-    building: { id: "a", name: "Residence", slug: "residence" },
+    building: { id: "a", name: "Building A", slug: "building-a" },
   };
 }
 
@@ -59,8 +59,8 @@ function makeDemoApartment(unit: (typeof units)[number]): AdminUnit {
     updatedAt: new Date(),
     building: {
       id: unit.buildingId,
-      name: unit.buildingId === "b" ? "Park" : "Residence",
-      slug: unit.buildingId === "b" ? "park" : "residence",
+      name: unit.buildingId === "b" ? "Building B" : "Building A",
+      slug: unit.buildingId === "b" ? "building-b" : "building-a",
     },
     _count: { leads: unit.id === "a-204" ? 1 : 0 },
   };
@@ -81,8 +81,8 @@ function makeDemoParking(buildingId: "a" | "b", code: string, id: string, areaSq
     updatedAt: new Date(),
     building: {
       id: buildingId,
-      name: buildingId === "b" ? "Park" : "Residence",
-      slug: buildingId === "b" ? "park" : "residence",
+      name: buildingId === "b" ? "Building B" : "Building A",
+      slug: buildingId === "b" ? "building-b" : "building-a",
     },
     _count: { leads: 0 },
   };

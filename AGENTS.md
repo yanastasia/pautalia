@@ -10,6 +10,10 @@
 - Every table has building_id UUID FK — even when only one building exists
 - Asset paths: /assets/[building-slug]/[typology-slug]/[room-name].webp
 - Unit codes: [BUILDING_LETTER]-[TYPE].[NUMBER] e.g. A-AP.01 or B-PM.03
+- Building Naming: 
+  - External: "Residence" (Building A), "Park" (Building B)
+  - Internal: "Building A", "Building B"
+  - Detection: Handled via `getUserType()` based on admin session cookie.
 - ISR revalidation via POST /api/webhooks/payload on any CMS change
 - Rate limiting: in-memory Map (no Redis) — 3 req/IP/15min on lead forms
 - Honeypot anti-spam on all forms — no reCAPTCHA
