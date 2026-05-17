@@ -11,7 +11,7 @@ import type {
 import { buildingAFloorOverrides, buildingAParsedUnits } from "@/data/building-a-floorplans";
 import { buildingAParkingUnits } from "@/data/building-a-parking";
 import { buildingBFloorOverrides, buildingBParsedUnits } from "@/data/building-b-floorplans";
-import { buildingBFloors, buildingBParkingUnits, buildingBSeed, buildingBTypologies } from "@/data/building-b";
+import { buildingBParkingUnits, buildingBSeed, buildingBTypologies } from "@/data/building-b";
 import { getOfficialApartmentValue } from "@/data/official-unit-values";
 import { getResidenceUnitGallery, parkGeneralGalleryImages } from "@/data/unit-gallery-assets";
 

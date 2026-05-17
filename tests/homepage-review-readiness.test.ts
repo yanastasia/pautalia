@@ -172,7 +172,7 @@ describe("homepage review readiness helpers", () => {
 
     expect(selector.buildingCards).toHaveLength(1);
     expect(selector.buildingCards[0]?.href).toBe("/building/residence");
-    expect(selector.highlightedUnits.map((unit: any) => unit.href)).toEqual([
+    expect(selector.highlightedUnits.map((unit: { href: string }) => unit.href)).toEqual([
       "/unit/unit-a101",
       "/unit/unit-a201",
     ]);
