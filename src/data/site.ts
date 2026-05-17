@@ -25,7 +25,7 @@ const buildingSeeds = [
     shortDescription: "Spacious homes with broad outlooks, practical layouts, and private yards on floor one.",
     description:
       "Residence offers larger homes, private outdoor space on the ground floor, and broad views from the upper levels.",
-    heroImage: "/assets/buildings/hero/residence_exterior-front.jpg",
+    heroImage: "/assets/buildings/residence/hero/exterior-front.jpg",
     heroImageId: "media-exterior-front",
     coverRenderId: "media-exterior-front",
     status: "published" as const,

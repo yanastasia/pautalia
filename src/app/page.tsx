@@ -15,7 +15,7 @@ import { fetchAllPautaliaUnits, fetchPautaliaBuildings } from "@/lib/public-api"
 import { cn } from "@/lib/utils";
 
 const featureImages = {
-  a: "/assets/buildings/residence/gallery/exterior-front.jpg",
+  a: "/assets/buildings/residence/hero/exterior-front.jpg",
   b: "/assets/buildings/park/hero/park_exterior-front.png",
 } as const;
 

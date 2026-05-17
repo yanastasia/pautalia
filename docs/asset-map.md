@@ -42,6 +42,7 @@ The old shared top-level folders were retired. New building-specific work should
 
 | File | Used for |
 | --- | --- |
+| `public/assets/buildings/residence/hero/exterior-front.jpg` | Residence public building card, `/buildings` overview card, homepage feature card, building metadata image. |
 | `public/assets/buildings/residence/selector/main.png` | Residence selector card, building selector visual, Residence facade reference. |
 | `public/assets/buildings/residence/floors/floor-01.png` through `floor-04.png` | Residence floor pages, floor selector, unit plan gallery, inventory seed data. |
 | `public/assets/buildings/residence/floors/floor-01-outline.png` through `floor-04-outline.png` | Stored floor outline assets for future floorplan overlays. |

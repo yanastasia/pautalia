@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 const buildingVisuals = {
   a: {
-    src: "/assets/buildings/residence/gallery/exterior-front.jpg",
+    src: "/assets/buildings/residence/hero/exterior-front.jpg",
     position: "object-[28%_center]",
   },
   b: {

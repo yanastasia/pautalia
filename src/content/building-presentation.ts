@@ -17,7 +17,7 @@ export type BuildingPresentation = {
 
 export const buildingPresentation: Record<string, BuildingPresentation> = {
   "building-a": {
-    heroImage: "/assets/buildings/hero/residence_exterior-front.jpg",
+    heroImage: "/assets/buildings/residence/hero/exterior-front.jpg",
     modelColor: "#c77d4f",
     sequence: 1,
     completionPercent: 5,
