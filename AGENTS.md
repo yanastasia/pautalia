@@ -9,7 +9,7 @@
 ## Architecture rules
 - Every table has building_id UUID FK — even when only one building exists
 - Asset paths: /assets/[building-slug]/[typology-slug]/[room-name].webp
-- Unit codes: [BUILDING_LETTER]-[FLOOR][UNIT] e.g. A-204
+- Unit codes: [BUILDING_LETTER]-[TYPE].[NUMBER] e.g. A-AP.01 or B-PM.03
 - ISR revalidation via POST /api/webhooks/payload on any CMS change
 - Rate limiting: in-memory Map (no Redis) — 3 req/IP/15min on lead forms
 - Honeypot anti-spam on all forms — no reCAPTCHA

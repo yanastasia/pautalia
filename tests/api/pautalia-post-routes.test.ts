@@ -9,13 +9,13 @@ describe("pautalia post api routes", () => {
 
     expect(response.status).toBe(200);
     expect(body.items).toHaveLength(1);
-    expect(body.items[0].slug).toBe("construction-update-building-a-may-2026");
+    expect(body.items[0].slug).toBe("construction-update-residence-may-2026");
   });
 
   it("returns one published post", async () => {
     const response = await postRoute(
-      new Request("http://localhost:3000/api/pautalia/posts/construction-update-building-a-may-2026?locale=en"),
-      { params: Promise.resolve({ slug: "construction-update-building-a-may-2026" }) },
+      new Request("http://localhost:3000/api/pautalia/posts/construction-update-residence-may-2026?locale=en"),
+      { params: Promise.resolve({ slug: "construction-update-residence-may-2026" }) },
     );
     const body = await response.json();
 
@@ -25,8 +25,8 @@ describe("pautalia post api routes", () => {
 
   it("returns 404 for draft posts", async () => {
     const response = await postRoute(
-      new Request("http://localhost:3000/api/pautalia/posts/draft-building-b-launch-note"),
-      { params: Promise.resolve({ slug: "draft-building-b-launch-note" }) },
+      new Request("http://localhost:3000/api/pautalia/posts/draft-park-launch-note"),
+      { params: Promise.resolve({ slug: "draft-park-launch-note" }) },
     );
 
     expect(response.status).toBe(404);

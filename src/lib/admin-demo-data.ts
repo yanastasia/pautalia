@@ -1,7 +1,7 @@
 import { buildingBParkingUnits } from "@/data/building-b";
 import { units } from "@/data/site";
 import type { AdminLead, AdminLeadStatus, AdminUnit, AdminUnitStatus } from "@/lib/admin-data";
-import { getBuildingLabel } from "@/lib/i18n/messages";
+
 
 let demoLeadStatus: AdminLeadStatus = "new";
 let demoLeadNotes = "";
@@ -13,13 +13,13 @@ export function getDemoLead(): AdminLead {
     fullName: "Тестов клиент",
     email: "demo@pautalia.bg",
     phone: "+359 877 909 010",
-    message: "Интересувам се от апартамент AP.08 и възможност за оглед.",
+    message: "Интересувам се от апартамент A-AP.08 и възможност за оглед.",
     status: demoLeadStatus,
     adminNotes: demoLeadNotes,
     sourcePageUrl: "/unit/unit-a208",
     createdAt: new Date(),
-    unit: { id: "a-204", externalCode: "AP.08", kind: "apartment" },
-    building: { id: "a", name: "A", slug: "building-a" },
+    unit: { id: "a-204", externalCode: "A-AP.08", kind: "apartment" },
+    building: { id: "a", name: "Residence", slug: "residence" },
   };
 }
 
@@ -31,7 +31,7 @@ export function setDemoLead(status: AdminLeadStatus, adminNotes: string | null) 
 export function getDemoUnits(): AdminUnit[] {
   return [
     ...units.map(makeDemoApartment),
-    ...Array.from({ length: 14 }, (_, index) => makeDemoParking("a", `A-P${String(index + 1).padStart(2, "0")}`, `a-parking-${index + 1}`, 0)),
+    ...Array.from({ length: 14 }, (_, index) => makeDemoParking("a", `A-PM.${String(index + 1).padStart(2, "0")}`, `a-parking-${index + 1}`, 0)),
     ...buildingBParkingUnits.map((parking) => makeDemoParking("b", parking.code, parking.id, parking.areaSqm)),
   ];
 }
@@ -59,8 +59,8 @@ function makeDemoApartment(unit: (typeof units)[number]): AdminUnit {
     updatedAt: new Date(),
     building: {
       id: unit.buildingId,
-      name: getBuildingLabel("bg", unit.buildingId).replace(/^Сграда\s/, ""),
-      slug: unit.buildingId === "b" ? "building-b" : "building-a",
+      name: unit.buildingId === "b" ? "Park" : "Residence",
+      slug: unit.buildingId === "b" ? "park" : "residence",
     },
     _count: { leads: unit.id === "a-204" ? 1 : 0 },
   };
@@ -81,8 +81,8 @@ function makeDemoParking(buildingId: "a" | "b", code: string, id: string, areaSq
     updatedAt: new Date(),
     building: {
       id: buildingId,
-      name: getBuildingLabel("bg", buildingId).replace(/^Сграда\s/, ""),
-      slug: buildingId === "b" ? "building-b" : "building-a",
+      name: buildingId === "b" ? "Park" : "Residence",
+      slug: buildingId === "b" ? "park" : "residence",
     },
     _count: { leads: 0 },
   };

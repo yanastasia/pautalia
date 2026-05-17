@@ -1,3 +1,5 @@
+import { normalizeFloorplanImagePath } from "@/lib/floorplan-assets";
+
 type FloorplanFrame = {
   aspectRatio: string;
   imageWrapperClassName: string;
@@ -23,28 +25,28 @@ const DEFAULT_FLOORPLAN_FRAME: FloorplanFrame = {
 
 const RESIDENCE_FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
   "floor-01": {
-    aspectRatio: "1000 / 634",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
-    hotspotScale: 1.88,
-    hotspotOffsetX: -0.3,
-    hotspotOffsetY: -1.6,
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
   },
   "floor-02": {
-    aspectRatio: "1000 / 634",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
-    hotspotScale: 0.96,
-    hotspotOffsetX: 2.4,
-    hotspotOffsetY: -6.6,
+    hotspotScale: 1,
+    hotspotOffsetX: 0,
+    hotspotOffsetY: 0,
   },
   "floor-03": {
-    aspectRatio: "1000 / 634",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
     hotspotOffsetY: 0,
   },
   "floor-04": {
-    aspectRatio: "1000 / 634",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
@@ -58,21 +60,21 @@ const FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
   "/assets/buildings/residence/floors/floor-03.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-03"],
   "/assets/buildings/residence/floors/floor-04.png": RESIDENCE_FLOORPLAN_FRAME_CONFIGS["floor-04"],
   "/assets/buildings/park/floors/floor-01.png": {
-    aspectRatio: "18140 / 11336",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
     hotspotOffsetY: 0,
   },
   "/assets/buildings/park/floors/floor-02.png": {
-    aspectRatio: "13856 / 10667",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
     hotspotOffsetY: 0,
   },
   "/assets/buildings/park/floors/floor-03.png": {
-    aspectRatio: "13701 / 10616",
+    aspectRatio: "1 / 1",
     imageWrapperClassName: "",
     hotspotScale: 1,
     hotspotOffsetX: 0,
@@ -81,7 +83,7 @@ const FLOORPLAN_FRAME_CONFIGS: Record<string, FloorplanFrameConfig> = {
 };
 
 export function resolveFloorplanFrame(imagePath: string, mapAspectRatio?: string): FloorplanFrame {
-  const config = FLOORPLAN_FRAME_CONFIGS[imagePath];
+  const config = FLOORPLAN_FRAME_CONFIGS[normalizeFloorplanImagePath(imagePath)];
 
   if (config) {
     return {

@@ -116,8 +116,8 @@ export async function getAdminUnits() {
 export async function getAdminBuildings(): Promise<AdminBuildingOption[]> {
   if (!(await hasAdminDashboardSchema())) {
     return [
-      { id: "a", name: "A", slug: "building-a" },
-      { id: "b", name: "B", slug: "building-b" },
+      { id: "a", name: "Residence", slug: "residence" },
+      { id: "b", name: "Park", slug: "park" },
     ];
   }
 

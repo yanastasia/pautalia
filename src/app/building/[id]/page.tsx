@@ -8,6 +8,8 @@ import { PublicApiError, fetchAllPautaliaUnits, fetchPautaliaBuilding } from "@/
 import { getLocale } from "@/lib/i18n/server";
 import { getBuildingJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
+import { getUserType } from "@/lib/access-control";
+import { getBuildingLabel } from "@/lib/i18n/messages";
 
 function normalizeUnitSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const normalized: Record<string, string> = {};
@@ -42,6 +44,7 @@ function normalizeUnitSearchParams(searchParams: Record<string, string | string[
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const locale = await getLocale();
+  const userType = await getUserType();
   let buildingResponse: Awaited<ReturnType<typeof fetchPautaliaBuilding>>;
 
   try {
@@ -60,13 +63,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return { title: locale === "bg" ? "Сградата не е намерена" : "Building not found" };
   }
 
+  const buildingLabel = getBuildingLabel(locale, building.id, userType);
+
   return buildPageMetadata({
     locale,
     pathname: `/building/${building.slug}`,
-    title: building.name,
+    title: buildingLabel,
     description: building.fullDescription,
     imagePath: building.heroImage,
-    imageAlt: locale === "bg" ? `Изглед към ${building.name}` : `${building.name} exterior view`,
+    imageAlt: `${buildingLabel} facade`,
   });
 }
 
@@ -79,6 +84,7 @@ export default async function BuildingPage({
 }) {
   const { id } = await params;
   const locale = await getLocale();
+  const userType = await getUserType();
   const messages = getMessages(locale);
   const normalizedSearchParams = normalizeUnitSearchParams(await searchParams);
   let buildingResponse: Awaited<ReturnType<typeof fetchPautaliaBuilding>>;
@@ -94,6 +100,7 @@ export default async function BuildingPage({
   }
 
   const { item: building, floors: buildingFloors } = buildingResponse;
+  const buildingLabel = getBuildingLabel(locale, building.id, userType);
   const [buildingUnits, filteredUnits] = await Promise.all([
     fetchAllPautaliaUnits(locale, {
       building: building.slug,
@@ -144,7 +151,7 @@ export default async function BuildingPage({
           <LeadForm
             buildingId={building.id}
             source={`building-${building.slug}`}
-            heading={`${messages.building.askAbout} ${building.name}`}
+            heading={`${messages.building.askAbout} ${buildingLabel}`}
           />
         </div>
       </section>

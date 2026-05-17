@@ -31,6 +31,17 @@ describe("resolveFloorplanFrame", () => {
     });
   });
 
+  it("normalizes legacy Residence floorplan paths before resolving frames", () => {
+    expect(resolveFloorplanFrame("/assets/floorplans/second_floor.png")).toMatchObject({
+      aspectRatio: "1000 / 634",
+      imageWrapperClassName: "",
+      imageClassName: "object-center",
+      hotspotScale: 0.96,
+      hotspotOffsetX: 2.4,
+      hotspotOffsetY: -6.6,
+    });
+  });
+
   it("uses Park floorplan dimensions and selector floor bands", () => {
     expect(resolveFloorplanFrame("/assets/buildings/park/floors/floor-01.png")).toMatchObject({
       aspectRatio: "18140 / 11336",

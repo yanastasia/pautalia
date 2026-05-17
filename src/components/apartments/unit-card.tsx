@@ -14,17 +14,20 @@ import type { PublicUnit } from "@/types/public-api";
 export function UnitCard({ unit }: { unit: PublicUnit }) {
   const locale = useLocale();
   const messages = getMessages(locale);
+  const mainImage = unit.gallery[0] || unit.panoramaImage || unit.floorplan;
 
   return (
     <article className="group grid gap-6 border-t border-[color:var(--line)] pt-6 lg:grid-cols-[minmax(22rem,26rem)_minmax(0,1fr)] lg:gap-12 lg:pt-8">
       <div className="relative min-h-[14.5rem] overflow-hidden bg-[color:var(--surface-dark)] sm:min-h-[18rem] lg:min-h-[22rem]">
-        <Image
-          src={unit.gallery[0]}
-          alt={`${getResidenceLabel(locale, unit.rooms)} ${unit.code}`}
-          fill
-          className="object-cover transition duration-700 group-hover:scale-105"
-          sizes="(max-width: 1024px) 100vw, 42vw"
-        />
+        {mainImage && (
+          <Image
+            src={mainImage}
+            alt={`${getResidenceLabel(locale, unit.rooms)} ${unit.code}`}
+            fill
+            className="object-cover transition duration-700 group-hover:scale-105"
+            sizes="(max-width: 1024px) 100vw, 42vw"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#08111a]/82 via-[#08111a]/14 to-transparent" />
         <div className="absolute left-4 top-4">
           <StatusPill status={unit.status} />

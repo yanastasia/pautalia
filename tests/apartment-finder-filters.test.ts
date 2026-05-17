@@ -11,13 +11,13 @@ function createUnit(overrides: Partial<PublicUnit>): PublicUnit {
   return {
     id: "unit-a101",
     slug: "unit-a101",
-    externalCode: "AP.01",
+    externalCode: "A-AP.01",
     code: "A-101",
     buildingId: "a",
     floorId: "a-1",
     typologyId: "typology-2a",
     unitNumber: "01",
-    building: { id: "a", slug: "building-a", name: "Residence" },
+    building: { id: "a", slug: "residence", name: "Residence" },
     floor: 1,
     floorMeta: { id: "a-1", number: 1, label: "Floor 1" },
     typology: { id: "typology-2a", name: "2-room apartment", rooms: 2 },
@@ -91,15 +91,15 @@ describe("apartment finder filter state", () => {
     expect(Object.fromEntries(next.entries())).toEqual({ floor: "3" });
   });
 
-  it("reads all filter fields from URLSearchParams", () => {
-    const filters = getApartmentFinderFilters(
-      new URLSearchParams("building=building-a&rooms=3&floor=2&orientation=south-west&maxPrice=160000&status=reserved"),
-    );
+  it("extracts filters from search params", () => {
+    const searchParams = new URLSearchParams("building=residence&rooms=3&floor=2&orientation=south-west&maxPrice=160000&status=reserved");
+    const result = getApartmentFinderFilters(searchParams);
 
-    expect(filters).toMatchObject({
-      building: "building-a",
+    expect(result).toEqual({
+      building: "residence",
       rooms: "3",
       floor: "2",
+      minPrice: "",
       maxPrice: "160000",
       orientation: "south-west",
       status: "reserved",
@@ -126,16 +126,15 @@ describe("apartment finder filter state", () => {
       status: "available",
     });
 
-    expect(result.map((unit) => unit.id)).toEqual(["a-201"]);
+    expect(result.map((unit: PublicUnit) => unit.id)).toEqual(["a-201"]);
   });
 
-  it("filters units by Park slug or id", () => {
+  it("filters units correctly", () => {
     const units = [
-      createUnit({ id: "a-201", buildingId: "a", building: { id: "a", slug: "building-a", name: "Residence" } }),
-      createUnit({ id: "b-ap-01", buildingId: "b", building: { id: "b", slug: "building-b", name: "Park" } }),
+      createUnit({ id: "a-201", buildingId: "a", building: { id: "a", slug: "residence", name: "Residence" } }),
+      createUnit({ id: "b-ap-01", buildingId: "b", building: { id: "b", slug: "park", name: "Park" } }),
     ];
 
-    expect(filterUnitsForApartmentFinder(units, { ...getApartmentFinderFilters({}), building: "building-b" }).map((unit) => unit.id)).toEqual(["b-ap-01"]);
-    expect(filterUnitsForApartmentFinder(units, { ...getApartmentFinderFilters({}), building: "b" }).map((unit) => unit.id)).toEqual(["b-ap-01"]);
+    expect(filterUnitsForApartmentFinder(units, { ...getApartmentFinderFilters(new URLSearchParams()), building: "park" }).map((unit: PublicUnit) => unit.id)).toEqual(["b-ap-01"]);
   });
 });

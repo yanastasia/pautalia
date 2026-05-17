@@ -6,12 +6,12 @@ export type PostSeed = Omit<PublicPost, "status" | "translation"> & {
 
 export const postSeeds: PostSeed[] = [
   {
-    id: "construction-update-building-a-may-2026",
-    slug: "construction-update-building-a-may-2026",
+    id: "construction-update-residence-may-2026",
+    slug: "construction-update-residence-may-2026",
     status: "published",
     category: "construction_update",
     buildingId: "a",
-    building: { id: "a", slug: "building-a", name: "Residence" },
+    building: { id: "a", slug: "residence", name: "Residence" },
     publishedAt: "2026-05-01T09:00:00.000Z",
     coverImage: "/assets/buildings/residence/exterior/exterior-front.jpg",
     coverImageAlt: "Pautalia Residence exterior progress",
@@ -43,12 +43,12 @@ export const postSeeds: PostSeed[] = [
     },
   },
   {
-    id: "draft-building-b-launch-note",
-    slug: "draft-building-b-launch-note",
+    id: "draft-park-launch-note",
+    slug: "draft-park-launch-note",
     status: "draft",
     category: "announcement",
     buildingId: "b",
-    building: { id: "b", slug: "building-b", name: "Park" },
+    building: { id: "b", slug: "park", name: "Park" },
     publishedAt: "2026-05-02T09:00:00.000Z",
     coverImage: "/assets/buildings/residence/exterior/exterior-front.jpg",
     coverImageAlt: "Park staged preview",

@@ -10,7 +10,7 @@ describe("Bulgarian localization", () => {
   });
 
   it("returns localized building presentation fields", async () => {
-    const { item } = await getPublicBuilding("bg", "building-a");
+    const { item } = await getPublicBuilding("bg", "residence");
 
     expect(item.tagline).toContain("По-просторни жилища");
     expect(item.shortDescription).toContain("Просторни жилища");

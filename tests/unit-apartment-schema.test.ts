@@ -64,7 +64,7 @@ describe("unit/apartment data model", () => {
       ownership: { commonPartsPercent: 8.02, landPercent: 5.955, landArea: 61.16 },
       priceCents: 15321200,
       availabilityStatus: "available",
-      floorplanImage: "/assets/buildings/residence/apartments/A-AP.08.png",
+      floorplanImage: "/assets/buildings/residence/apartments/A-A-AP.08.png",
       description: expect.stringContaining("Second-floor"),
     });
   });
@@ -101,12 +101,12 @@ describe("unit/apartment data model", () => {
   it("stages Park units without invented official ownership values", () => {
     expect(buildingBUnits).toHaveLength(6);
     expect(buildingBUnits.map((unit) => unit.externalCode)).toEqual([
-      "B-AP-01",
-      "B-AP-02",
-      "B-AP-03",
-      "B-AP-04",
-      "B-AP-05",
-      "B-AP-06",
+      "B-AP.01",
+      "B-AP.02",
+      "B-AP.03",
+      "B-AP.04",
+      "B-AP.05",
+      "B-AP.06",
     ]);
     buildingBUnits.forEach((unit) => {
       expect(unit.buildingId).toBe("b");
@@ -121,7 +121,7 @@ describe("unit/apartment data model", () => {
 
       expect(gallery).toBeDefined();
       expect(unit.gallery).toEqual(gallery);
-      expect(unit.gallery[0]).toContain(`/park/gallery/apartment_renders/${unit.externalCode.replace("-AP-", "-AP.")}/`);
+      expect(unit.gallery[0]).toContain(`/park/gallery/apartment_renders/${unit.externalCode.replace("-AP-", "-A-A-AP.")}/`);
       unit.gallery.forEach((image) => {
         expect(publicAssetExists(image)).toBe(true);
       });
@@ -167,6 +167,6 @@ describe("unit/apartment data model", () => {
   it("includes SQL seed data for the milestone sample units", () => {
     expect(seedSql).toContain("insert into units");
     expect(seedSql).toContain("A-204");
-    expect(seedSql).toContain("/assets/buildings/residence/apartments/A-AP.08.png");
+    expect(seedSql).toContain("/assets/buildings/residence/apartments/A-A-AP.08.png");
   });
 });

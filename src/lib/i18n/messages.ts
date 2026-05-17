@@ -24,6 +24,7 @@ const messages = {
       shareableUrlState: "Shareable URL state",
       publishedInventoryOnly: "Published inventory only",
       sqm: "sq m",
+      noImageAvailable: "No images available",
     },
     header: {
       callback: "Contact us",
@@ -362,6 +363,7 @@ const messages = {
       shareableUrlState: "Споделяем URL",
       publishedInventoryOnly: "Само публикувани имоти",
       sqm: "кв.м",
+      noImageAvailable: "Няма налични изображения",
     },
     header: {
       callback: "Свържете се",
@@ -696,11 +698,23 @@ export function getFloorLabel(locale: Locale, floor: number) {
   return locale === "bg" ? `Етаж ${floor}` : `Floor ${floor}`;
 }
 
-export function getBuildingLabel(locale: Locale, buildingId: string) {
-  const labels: Record<string, Record<Locale, string>> = {
-    a: { bg: "Резиденс", en: "Residence" },
-    b: { bg: "Парк", en: "Park" },
+export function getBuildingLabel(locale: Locale, buildingId: string, userType: "internal" | "external" = "external") {
+  const labels: Record<string, Record<"internal" | "external", Record<Locale, string>>> = {
+    a: {
+      external: { bg: "Резиденс", en: "Residence" },
+      internal: { bg: "Сграда А", en: "Building A" },
+    },
+    b: {
+      external: { bg: "Парк", en: "Park" },
+      internal: { bg: "Сграда Б", en: "Building B" },
+    },
   };
   const normalizedId = buildingId.toLowerCase();
-  return labels[normalizedId]?.[locale] ?? (locale === "bg" ? `Сграда ${buildingId.toUpperCase()}` : `Building ${buildingId.toUpperCase()}`);
+  const config = labels[normalizedId];
+  
+  if (!config) {
+    return locale === "bg" ? `Сграда ${buildingId.toUpperCase()}` : `Building ${buildingId.toUpperCase()}`;
+  }
+
+  return config[userType][locale];
 }

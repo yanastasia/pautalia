@@ -115,6 +115,10 @@ function stringifyPoints(points: Point[]): string {
   return points.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
 }
 
+function hasRenderableArea(region: { width: number; height: number }) {
+  return region.width > 0 && region.height > 0;
+}
+
 export function BuildingFloorplanBrowser({
   floors,
   selectedFloor,
@@ -226,7 +230,12 @@ export function BuildingFloorplanBrowser({
       }
     }
 
-    const region = activeUnit.planRegions?.[0] ?? activeUnit.planArea;
+    const region = activeUnit.planRegions?.find(hasRenderableArea) ?? (hasRenderableArea(activeUnit.planArea) ? activeUnit.planArea : null);
+
+    if (!region) {
+      return null;
+    }
+
     return getCalloutPosition(region.x, region.x + region.width, region.y);
   }, [activeUnit, trimmedHotspotOffsetX, trimmedHotspotOffsetY, trimmedHotspotScale]);
 
@@ -318,6 +327,7 @@ export function BuildingFloorplanBrowser({
                 fill
                 className={cn("object-contain", floorplanFrame.imageClassName)}
                 sizes="(max-width: 1024px) 100vw, 960px"
+                unoptimized
               />
 
               {activeUnit && activeTheme && activeCalloutPosition ? (
@@ -410,7 +420,12 @@ export function BuildingFloorplanBrowser({
                   });
                 }
 
-                  const regions = unit.planRegions?.length ? unit.planRegions : [unit.planArea];
+                  const regions = (unit.planRegions?.length ? unit.planRegions : [unit.planArea]).filter(hasRenderableArea);
+
+                  if (regions.length === 0) {
+                    return null;
+                  }
+
                   return regions.map((region, index) => (
                     <rect
                       key={`${unit.id}-rect-${index}`}

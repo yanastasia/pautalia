@@ -33,7 +33,7 @@ Building-specific assets should live under `public/assets/buildings/[building-fo
 | Floor plans | `public/assets/buildings/residence/floors/` | `public/assets/buildings/park/floors/` | `floor-01.png`, `floor-02.png`, etc. |
 | Floor outline overlays | `public/assets/buildings/residence/floors/` | `public/assets/buildings/park/floors/` | `floor-01-outline.png`, `floor-02-outline.png`, etc. |
 | Floor hotspot overlays | `public/assets/buildings/residence/floors/hotspots/` | `public/assets/buildings/park/floors/hotspots/` | `floor-01-hotspots.png`, `floor-02-hotspots.png`, etc. |
-| Apartment floor plans | `public/assets/buildings/residence/apartments/` | `public/assets/buildings/park/apartments/` | `A-AP.01.png` through `A-AP.14.png`; `B-AP.01.png` through `B-AP.06.png`. |
+| Apartment floor plans | `public/assets/buildings/residence/apartments/` | `public/assets/buildings/park/apartments/` | `A-A-AP.01.png` through `A-A-AP.14.png`; `B-A-A-AP.01.png` through `B-A-A-AP.06.png`. |
 | Apartment render galleries | `public/assets/buildings/residence/gallery/apartment_renders/[unit-code]/` | `public/assets/buildings/park/gallery/apartment_renders/[unit-code]/` | Room-specific files for each unit, for example `01_living.png`, `01_bath.png`, `01_yard.png`. |
 
 The old shared top-level folders were retired. New building-specific work should use the canonical building folders above.
@@ -46,7 +46,7 @@ The old shared top-level folders were retired. New building-specific work should
 | `public/assets/buildings/residence/selector/main.png` | Residence selector card, building selector visual, Residence facade reference. |
 | `public/assets/buildings/residence/floors/floor-01.png` through `floor-04.png` | Residence floor pages, floor selector, unit plan gallery, inventory seed data. |
 | `public/assets/buildings/residence/floors/floor-01-outline.png` through `floor-04-outline.png` | Stored floor outline assets for future floorplan overlays. |
-| `public/assets/buildings/residence/apartments/A-AP.01.png` through `A-AP.14.png` | Residence unit detail apartment plans and plan gallery. |
+| `public/assets/buildings/residence/apartments/A-A-AP.01.png` through `A-A-AP.14.png` | Residence unit detail apartment plans and plan gallery. |
 | `public/assets/buildings/residence/floors/hotspots/floor-01-hotspots.png` through `floor-04-hotspots.png` | Residence interactive floorplan hotspot overlays. |
 
 ## Current Park Assets
@@ -57,9 +57,9 @@ The old shared top-level folders were retired. New building-specific work should
 | `public/assets/buildings/park/selector/main.png` | Park selector card, building selector visual, Park facade reference. |
 | `public/assets/buildings/park/floors/floor-01.png` through `floor-03.png` | Park floor pages, floor selector, unit plan gallery, inventory seed data. |
 | `src/data/building-selector-visuals.ts` Park floor bands | Park building facade floor selector overlays for floors 1-3. |
-| `public/assets/buildings/park/apartments/B-AP.01.png` through `B-AP.06.png` | Park unit detail apartment plans and plan gallery. |
+| `public/assets/buildings/park/apartments/B-A-A-AP.01.png` through `B-A-A-AP.06.png` | Park unit detail apartment plans and plan gallery. |
 | `public/assets/buildings/park/exterior/park_exterior1.png` through `park_exterior4.png` | Park exterior render set and curated public gallery entries. |
-| `public/assets/buildings/park/gallery/apartment_renders/B-AP.01/` through `B-AP.06/` | Per-apartment Park render galleries used by unit cards, unit hero images, and unit detail gallery sections. |
+| `public/assets/buildings/park/gallery/apartment_renders/B-A-A-AP.01/` through `B-A-A-AP.06/` | Per-apartment Park render galleries used by unit cards, unit hero images, and unit detail gallery sections. |
 
 The Park `location`, `panoramas`, and `floors/hotspots` folders are prepared for approved future media.
 

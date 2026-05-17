@@ -16,7 +16,7 @@ export type BuildingPresentation = {
 };
 
 export const buildingPresentation: Record<string, BuildingPresentation> = {
-  "building-a": {
+  residence: {
     heroImage: "/assets/buildings/residence/hero/exterior-front.jpg",
     modelColor: "#c77d4f",
     sequence: 1,
@@ -55,7 +55,7 @@ export const buildingPresentation: Record<string, BuildingPresentation> = {
       bg: "Резиденс предлага по-просторни жилища, частни външни пространства на първия етаж и широки гледки от горните нива.",
     },
   },
-  "building-b": {
+  park: {
     heroImage: "/assets/buildings/park/hero/park_exterior-front.png",
     modelColor: "#7f988a",
     sequence: 2,

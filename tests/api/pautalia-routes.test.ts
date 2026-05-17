@@ -63,7 +63,7 @@ function jsonRequest(url: string, body: unknown, init?: RequestInit) {
 describe("pautalia api routes", () => {
   it("lists buildings through the standardized route", async () => {
     listPublicBuildings.mockResolvedValueOnce([
-      { id: "a", slug: "building-a", name: "Residence" },
+      { id: "a", slug: "residence", name: "Residence" },
     ]);
 
     const response = await buildingsRoute(new Request("http://localhost:3000/api/pautalia/buildings"));
@@ -71,22 +71,22 @@ describe("pautalia api routes", () => {
 
     expect(response.status).toBe(200);
     expect(body.items).toHaveLength(1);
-    expect(body.items[0]).toMatchObject({ slug: "building-a" });
+    expect(body.items[0]).toMatchObject({ slug: "residence" });
   });
 
   it("returns one building and its floors", async () => {
     getPublicBuilding.mockResolvedValueOnce({
-      item: { id: "a", slug: "building-a", name: "Residence" },
+      item: { id: "a", slug: "residence", name: "Residence" },
       floors: [{ id: "a-1", number: 1, label: "Floor 1" }],
     });
 
-    const response = await buildingRoute(new Request("http://localhost:3000/api/pautalia/buildings/building-a"), {
-      params: Promise.resolve({ slug: "building-a" }),
+    const response = await buildingRoute(new Request("http://localhost:3000/api/pautalia/buildings/residence"), {
+      params: Promise.resolve({ slug: "residence" }),
     });
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.item.slug).toBe("building-a");
+    expect(body.item.slug).toBe("residence");
     expect(body.floors).toHaveLength(1);
   });
 
@@ -97,7 +97,7 @@ describe("pautalia api routes", () => {
     });
 
     const response = await unitsRoute(
-      new Request("http://localhost:3000/api/pautalia/units?building=building-a&rooms=2&maxPrice=120000"),
+      new Request("http://localhost:3000/api/pautalia/units?building=residence&rooms=2&maxPrice=120000"),
     );
     const body = await response.json();
 
@@ -111,7 +111,7 @@ describe("pautalia api routes", () => {
       item: {
         id: "a-101",
         slug: "unit-a101",
-        code: "AP.01",
+        code: "A-AP.01",
         rooms: 3,
       },
     });
@@ -122,7 +122,7 @@ describe("pautalia api routes", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.item.code).toBe("AP.01");
+    expect(body.item.code).toBe("A-AP.01");
   });
 
   it("creates a lead through the standardized route", async () => {
@@ -154,7 +154,7 @@ describe("pautalia api routes", () => {
         "http://localhost:3000/api/pautalia/events",
         {
           eventType: "apartment_detail_view",
-          sourcePageUrl: "/building/building-a",
+          sourcePageUrl: "/building/residence",
           unitId: "a-101",
         },
         { headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.10" } },
@@ -179,7 +179,7 @@ describe("pautalia api routes", () => {
     const response = await eventsRoute(
       jsonRequest("http://localhost:3000/api/pautalia/events", {
         eventType: "room_view",
-        sourcePageUrl: "/building/building-a",
+        sourcePageUrl: "/building/residence",
       }),
     );
 

@@ -68,7 +68,7 @@ Unit imagery follows:
 Example:
 
 ```text
-/assets/buildings/residence/apartments/A-AP.08.png
+/assets/buildings/residence/apartments/A-A-AP.08.png
 ```
 
 ## Price Visibility

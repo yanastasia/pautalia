@@ -9,8 +9,9 @@ import type {
   UnitStatus,
 } from "@/types/domain";
 import { buildingAFloorOverrides, buildingAParsedUnits } from "@/data/building-a-floorplans";
+import { buildingAParkingUnits } from "@/data/building-a-parking";
+import { buildingBFloorOverrides, buildingBParsedUnits } from "@/data/building-b-floorplans";
 import { buildingBFloors, buildingBParkingUnits, buildingBSeed, buildingBTypologies } from "@/data/building-b";
-import { buildingBUnits } from "@/data/building-b-units";
 import { getOfficialApartmentValue } from "@/data/official-unit-values";
 import { getResidenceUnitGallery, parkGeneralGalleryImages } from "@/data/unit-gallery-assets";
 
@@ -19,7 +20,7 @@ const nowIso = "2026-03-18T09:00:00.000Z";
 const buildingSeeds = [
   {
     id: "a",
-    slug: "building-a",
+    slug: "residence",
     name: "Residence",
     tagline: "Larger homes with open views and private outdoor space on the ground floor.",
     shortDescription: "Spacious homes with broad outlooks, practical layouts, and private yards on floor one.",
@@ -119,7 +120,7 @@ const buildingAFloors: Floor[] = buildingSeeds
       floorplanImageId: floorOverride?.floorplanImageId ?? "media-floorplan-typical",
       mapAspectRatio: floorOverride?.mapAspectRatio ?? "16 / 9",
       svgOverlayData: {
-        viewBox: "0 0 100 60",
+        viewBox: "0 0 100 100",
       },
       createdAt: nowIso,
       updatedAt: nowIso,
@@ -127,7 +128,32 @@ const buildingAFloors: Floor[] = buildingSeeds
     }),
   );
 
-export const floors: Floor[] = [...buildingAFloors, ...buildingBFloors];
+const buildingBFloorsParsed: Floor[] = buildingSeeds
+  .filter((building) => building.id === "b")
+  .flatMap((building) =>
+    Array.from({ length: building.floorsCount }, (_, index) => {
+      const number = index + 1;
+      const floorKey = `${building.id}-${number}`;
+      const floorOverride = buildingBFloorOverrides[floorKey];
+      return {
+        id: `${building.id}-${number}`,
+        buildingId: building.id,
+        number,
+        label: floorOverride?.label || floorLabels[number as keyof typeof floorLabels],
+        description: floorOverride?.description || floorDescriptions[number as keyof typeof floorDescriptions],
+        floorplanImage: floorOverride?.floorplanImage ?? building.floorplanImage,
+        floorplanImageId: floorOverride?.floorplanImageId ?? "media-floorplan-typical",
+        mapAspectRatio: floorOverride?.mapAspectRatio ?? "1 / 1",
+        svgOverlayData: {
+          viewBox: "0 0 100 100",
+        },
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+    }),
+  );
+
+export const floors: Floor[] = [...buildingAFloors, ...buildingBFloorsParsed];
 
 const buildingASeed = buildingSeeds.find((building) => building.id === "a");
 
@@ -180,7 +206,135 @@ const buildingAUnits: Unit[] = buildingASeed
     })
   : [];
 
-export const units: Unit[] = [...buildingAUnits, ...buildingBUnits];
+const buildingBUnits: Unit[] = buildingBParsedUnits.map((unit) => {
+  return {
+    ...unit,
+    kind: "apartment",
+    buildingId: "b",
+    floorId: `b-${unit.floor}`,
+    area: {
+      living: unit.areaInternalSqm,
+      shared: 0,
+      ...(unit.terraceSqm > 0 ? { terrace: unit.terraceSqm } : {}),
+      total: unit.areaTotalSqm,
+    },
+    ownership: {
+      commonPartsPercent: 0,
+      landPercent: 0,
+      landArea: 0,
+    },
+    price: 0,
+    currency: "EUR",
+    status: "available",
+    isPublished: true,
+    isPriceVisible: false,
+    gallery: getResidenceUnitGallery(unit.externalCode), // Fallback or updated gallery helper
+    panoramaImage: "",
+    updatedByUserId: "seed-admin",
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  };
+});
+
+const buildingAParking: Unit[] = buildingAParkingUnits.map((parking) => ({
+  id: parking.id,
+  kind: "parking",
+  externalCode: parking.code,
+  code: parking.code,
+  slug: parking.code.toLowerCase().replace(".", "-"),
+  buildingId: "a",
+  floorId: "",
+  typologyId: "",
+  unitNumber: parking.code.split(".")[1],
+  floor: 0,
+  rooms: 0,
+  bedrooms: 0,
+  bathrooms: 0,
+  areaInternalSqm: 0,
+  areaTotalSqm: parking.areaSqm,
+  terraceSqm: 0,
+  area: {
+    living: 0,
+    shared: 0,
+    total: parking.areaSqm,
+  },
+  ownership: {
+    commonPartsPercent: 0,
+    landPercent: 0,
+    landArea: 0,
+  },
+  size: parking.areaSqm,
+  price: 0,
+  currency: "EUR",
+  status: "available",
+  isPublished: true,
+  isPriceVisible: false,
+  description: "Private parking space in Residence.",
+  highlight: "Parking space.",
+  floorplan: "/assets/buildings/residence/floors/floor-01.png",
+  panoramaImage: "",
+  gallery: [],
+  features: ["parking"],
+  planArea: { x: 0, y: 0, width: 0, height: 0 },
+  seoTitle: `Parking ${parking.code}`,
+  seoDescription: `Private parking space ${parking.code} in Residence.`,
+  orientation: "parking",
+  exposure: "parking",
+  updatedByUserId: "seed-admin",
+  createdAt: nowIso,
+  updatedAt: nowIso,
+}));
+
+const buildingBParking: Unit[] = buildingBParkingUnits.map((parking) => ({
+  id: parking.id,
+  kind: "parking",
+  externalCode: parking.code,
+  code: parking.code,
+  slug: parking.code.toLowerCase().replace(".", "-"),
+  buildingId: "b",
+  floorId: "",
+  typologyId: "",
+  unitNumber: parking.code.split(".")[1],
+  floor: 0,
+  rooms: 0,
+  bedrooms: 0,
+  bathrooms: 0,
+  areaInternalSqm: 0,
+  areaTotalSqm: parking.areaSqm,
+  terraceSqm: 0,
+  area: {
+    living: 0,
+    shared: 0,
+    total: parking.areaSqm,
+  },
+  ownership: {
+    commonPartsPercent: 0,
+    landPercent: 0,
+    landArea: 0,
+  },
+  size: parking.areaSqm,
+  price: 0,
+  currency: "EUR",
+  status: "available",
+  isPublished: true,
+  isPriceVisible: false,
+  description: "Private parking space in Park.",
+  highlight: "Parking space.",
+  floorplan: "/assets/buildings/park/floors/floor-01.png",
+  panoramaImage: "",
+  gallery: [],
+  features: ["parking"],
+  planArea: { x: 0, y: 0, width: 0, height: 0 },
+  seoTitle: `Parking ${parking.code}`,
+  seoDescription: `Private parking space ${parking.code} in Park.`,
+  orientation: "parking",
+  exposure: "parking",
+  updatedByUserId: "seed-admin",
+  createdAt: nowIso,
+  updatedAt: nowIso,
+}));
+
+export const units: Unit[] = [...buildingAUnits, ...buildingBUnits, ...buildingAParking, ...buildingBParking];
 
 export const buildings: Building[] = buildingSeeds.map((building) => {
   const buildingUnits = units.filter((unit) => unit.buildingId === building.id);

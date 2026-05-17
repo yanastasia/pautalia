@@ -1,0 +1,16 @@
+export const buildingAParkingUnits = [
+  { id: "a-parking-1", code: "A-PM.01", areaSqm: 12.5 },
+  { id: "a-parking-2", code: "A-PM.02", areaSqm: 12.5 },
+  { id: "a-parking-3", code: "A-PM.03", areaSqm: 12.5 },
+  { id: "a-parking-4", code: "A-PM.04", areaSqm: 12.5 },
+  { id: "a-parking-5", code: "A-PM.05", areaSqm: 12.5 },
+  { id: "a-parking-6", code: "A-PM.06", areaSqm: 12.5 },
+  { id: "a-parking-7", code: "A-PM.07", areaSqm: 12.5 },
+  { id: "a-parking-8", code: "A-PM.08", areaSqm: 12.5 },
+  { id: "a-parking-9", code: "A-PM.09", areaSqm: 12.5 },
+  { id: "a-parking-10", code: "A-PM.10", areaSqm: 12.5 },
+  { id: "a-parking-11", code: "A-PM.11", areaSqm: 12.5 },
+  { id: "a-parking-12", code: "A-PM.12", areaSqm: 12.5 },
+  { id: "a-parking-13", code: "A-PM.13", areaSqm: 12.5 },
+  { id: "a-parking-14", code: "A-PM.14", areaSqm: 12.5 },
+] as const;

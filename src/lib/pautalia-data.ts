@@ -10,6 +10,7 @@ import {
   getTypology as getStaticTypology,
 } from "@/data/site";
 import type { Locale } from "@/lib/i18n/config";
+import { normalizeFloorplanImagePath } from "@/lib/floorplan-assets";
 import { getBuildingLabel, getFloorLabel, getResidenceLabel } from "@/lib/i18n/messages";
 import { getFeatureLabel, getOutdoorTypeLabel } from "@/lib/i18n/property";
 import { notFoundError, validationError } from "@/lib/errors";
@@ -80,20 +81,20 @@ type UnitFeatureRecord = {
   outdoorType?: string | null;
 };
 
-function localizeBuildingName(locale: Locale, building: { id: string; name: string }) {
+function localizeBuildingName(locale: Locale, building: { id: string; name: string }, userType: "internal" | "external" = "external") {
   if (["a", "b"].includes(building.id.toLowerCase())) {
-    return getBuildingLabel(locale, building.id);
+    return getBuildingLabel(locale, building.id, userType);
   }
 
   if (/^building\s+/i.test(building.name)) {
     return locale === "bg"
-      ? getBuildingLabel(locale, building.id)
+      ? getBuildingLabel(locale, building.id, userType)
       : building.name;
   }
 
   return locale === "bg"
-    ? getBuildingLabel(locale, building.id)
-    : `Building ${building.id.toUpperCase()}`;
+    ? getBuildingLabel(locale, building.id, userType)
+    : getBuildingLabel(locale, building.id, userType);
 }
 
 function getBuildingPresentation(slug: string) {
@@ -141,6 +142,26 @@ function parsePlanRegions(value: Prisma.JsonValue | null): UnitPlanArea[] | null
     .safeParse(value);
 
   return parsed.success ? parsed.data : null;
+}
+
+function hasUsablePlanArea(area: UnitPlanArea) {
+  return area.width > 0 && area.height > 0;
+}
+
+function findStaticFloor(buildingId: string, floorNumber: number) {
+  return staticFloors.find((candidate) => candidate.buildingId === buildingId && candidate.number === floorNumber) ?? null;
+}
+
+function findStaticUnit(unit: Pick<UnitRecord, "id" | "slug" | "externalCode">) {
+  return (
+    getStaticPublicUnits().find(
+      (candidate) =>
+        candidate.id === unit.id ||
+        candidate.slug === unit.slug ||
+        candidate.externalCode === unit.externalCode ||
+        candidate.code === unit.externalCode,
+    ) ?? null
+  );
 }
 
 function resolvePublicPrice(
@@ -235,14 +256,14 @@ function buildUnitHighlight(
   return `${parts.join(" ")}.`;
 }
 
-function mapStaticPublicBuilding(locale: Locale, building: StaticBuilding): PublicBuilding {
+function mapStaticPublicBuilding(locale: Locale, building: StaticBuilding, userType: "internal" | "external" = "external"): PublicBuilding {
   const presentation = getBuildingPresentation(building.slug);
   const publicUnits = getStaticPublicUnits().filter((unit) => unit.buildingId === building.id);
 
   return {
     id: building.id,
     slug: building.slug,
-    name: localizeBuildingName(locale, building),
+    name: localizeBuildingName(locale, building, userType),
     tagline: presentation.tagline[locale] || building.tagline,
     shortDescription: presentation.shortDescription[locale] || building.shortDescription,
     description: presentation.description[locale] || building.description,
@@ -277,7 +298,7 @@ function mapStaticPublicFloor(locale: Locale, floor: StaticFloor): PublicFloor {
   };
 }
 
-function mapStaticPublicUnit(locale: Locale, unit: StaticUnit, priceVisibilityMode: PriceVisibility = "per_unit"): PublicUnit {
+function mapStaticPublicUnit(locale: Locale, unit: StaticUnit, priceVisibilityMode: PriceVisibility = "per_unit", userType: "internal" | "external" = "external"): PublicUnit {
   const building = staticBuildings.find((candidate) => candidate.id === unit.buildingId) ?? null;
   const floor = staticFloors.find((candidate) => candidate.id === unit.floorId) ?? null;
   const typology = getStaticTypology(unit.typologyId);
@@ -296,7 +317,7 @@ function mapStaticPublicUnit(locale: Locale, unit: StaticUnit, priceVisibilityMo
       ? {
           id: building.id,
           slug: building.slug,
-          name: localizeBuildingName(locale, building),
+          name: localizeBuildingName(locale, building, userType),
         }
       : null,
     floor: unit.floor,
@@ -360,21 +381,30 @@ function compareStaticUnits(a: StaticUnit, b: StaticUnit, sort: (typeof unitSort
   }
 }
 
-function listStaticPublicBuildings(locale: Locale) {
+function listStaticPublicBuildings(locale: Locale, userType: "internal" | "external" = "external") {
   return getStaticPublicBuildings()
     .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((building) => mapStaticPublicBuilding(locale, building));
+    .map((building) => mapStaticPublicBuilding(locale, building, userType));
 }
 
-function getStaticPublicBuilding(locale: Locale, slugOrId: string) {
-  const building = getStaticPublicBuildings().find((candidate) => candidate.slug === slugOrId || candidate.id === slugOrId);
+function getStaticPublicBuilding(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
+  const normalizedSlug = slugOrId.toLowerCase();
+  const building = getStaticPublicBuildings().find(
+    (candidate) =>
+      candidate.id.toLowerCase() === normalizedSlug ||
+      candidate.slug.toLowerCase() === normalizedSlug ||
+      (normalizedSlug === "building.a" && candidate.id === "a") ||
+      (normalizedSlug === "building-a" && candidate.id === "a") ||
+      (normalizedSlug === "building.b" && candidate.id === "b") ||
+      (normalizedSlug === "building-b" && candidate.id === "b"),
+  );
 
   if (!building) {
     throw notFoundError("Building not found");
   }
 
   return {
-    item: mapStaticPublicBuilding(locale, building),
+    item: mapStaticPublicBuilding(locale, building, userType),
     floors: staticFloors
       .filter((floor) => floor.buildingId === building.id)
       .sort((a, b) => a.number - b.number)
@@ -385,6 +415,7 @@ function getStaticPublicBuilding(locale: Locale, slugOrId: string) {
 function listStaticPublicUnits(
   locale: Locale,
   parsed: z.infer<typeof pautaliaUnitsQuerySchema>,
+  userType: "internal" | "external" = "external",
 ) {
   const staticBuilding = parsed.building
     ? getStaticPublicBuildings().find((candidate) => candidate.slug === parsed.building || candidate.id === parsed.building)
@@ -435,7 +466,7 @@ function listStaticPublicUnits(
   const paginated = filtered.slice((parsed.page - 1) * parsed.limit, parsed.page * parsed.limit);
 
   return {
-    items: paginated.map((unit) => mapStaticPublicUnit(locale, unit)),
+    items: paginated.map((unit) => mapStaticPublicUnit(locale, unit, "per_unit", userType)),
     pagination: {
       page: parsed.page,
       limit: parsed.limit,
@@ -445,7 +476,7 @@ function listStaticPublicUnits(
   };
 }
 
-function getStaticPublicUnit(locale: Locale, slugOrId: string) {
+function getStaticPublicUnit(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
   const unit = getStaticPublicUnits().find((candidate) => candidate.slug === slugOrId || candidate.id === slugOrId);
 
   if (!unit) {
@@ -453,18 +484,18 @@ function getStaticPublicUnit(locale: Locale, slugOrId: string) {
   }
 
   return {
-    item: mapStaticPublicUnit(locale, unit),
+    item: mapStaticPublicUnit(locale, unit, "per_unit", userType),
   };
 }
 
-function mapPublicBuilding(locale: Locale, building: BuildingRecord): PublicBuilding {
+function mapPublicBuilding(locale: Locale, building: BuildingRecord, userType: "internal" | "external" = "external"): PublicBuilding {
   const presentation = getBuildingPresentation(building.slug);
   const publicUnits = building.units.filter((unit) => unit.kind === "apartment" && unit.isPublished && unit.status !== "hidden");
 
   return {
     id: building.id,
     slug: building.slug,
-    name: localizeBuildingName(locale, building),
+    name: localizeBuildingName(locale, building, userType),
     tagline: presentation.tagline[locale],
     shortDescription: presentation.shortDescription[locale] || building.shortDescription,
     description: presentation.description[locale] || building.fullDescription,
@@ -487,20 +518,27 @@ function mapPublicBuilding(locale: Locale, building: BuildingRecord): PublicBuil
 }
 
 function mapPublicFloor(locale: Locale, floor: FloorRecord): PublicFloor {
+  const staticFloor = findStaticFloor(floor.buildingId, floor.number);
+
   return {
     id: floor.id,
     buildingId: floor.buildingId,
     number: floor.number,
     label: getFloorLabel(locale, floor.number),
     description: floor.description,
-    floorplanImage: floor.floorplanImage,
-    mapAspectRatio: floor.mapAspectRatio ?? undefined,
+    floorplanImage: normalizeFloorplanImagePath(floor.floorplanImage, staticFloor?.floorplanImage),
+    mapAspectRatio: floor.mapAspectRatio ?? staticFloor?.mapAspectRatio ?? undefined,
     svgOverlayData: null,
   };
 }
 
-function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: PriceVisibility = "per_unit"): PublicUnit {
+function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: PriceVisibility = "per_unit", userType: "internal" | "external" = "external"): PublicUnit {
   const price = resolvePublicPrice(priceVisibilityMode, unit.price ?? null, unit.currency, unit.isPriceVisible);
+  const staticUnit = findStaticUnit(unit);
+  const parsedPlanArea = parsePlanArea(unit.planArea);
+  const staticPlanArea = staticUnit?.planArea;
+  const parsedPlanRegions = parsePlanRegions(unit.planRegions);
+
   return {
     kind: "apartment",
     id: unit.id,
@@ -514,7 +552,7 @@ function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: Pr
     building: {
       id: unit.building.id,
       slug: unit.building.slug,
-      name: localizeBuildingName(locale, unit.building),
+      name: localizeBuildingName(locale, unit.building, userType),
     },
     floor: unit.floor?.number ?? 0,
     floorMeta: unit.floor
@@ -555,15 +593,15 @@ function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: Pr
     isPriceVisible: price.isPriceVisible,
     description: buildUnitDescription(locale, { ...unit, floor: unit.floor ?? { number: 0 } }),
     highlight: buildUnitHighlight(locale, unit),
-    floorplan: unit.floorplan,
+    floorplan: normalizeFloorplanImagePath(unit.floorplan, staticUnit?.floorplan),
     gallery: unit.gallery,
     panoramaImage: unit.panoramaImage ?? unit.gallery[0] ?? unit.floorplan,
     features: buildUnitFeatures(locale, unit),
-    planArea: parsePlanArea(unit.planArea),
-    planRegions: parsePlanRegions(unit.planRegions),
-    planPolygonPoints: null,
+    planArea: hasUsablePlanArea(parsedPlanArea) ? parsedPlanArea : (staticPlanArea ?? parsedPlanArea),
+    planRegions: parsedPlanRegions ?? staticUnit?.planRegions ?? null,
+    planPolygonPoints: staticUnit?.planPolygonPoints ?? null,
     digitalTwinId: null,
-    seoTitle: unit.seoTitle ?? `${getResidenceLabel(locale, unit.rooms)} | ${localizeBuildingName(locale, unit.building)}`,
+    seoTitle: unit.seoTitle ?? `${getResidenceLabel(locale, unit.rooms)} | ${localizeBuildingName(locale, unit.building, userType)}`,
     seoDescription: unit.seoDescription ?? unit.description,
   };
 }
@@ -587,8 +625,19 @@ function buildUnitSort(sort: (typeof unitSortValues)[number]): Prisma.UnitOrderB
 }
 
 function buildingSlugOrIdFilter(slugOrId: string): Prisma.BuildingWhereInput {
+  const normalizedSlug = slugOrId.toLowerCase();
+  const filters: Prisma.BuildingWhereInput[] = [{ slug: slugOrId }, { id: slugOrId }];
+
+  if (normalizedSlug === "building.a" || normalizedSlug === "building-a") {
+    filters.push({ id: "a" });
+  }
+
+  if (normalizedSlug === "building.b" || normalizedSlug === "building-b") {
+    filters.push({ id: "b" });
+  }
+
   return {
-    OR: [{ slug: slugOrId }, { id: slugOrId }],
+    OR: filters,
   };
 }
 
@@ -786,46 +835,46 @@ function getCachedUnitFromDb(slugOrId: string) {
   )();
 }
 
-export async function listPublicBuildings(locale: Locale) {
+export async function listPublicBuildings(locale: Locale, userType: "internal" | "external" = "external") {
   if (preferStaticInventory) {
-    return listStaticPublicBuildings(locale);
+    return listStaticPublicBuildings(locale, userType);
   }
 
   try {
     const buildings = await getCachedBuildingsFromDb();
 
     if (buildings.length === 0 && getStaticPublicBuildings().length > 0) {
-      return listStaticPublicBuildings(locale);
+      return listStaticPublicBuildings(locale, userType);
     }
 
-    return buildings.map((building) => mapPublicBuilding(locale, building));
+    return buildings.map((building) => mapPublicBuilding(locale, building, userType));
   } catch {
-    return listStaticPublicBuildings(locale);
+    return listStaticPublicBuildings(locale, userType);
   }
 }
 
-export async function getPublicBuilding(locale: Locale, slugOrId: string) {
+export async function getPublicBuilding(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
   if (preferStaticInventory) {
-    return getStaticPublicBuilding(locale, slugOrId);
+    return getStaticPublicBuilding(locale, slugOrId, userType);
   }
 
   try {
     const building = await getCachedBuildingFromDb(slugOrId);
 
     if (!building) {
-      return getStaticPublicBuilding(locale, slugOrId);
+      return getStaticPublicBuilding(locale, slugOrId, userType);
     }
 
     return {
-      item: mapPublicBuilding(locale, building),
+      item: mapPublicBuilding(locale, building, userType),
       floors: building.floors.map((floor) => mapPublicFloor(locale, floor)),
     };
   } catch {
-    return getStaticPublicBuilding(locale, slugOrId);
+    return getStaticPublicBuilding(locale, slugOrId, userType);
   }
 }
 
-export async function listPublicUnits(locale: Locale, rawQuery: Record<string, string | string[] | undefined>) {
+export async function listPublicUnits(locale: Locale, rawQuery: Record<string, string | string[] | undefined>, userType: "internal" | "external" = "external") {
   const parsed = pautaliaUnitsQuerySchema.parse(rawQuery);
 
   if (parsed.minPrice !== undefined && parsed.maxPrice !== undefined && parsed.minPrice > parsed.maxPrice) {
@@ -835,7 +884,7 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
   }
 
   if (preferStaticInventory) {
-    return listStaticPublicUnits(locale, parsed);
+    return listStaticPublicUnits(locale, parsed, userType);
   }
 
   let buildingId: string | undefined;
@@ -845,7 +894,7 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
       const building = await getCachedBuildingIdFromDb(parsed.building);
 
       if (!building) {
-        return listStaticPublicUnits(locale, parsed);
+        return listStaticPublicUnits(locale, parsed, userType);
       }
 
       buildingId = building.id;
@@ -854,7 +903,7 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
     const { total, items } = await getCachedUnitsFromDb(parsed, buildingId);
 
     if (total === 0) {
-      const staticResponse = listStaticPublicUnits(locale, parsed);
+      const staticResponse = listStaticPublicUnits(locale, parsed, userType);
       if (staticResponse.items.length > 0) {
         return staticResponse;
       }
@@ -863,7 +912,7 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
     const settings = await getCachedSiteSettingsFromDb();
 
     return {
-      items: items.map((unit) => mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit")),
+      items: items.map((unit) => mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit", userType)),
       pagination: {
         page: parsed.page,
         limit: parsed.limit,
@@ -872,28 +921,28 @@ export async function listPublicUnits(locale: Locale, rawQuery: Record<string, s
       },
     };
   } catch {
-    return listStaticPublicUnits(locale, parsed);
+    return listStaticPublicUnits(locale, parsed, userType);
   }
 }
 
-export async function getPublicUnit(locale: Locale, slugOrId: string) {
+export async function getPublicUnit(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
   if (preferStaticInventory) {
-    return getStaticPublicUnit(locale, slugOrId);
+    return getStaticPublicUnit(locale, slugOrId, userType);
   }
 
   try {
     const unit = await getCachedUnitFromDb(slugOrId);
 
     if (!unit) {
-      return getStaticPublicUnit(locale, slugOrId);
+      return getStaticPublicUnit(locale, slugOrId, userType);
     }
 
     const settings = await getCachedSiteSettingsFromDb();
 
     return {
-      item: mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit"),
+      item: mapPublicUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit", userType),
     };
   } catch {
-    return getStaticPublicUnit(locale, slugOrId);
+    return getStaticPublicUnit(locale, slugOrId, userType);
   }
 }

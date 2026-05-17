@@ -5,7 +5,7 @@ describe("buildUnitPlanGalleryContent", () => {
   it("builds the two plan gallery items in display order", () => {
     const result = buildUnitPlanGalleryContent({
       locale: "en",
-      unitCode: "AP.08",
+      unitCode: "A-AP.08",
       unitFloorplan: "/assets/buildings/residence/apartments/A-AP.08.png",
       floorPlanImage: "/assets/buildings/residence/floors/floor-02.png",
       floorNumber: 2,
@@ -24,8 +24,8 @@ describe("buildUnitPlanGalleryContent", () => {
       {
         id: "unit-plan",
         src: "/assets/buildings/residence/apartments/A-AP.08.png",
-        title: "Apartment AP.08",
-        alt: "Apartment AP.08 plan",
+        title: "Apartment A-AP.08",
+        alt: "Apartment A-AP.08 plan",
       },
       {
         id: "floor-plan",
@@ -39,7 +39,7 @@ describe("buildUnitPlanGalleryContent", () => {
   it("localizes the summary card rows for Bulgarian", () => {
     const result = buildUnitPlanGalleryContent({
       locale: "bg",
-      unitCode: "AP.14",
+      unitCode: "A-AP.14",
       unitFloorplan: "/assets/buildings/residence/apartments/A-AP.14.png",
       floorPlanImage: "/assets/buildings/residence/floors/floor-04.png",
       floorNumber: 4,
@@ -83,7 +83,7 @@ describe("buildUnitPlanGalleryContent", () => {
   it("hides ownership rows when official ownership values are not available", () => {
     const result = buildUnitPlanGalleryContent({
       locale: "en",
-      unitCode: "B-AP-01",
+      unitCode: "B-AP.01",
       unitFloorplan: "/assets/buildings/park/apartments/B-AP.01.png",
       floorPlanImage: "/assets/buildings/park/floors/floor-01.png",
       floorNumber: 1,

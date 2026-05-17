@@ -4,7 +4,7 @@ const nowIso = "2026-03-18T09:00:00.000Z";
 
 export const buildingBSeed: Omit<Building, "totalUnits" | "availableUnits" | "createdAt" | "updatedAt"> = {
   id: "b",
-  slug: "building-b",
+  slug: "park",
   name: "Park",
   tagline: "Six apartments across three floors with private yards on the ground level and open balconies above.",
   shortDescription: "Six apartments across three floors with private yards on the ground level and open balconies above.",
@@ -79,8 +79,8 @@ export const buildingBFloors: Floor[] = [
     description: "Ground-floor homes with private yards and direct outdoor access.",
     floorplanImage: "/assets/buildings/park/floors/floor-01.png",
     floorplanImageId: "media-floorplan-b-1",
-    mapAspectRatio: "18140 / 11336",
-    svgOverlayData: { viewBox: "0 0 100 60" },
+    mapAspectRatio: "1 / 1",
+    svgOverlayData: { viewBox: "0 0 100 100" },
     createdAt: nowIso,
     updatedAt: nowIso,
   },
@@ -92,7 +92,7 @@ export const buildingBFloors: Floor[] = [
     description: "Second-floor homes with practical layouts, dressing rooms, and two balconies.",
     floorplanImage: "/assets/buildings/park/floors/floor-02.png",
     floorplanImageId: "media-floorplan-b-2",
-    mapAspectRatio: "13856 / 10667",
+    mapAspectRatio: "1 / 1",
     svgOverlayData: { viewBox: "0 0 100 60" },
     createdAt: nowIso,
     updatedAt: nowIso,
@@ -102,10 +102,10 @@ export const buildingBFloors: Floor[] = [
     buildingId: "b",
     number: 3,
     label: "Upper-Level Collection",
-    description: "Third-floor homes with the same efficient upper-floor typologies.",
+    description: "Top-floor homes with generous space and panoramic views.",
     floorplanImage: "/assets/buildings/park/floors/floor-03.png",
     floorplanImageId: "media-floorplan-b-3",
-    mapAspectRatio: "13701 / 10616",
+    mapAspectRatio: "1 / 1",
     svgOverlayData: { viewBox: "0 0 100 60" },
     createdAt: nowIso,
     updatedAt: nowIso,
@@ -113,10 +113,10 @@ export const buildingBFloors: Floor[] = [
 ];
 
 export const buildingBParkingUnits = [
-  { id: "b-parking-1", code: "B-PM-01", areaSqm: 12.48 },
-  { id: "b-parking-2", code: "B-PM-02", areaSqm: 13.46 },
-  { id: "b-parking-3", code: "B-PM-03", areaSqm: 12.5 },
-  { id: "b-parking-4", code: "B-PM-04", areaSqm: 12.5 },
-  { id: "b-parking-5", code: "B-PM-05", areaSqm: 12.5 },
-  { id: "b-parking-6", code: "B-PM-06", areaSqm: 11.95 },
+  { id: "b-parking-1", code: "B-PM.01", areaSqm: 12.48 },
+  { id: "b-parking-2", code: "B-PM.02", areaSqm: 13.46 },
+  { id: "b-parking-3", code: "B-PM.03", areaSqm: 12.5 },
+  { id: "b-parking-4", code: "B-PM.04", areaSqm: 12.5 },
+  { id: "b-parking-5", code: "B-PM.05", areaSqm: 12.5 },
+  { id: "b-parking-6", code: "B-PM.06", areaSqm: 11.95 },
 ] as const;

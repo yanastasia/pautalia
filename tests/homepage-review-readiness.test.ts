@@ -171,8 +171,8 @@ describe("homepage review readiness helpers", () => {
     const selector = getHomeSelectorModel("en", buildings, units);
 
     expect(selector.buildingCards).toHaveLength(1);
-    expect(selector.buildingCards[0]?.href).toBe("/building/building-a");
-    expect(selector.highlightedUnits.map((unit) => unit.href)).toEqual([
+    expect(selector.buildingCards[0]?.href).toBe("/building/residence");
+    expect(selector.highlightedUnits.map((unit: any) => unit.href)).toEqual([
       "/unit/unit-a101",
       "/unit/unit-a201",
     ]);

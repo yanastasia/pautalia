@@ -16,9 +16,12 @@ import { getUnitJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
 import { formatCurrency } from "@/lib/utils";
 
+import { getUserType } from "@/lib/access-control";
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const locale = await getLocale();
+  const userType = await getUserType();
   let unit: Awaited<ReturnType<typeof fetchPautaliaUnit>>;
 
   try {
@@ -38,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = locale === "bg" ? `Апартамент ${unit.code}` : unit.seoTitle || `Unit ${unit.code}`;
   const description =
     locale === "bg"
-      ? `${unit.code} в ${getBuildingLabel(locale, unit.buildingId).toLowerCase()} на ${getFloorLabel(locale, unit.floor).toLowerCase()} с площ ${unit.size} кв.м.`
+      ? `${unit.code} в ${getBuildingLabel(locale, unit.buildingId, userType).toLowerCase()} на ${getFloorLabel(locale, unit.floor).toLowerCase()} с площ ${unit.size} кв.м.`
       : unit.seoDescription || `${unit.code} in building ${unit.buildingId.toUpperCase()} on floor ${unit.floor}.`;
 
   return buildPageMetadata({
@@ -54,6 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function UnitPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const locale = await getLocale();
+  const userType = await getUserType();
   const messages = getMessages(locale);
   let unit: Awaited<ReturnType<typeof fetchPautaliaUnit>>;
   try {
@@ -88,7 +92,7 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
       <UnitPageHero
         buildingId={unit.buildingId}
         buildingSlug={unit.building?.slug ?? unit.buildingId}
-        buildingLabel={getBuildingLabel(locale, unit.buildingId)}
+        buildingLabel={getBuildingLabel(locale, unit.buildingId, userType)}
         backToBuildingLabel={messages.unit.backToBuilding}
         highlight={unit.highlight}
         image={unit.gallery[0]}
@@ -147,17 +151,23 @@ export default async function UnitPage({ params }: { params: Promise<{ id: strin
           <div>
             <UnitPageSectionHeading eyebrow={messages.unit.galleryEyebrow} title={messages.unit.galleryTitle} />
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
-              {unit.gallery.map((image, index) => (
-                <div key={image} className={`page-image-block ${index === 0 ? "sm:col-span-2 min-h-[22rem]" : "min-h-[18rem]"}`}>
-                  <Image
-                    src={image}
-                    alt={locale === "bg" ? `Изображение ${index + 1} за ${unit.code}` : `${unit.code} gallery image ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                  />
+              {unit.gallery.length > 0 ? (
+                unit.gallery.map((image, index) => (
+                  <div key={image} className={`page-image-block ${index === 0 ? "sm:col-span-2 min-h-[22rem]" : "min-h-[18rem]"}`}>
+                    <Image
+                      src={image}
+                      alt={locale === "bg" ? `Изображение ${index + 1} за ${unit.code}` : `${unit.code} gallery image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="page-image-block sm:col-span-2 min-h-[22rem] bg-[color:var(--surface-dark)] flex items-center justify-center">
+                   <p className="text-white/40 text-sm font-semibold uppercase tracking-widest">{messages.common.noImageAvailable}</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

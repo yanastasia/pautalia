@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getUserType } from "@/lib/access-control";
 import { isAppError } from "@/lib/errors";
 import {
   getPublicBuilding,
@@ -69,7 +70,8 @@ function wrapPublicDataError(error: unknown): never {
 
 export async function fetchPautaliaBuildings(locale: Locale): Promise<PublicBuilding[]> {
   try {
-    return await listPublicBuildings(locale);
+    const userType = await getUserType();
+    return await listPublicBuildings(locale, userType);
   } catch (error) {
     wrapPublicDataError(error);
   }
@@ -80,7 +82,8 @@ export async function fetchPautaliaBuilding(
   slugOrId: string,
 ): Promise<{ item: PublicBuilding; floors: PublicFloor[] }> {
   try {
-    return await getPublicBuilding(locale, slugOrId);
+    const userType = await getUserType();
+    return await getPublicBuilding(locale, slugOrId, userType);
   } catch (error) {
     wrapPublicDataError(error);
   }
@@ -91,7 +94,8 @@ export async function fetchPautaliaUnits(
   searchParams?: Record<string, string | number | undefined | null>,
 ): Promise<PaginatedUnitsResponse> {
   try {
-    return await listPublicUnits(locale, normalizeSearchParams(searchParams));
+    const userType = await getUserType();
+    return await listPublicUnits(locale, normalizeSearchParams(searchParams), userType);
   } catch (error) {
     wrapPublicDataError(error);
   }
@@ -122,7 +126,8 @@ export async function fetchAllPautaliaUnits(
 
 export async function fetchPautaliaUnit(locale: Locale, slugOrId: string): Promise<PublicUnit> {
   try {
-    const response = await getPublicUnit(locale, slugOrId);
+    const userType = await getUserType();
+    const response = await getPublicUnit(locale, slugOrId, userType);
     return response.item;
   } catch (error) {
     wrapPublicDataError(error);

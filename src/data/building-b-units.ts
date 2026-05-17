@@ -17,11 +17,11 @@ type BuildingBUnitInput = {
 };
 
 function floorplanPath(code: string) {
-  return `/assets/buildings/park/apartments/${code.replace("-AP-", "-AP.")}.png`;
+  return `/assets/buildings/park/apartments/${code.replace("-AP-", "-A-AP.")}.png`;
 }
 
 function makeBuildingBUnit(input: BuildingBUnitInput): Unit {
-  const unitNumber = input.code.replace("B-AP-", "");
+  const unitNumber = input.code.replace("B-AP.", "");
   return {
     id: `b-ap-${unitNumber}`,
     kind: "apartment",
@@ -69,7 +69,7 @@ function makeBuildingBUnit(input: BuildingBUnitInput): Unit {
 
 export const buildingBUnits: Unit[] = [
   makeBuildingBUnit({
-    code: "B-AP-01",
+    code: "B-AP.01",
     floor: 1,
     rooms: 3,
     total: 67.37,
@@ -81,7 +81,7 @@ export const buildingBUnits: Unit[] = [
     highlight: "Ground-floor home with private yard and direct outdoor access.",
   }),
   makeBuildingBUnit({
-    code: "B-AP-02",
+    code: "B-AP.02",
     floor: 1,
     rooms: 3,
     total: 67.37,
@@ -93,7 +93,7 @@ export const buildingBUnits: Unit[] = [
     highlight: "Mirror ground-floor home with a private yard and practical layout.",
   }),
   makeBuildingBUnit({
-    code: "B-AP-03",
+    code: "B-AP.03",
     floor: 2,
     rooms: 4,
     total: 83.75,
@@ -105,7 +105,7 @@ export const buildingBUnits: Unit[] = [
     highlight: "Upper-floor home with dressing room, open living area, and two balconies.",
   }),
   makeBuildingBUnit({
-    code: "B-AP-04",
+    code: "B-AP.04",
     floor: 2,
     rooms: 4,
     total: 83.75,
@@ -117,7 +117,7 @@ export const buildingBUnits: Unit[] = [
     highlight: "Mirror upper-floor home with dressing room and two balconies.",
   }),
   makeBuildingBUnit({
-    code: "B-AP-05",
+    code: "B-AP.05",
     floor: 3,
     rooms: 4,
     total: 83.75,
@@ -129,7 +129,7 @@ export const buildingBUnits: Unit[] = [
     highlight: "Upper-level home with two balconies and a practical day-night layout.",
   }),
   makeBuildingBUnit({
-    code: "B-AP-06",
+    code: "B-AP.06",
     floor: 3,
     rooms: 4,
     total: 83.75,
