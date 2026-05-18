@@ -134,7 +134,7 @@ describe("pautalia api routes", () => {
         email: "ivan@example.com",
         phone: "+359888000123",
         consent: true,
-        sourcePageUrl: "/unit/unit-a101",
+        sourcePageUrl: "/units/unit-a101",
         unitId: "a-101",
       }),
     );
@@ -154,7 +154,7 @@ describe("pautalia api routes", () => {
         "http://localhost:3000/api/pautalia/events",
         {
           eventType: "apartment_detail_view",
-          sourcePageUrl: "/building/residence",
+          sourcePageUrl: "/buildings/residence",
           unitId: "a-101",
         },
         { headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.10" } },
@@ -179,7 +179,7 @@ describe("pautalia api routes", () => {
     const response = await eventsRoute(
       jsonRequest("http://localhost:3000/api/pautalia/events", {
         eventType: "room_view",
-        sourcePageUrl: "/building/residence",
+        sourcePageUrl: "/buildings/residence",
       }),
     );
 
@@ -195,7 +195,7 @@ describe("pautalia api routes", () => {
         "http://localhost:3000/api/pautalia/events",
         {
           eventType: "page_view",
-          sourcePageUrl: "/apartments",
+          sourcePageUrl: "/units",
           buildingId: "a",
           visitorId: "visitor-123456",
           sessionId: "session-123456",

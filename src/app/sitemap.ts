@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const { buildings, units } = await getSitemapInventory();
 
-  const staticRoutes = ["", "/buildings", "/apartments", "/gallery", "/location", "/contact", "/news", "/privacy", "/cookies", "/terms"].map((route) => ({
+  const staticRoutes = ["", "/buildings", "/units", "/gallery", "/location", "/contact", "/news", "/privacy", "/cookies", "/terms"].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? ("weekly" as const) : ("monthly" as const),
@@ -17,14 +17,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const buildingRoutes = buildings.map((building) => ({
-    url: `${baseUrl}/building/${building.slug}`,
+    url: `${baseUrl}/buildings/${building.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
   const unitRoutes = units.map((unit) => ({
-    url: `${baseUrl}/unit/${unit.slug}`,
+    url: `${baseUrl}/units/${unit.slug}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
     priority: 0.7,

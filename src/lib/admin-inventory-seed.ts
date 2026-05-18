@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { buildingBParkingUnits } from "@/data/building-b";
 import { buildings, floors, units } from "@/data/site";
-import { getOfficialParkingValue } from "@/data/official-unit-values";
+import { seedParkingInventory } from "@/lib/admin-inventory-seed-parking";
 import { isProduction } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
@@ -108,95 +107,7 @@ async function seedApartments() {
 }
 
 async function seedParking() {
-  for (let index = 1; index <= 14; index += 1) {
-    const code = `A-P${String(index).padStart(2, "0")}`;
-    const official = getOfficialParkingValue(code);
-    const data = {
-      areaLivingSqm: 0,
-      areaSharedSqm: 0,
-      areaInternalSqm: 0,
-      areaTotalSqm: 0,
-      landPercent: official?.landPercent ?? 0,
-      landAreaSqm: official?.landArea ?? 0,
-    };
-
-    await prisma.unit.upsert({
-      where: { id: `a-parking-${index}` },
-      update: data,
-      create: {
-        ...data,
-        id: `a-parking-${index}`,
-        kind: "parking",
-        externalCode: code,
-        slug: code.toLowerCase(),
-        buildingId: "a",
-        unitNumber: `P${String(index).padStart(2, "0")}`,
-        rooms: 0,
-        bedrooms: null,
-        bathrooms: 0,
-        areaLivingSqm: data.areaLivingSqm,
-        areaSharedSqm: data.areaSharedSqm,
-        areaInternalSqm: data.areaInternalSqm,
-        areaTotalSqm: data.areaTotalSqm,
-        terraceSqm: 0,
-        commonPartsPercent: 0,
-        orientation: "parking",
-        exposure: "parking",
-        price: null,
-        currency: "EUR",
-        status: "available",
-        isPublished: true,
-        isPriceVisible: false,
-        description: "Sellable parking space.",
-        highlight: "Parking space.",
-        floorplan: "/assets/buildings/residence/floors/floor-01.png",
-        gallery: [],
-        features: ["parking"],
-      },
-    });
-  }
-
-  for (const parking of buildingBParkingUnits) {
-    const data = {
-      areaLivingSqm: 0,
-      areaSharedSqm: 0,
-      areaInternalSqm: 0,
-      areaTotalSqm: parking.areaSqm,
-      landPercent: 0,
-      landAreaSqm: 0,
-    };
-
-    await prisma.unit.upsert({
-      where: { id: parking.id },
-      update: data,
-      create: {
-        ...data,
-        id: parking.id,
-        kind: "parking",
-        externalCode: parking.code,
-        slug: parking.code.toLowerCase(),
-        buildingId: "b",
-        unitNumber: parking.code.replace("B-PM-", "PM-"),
-        rooms: 0,
-        bedrooms: null,
-        bathrooms: 0,
-        terraceSqm: 0,
-        commonPartsPercent: 0,
-        orientation: "parking",
-        exposure: "parking",
-        price: null,
-        currency: "EUR",
-        status: "available",
-        isPublished: true,
-        isPriceVisible: false,
-        description: "Sellable parking space for Park.",
-        highlight: "Park parking space.",
-        floorplan: "/assets/buildings/park/floors/floor-01.png",
-        gallery: [],
-        features: ["parking"],
-      },
-    });
-  }
+  await seedParkingInventory();
 }
 
 export async function ensureAdminInventorySeed() {
@@ -220,7 +131,7 @@ async function seedMissingInventory() {
     prisma.unit.count({ where: { kind: "parking" } }),
   ]);
 
-  if (apartmentCount >= units.length && parkingCount >= 14 + buildingBParkingUnits.length) {
+  if (apartmentCount >= units.length && parkingCount >= 14 + 6) {
     await ensureBuildingsAndFloors();
     await seedApartments();
     await seedParking();

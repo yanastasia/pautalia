@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   revalidateTag("pautalia:units");
   revalidatePath("/");
   revalidatePath("/apartments");
+  revalidatePath("/units");
   revalidatePath("/buildings");
   revalidatePath("/project");
   revalidatePath("/privacy");

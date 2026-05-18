@@ -80,7 +80,7 @@ export function UnitCard({ unit }: { unit: PublicUnit }) {
         </div>
 
         <Link
-          href={`/unit/${unit.slug}`}
+          href={`/units/${unit.slug}`}
           onClick={() => {
             sendAnalyticsEvent("apartment_card_click", {
               buildingId: unit.buildingId,

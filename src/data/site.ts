@@ -13,7 +13,7 @@ import { buildingAParkingUnits } from "@/data/building-a-parking";
 import { buildingBFloorOverrides, buildingBParsedUnits } from "@/data/building-b-floorplans";
 import { buildingBParkingUnits, buildingBSeed, buildingBTypologies } from "@/data/building-b";
 import { getOfficialApartmentValue } from "@/data/official-unit-values";
-import { getResidenceUnitGallery, parkGeneralGalleryImages } from "@/data/unit-gallery-assets";
+import { getResidenceUnitGallery, parkGeneralGalleryImages, parkUnitGalleriesByCode } from "@/data/unit-gallery-assets";
 
 const nowIso = "2026-03-18T09:00:00.000Z";
 
@@ -228,7 +228,7 @@ const buildingBUnits: Unit[] = buildingBParsedUnits.map((unit) => {
     status: "available",
     isPublished: true,
     isPriceVisible: false,
-    gallery: getResidenceUnitGallery(unit.externalCode), // Fallback or updated gallery helper
+    gallery: [...(parkUnitGalleriesByCode[unit.externalCode] ?? [])],
     panoramaImage: "",
     updatedByUserId: "seed-admin",
     createdAt: nowIso,
@@ -337,7 +337,7 @@ const buildingBParking: Unit[] = buildingBParkingUnits.map((parking) => ({
 export const units: Unit[] = [...buildingAUnits, ...buildingBUnits, ...buildingAParking, ...buildingBParking];
 
 export const buildings: Building[] = buildingSeeds.map((building) => {
-  const buildingUnits = units.filter((unit) => unit.buildingId === building.id);
+  const buildingUnits = units.filter((unit) => unit.buildingId === building.id && unit.kind === "apartment");
   return {
     ...building,
     totalUnits: buildingUnits.length,
@@ -599,7 +599,11 @@ export function getPublicBuildings() {
 }
 
 export function getPublicUnits() {
-  return units.filter((unit) => unit.isPublished && unit.status !== "hidden");
+  return units.filter((unit) => unit.kind === "apartment" && unit.isPublished && unit.status !== "hidden");
+}
+
+export function getPublicParkingUnits() {
+  return units.filter((unit) => unit.kind === "parking" && unit.isPublished && unit.status !== "hidden");
 }
 
 export function formatStatus(status: UnitStatus) {

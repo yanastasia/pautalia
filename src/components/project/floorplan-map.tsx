@@ -54,7 +54,7 @@ export function FloorplanMap({
                   tabIndex={index === 0 ? 0 : -1}
                   onMouseEnter={() => setActiveUnitId(unit.id)}
                   onFocus={() => setActiveUnitId(unit.id)}
-                  onClick={() => router.push(`/unit/${unit.slug}`)}
+                  onClick={() => router.push(`/units/${unit.slug}`)}
                   className={`absolute rounded-xl border transition-all ${
                     activeUnitId === unit.id
                       ? "border-[color:var(--accent)] bg-[color:var(--accent)]/35 shadow-[0_0_0_4px_rgba(173,138,86,0.16)]"
@@ -106,7 +106,7 @@ export function FloorplanMap({
           </div>
           <button
             type="button"
-            onClick={() => router.push(`/unit/${activeUnit.slug}`)}
+            onClick={() => router.push(`/units/${activeUnit.slug}`)}
             className="premium-button mt-6 w-full justify-center text-sm font-semibold"
           >
             {messages.common.openUnitDetail}

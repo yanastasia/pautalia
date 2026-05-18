@@ -21,7 +21,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   const links = [
     { href: "/", label: messages.header.nav.home },
     { href: "/buildings", label: messages.header.nav.project },
-    { href: "/apartments", label: messages.header.nav.apartments },
+    { href: "/units", label: messages.header.nav.apartments },
     { href: "/gallery", label: messages.header.nav.gallery },
     { href: "/news", label: locale === "bg" ? "Новини" : "News" },
     { href: "/location", label: messages.header.nav.location },
@@ -29,7 +29,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   ];
   const mobileLinks = [
     { href: "/buildings", label: messages.header.mobile.project },
-    { href: "/apartments", label: messages.header.mobile.units },
+    { href: "/units", label: messages.header.mobile.units },
     { href: "/gallery", label: messages.header.mobile.gallery },
     { href: "/news", label: locale === "bg" ? "Новини" : "News" },
     { href: "/location", label: messages.header.mobile.location },

@@ -35,7 +35,7 @@ describe("security hardening", () => {
         email: "ivan@example.com",
         phone: "+359888000123",
         consent: true,
-        sourcePageUrl: "https://example.com/unit/a-101",
+        sourcePageUrl: "https://example.com/units/a-101",
       }),
     ).toThrow();
 
@@ -45,8 +45,8 @@ describe("security hardening", () => {
         email: "ivan@example.com",
         phone: "+359888000123",
         consent: true,
-        sourcePageUrl: "/unit/a-101",
+        sourcePageUrl: "/units/a-101",
       }).sourcePageUrl,
-    ).toBe("/unit/a-101");
+    ).toBe("/units/a-101");
   });
 });

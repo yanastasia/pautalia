@@ -120,12 +120,12 @@ export async function getTrafficSources(filters: AnalyticsRange) {
 export async function getFunnel(filters: AnalyticsRange) {
   const overview = await getAnalyticsOverview(filters);
   const apartmentPageViews = await prisma.event.count({
-    where: { ...getDateRange(filters), eventType: "page_view", sourcePageUrl: { startsWith: "/apartments" } },
+    where: { ...getDateRange(filters), eventType: "page_view", sourcePageUrl: { startsWith: "/units" } },
   });
 
   return [
     { step: "Homepage", count: await prisma.event.count({ where: { ...getDateRange(filters), eventType: "page_view", sourcePageUrl: "/" } }) },
-    { step: "Apartments", count: apartmentPageViews },
+    { step: "Units", count: apartmentPageViews },
     { step: "Unit detail", count: overview.apartmentViews },
     { step: "Lead", count: overview.leads },
   ];

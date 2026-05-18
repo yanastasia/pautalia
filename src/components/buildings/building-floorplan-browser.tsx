@@ -242,7 +242,7 @@ export function BuildingFloorplanBrowser({
   const handleUnitKeyDown = (event: KeyboardEvent<SVGPolygonElement | SVGRectElement>, slug: string, unitId: string) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      router.push(`/unit/${slug}`);
+      router.push(`/units/${slug}`);
       return;
     }
 
@@ -275,7 +275,7 @@ export function BuildingFloorplanBrowser({
                 type="button"
                 onMouseEnter={() => setActiveUnitId(unit.id)}
                 onFocus={() => setActiveUnitId(unit.id)}
-                onClick={() => router.push(`/unit/${unit.slug}`)}
+                onClick={() => router.push(`/units/${unit.slug}`)}
                 className={cn(
                   "min-w-[7.35rem] rounded-full border px-4 py-3 text-left text-sm font-semibold tracking-[0.01em] backdrop-blur lg:min-w-0",
                   isActive
@@ -359,7 +359,7 @@ export function BuildingFloorplanBrowser({
                     </div>
                     <button
                       type="button"
-                      onClick={() => router.push(`/unit/${activeUnit.slug}`)}
+                      onClick={() => router.push(`/units/${activeUnit.slug}`)}
                       className={cn(
                         "rounded-full border border-current/14 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.08em] sm:px-2.5 sm:text-[0.56rem]",
                         activeTheme.floatingAction,
@@ -408,7 +408,7 @@ export function BuildingFloorplanBrowser({
                           tabIndex={index === 0 ? 0 : -1}
                           onMouseEnter={() => setActiveUnitId(unit.id)}
                           onFocus={() => setActiveUnitId(unit.id)}
-                          onClick={() => router.push(`/unit/${unit.slug}`)}
+                          onClick={() => router.push(`/units/${unit.slug}`)}
                           onKeyDown={(event) => handleUnitKeyDown(event, unit.slug, unit.id)}
                           className="cursor-pointer outline-none transition-all duration-200"
                           fill={isActive ? theme.fill : "rgba(255,255,255,0.01)"}
@@ -440,7 +440,7 @@ export function BuildingFloorplanBrowser({
                       tabIndex={index === 0 ? 0 : -1}
                       onMouseEnter={() => setActiveUnitId(unit.id)}
                       onFocus={() => setActiveUnitId(unit.id)}
-                      onClick={() => router.push(`/unit/${unit.slug}`)}
+                      onClick={() => router.push(`/units/${unit.slug}`)}
                       onKeyDown={(event) => handleUnitKeyDown(event, unit.slug, unit.id)}
                       className="cursor-pointer outline-none transition-all duration-200"
                       fill={isActive ? theme.fill : "rgba(255,255,255,0.01)"}

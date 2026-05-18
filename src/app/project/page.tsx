@@ -95,7 +95,7 @@ export default async function ProjectPage() {
               return (
                 <div key={building.id} className="motion-scale-in" style={{ animationDelay: `${140 + index * 120}ms` }}>
                   <Link
-                    href={`/building/${building.slug}`}
+                    href={`/buildings/${building.slug}`}
                     className="group overflow-hidden border border-[color:var(--line)] bg-[color:var(--surface-strong)] shadow-[0_24px_60px_rgba(12,13,15,0.1)] md:hidden"
                   >
                     <div className="relative min-h-[15.5rem] overflow-hidden">
@@ -146,7 +146,7 @@ export default async function ProjectPage() {
                     </div>
                   </Link>
 
-                  <Link href={`/building/${building.slug}`} className="building-progress-card group hidden md:block">
+                  <Link href={`/buildings/${building.slug}`} className="building-progress-card group hidden md:block">
                     <Image
                       src={visual.src}
                       alt={building.name}
