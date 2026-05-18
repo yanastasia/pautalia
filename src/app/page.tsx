@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, ArrowUpRight, Building2, Compass, Layers3, Sparkles } from "lucide-react";
 import { HomeBuildingSelectorSection } from "@/components/home/home-building-selector-section";
+import { HomeLocationMapSection } from "@/components/home/home-location-map-section";
 import { getHomeJournalItems, getHomeStorySections, getSiteCopy } from "@/content/site-content";
 import { HomeHero } from "@/components/home/home-hero";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -114,6 +115,12 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section-space bg-white/34">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <HomeLocationMapSection locale={locale} buildings={buildings} />
+        </div>
+      </section>
+
       <HomeBuildingSelectorSection locale={locale} selector={selector} />
 
       <section className="section-space bg-white/44">
@@ -188,6 +195,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
     </>
   );
 }

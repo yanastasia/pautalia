@@ -1,10 +1,14 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getNearbyPlaces, getSiteCopy } from "@/content/site-content";
+import { BuildingsMap } from "@/components/location/buildings-map";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
 import { buildPageMetadata } from "@/lib/metadata";
+import { fetchPautaliaBuildings } from "@/lib/public-api";
+import { getBuildingGeoBySlug, listBuildingGeos } from "@/lib/building-geo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -27,6 +31,27 @@ export default async function LocationPage() {
   const messages = getMessages(locale);
   const nearbyPlaces = getNearbyPlaces(locale);
   const siteCopy = getSiteCopy(locale);
+  const buildings = await fetchPautaliaBuildings(locale);
+  const geos = listBuildingGeos();
+  const center = {
+    lat: geos.reduce((sum, item) => sum + item.lat, 0) / (geos.length || 1),
+    lng: geos.reduce((sum, item) => sum + item.lng, 0) / (geos.length || 1),
+  };
+  const osmHref = `https://www.openstreetmap.org/?mlat=${center.lat}&mlon=${center.lng}#map=16/${center.lat}/${center.lng}`;
+  const markers = buildings
+    .map((building) => {
+      const geo = getBuildingGeoBySlug(building.slug);
+      if (!geo) return null;
+      return {
+        id: building.id,
+        lat: geo.lat,
+        lng: geo.lng,
+        label: building.name,
+        popup: `${building.name}<br/>${geo.address}`,
+        color: geo.markerColor,
+      };
+    })
+    .filter((marker): marker is NonNullable<typeof marker> => Boolean(marker));
 
   return (
     <>
@@ -95,18 +120,23 @@ export default async function LocationPage() {
             </div>
           </div>
 
-          <div className="page-image-block min-h-[19rem] sm:min-h-[30rem]">
-            <Image
-              src="/assets/buildings/residence/location/location-preview.jpg"
-              alt={messages.location.previewEyebrow}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 55vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07131d]/80 via-[#07131d]/16 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-white/58">{messages.location.previewEyebrow}</p>
-              <p className="mt-4 max-w-md font-serif text-4xl leading-[1.02]">{messages.location.previewCopy}</p>
+          <div className="rounded-[var(--radius-xl)] border border-[color:var(--line)] bg-white p-4 shadow-[0_20px_60px_rgba(34,30,24,0.08)] sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="premium-label text-[color:var(--muted)]">{messages.location.previewEyebrow}</p>
+                <p className="mt-2 font-serif text-3xl leading-[1.02] text-[color:var(--ink)]">{messages.location.previewCopy}</p>
+              </div>
+              <Link
+                href={osmHref}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-[color:var(--line)] bg-[rgba(249,245,238,0.7)] px-5 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--ink)] hover:bg-[rgba(249,245,238,0.95)]"
+              >
+                {locale === "bg" ? "Отвори карта" : "Open map"}
+              </Link>
+            </div>
+            <div className="mt-6 overflow-hidden rounded-[1.2rem] border border-[color:var(--line)] bg-[color:var(--surface)]">
+              <BuildingsMap markers={markers} zoom={15} className="h-[20rem] w-full sm:h-[28rem]" />
             </div>
           </div>
         </div>

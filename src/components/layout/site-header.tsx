@@ -88,7 +88,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-transform duration-300 ease-out",
+        "sticky top-0 z-[2000] transition-transform duration-300 ease-out",
         isHidden && !isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
       )}
     >

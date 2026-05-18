@@ -1,6 +1,7 @@
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import { BuildingInventorySelector } from "@/components/buildings/building-inventory-selector";
+import { BuildingLocationSection } from "@/components/buildings/building-location-section";
 import { LeadForm } from "@/components/forms/lead-form";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getMessages } from "@/lib/i18n/messages";
@@ -167,6 +168,7 @@ export default async function BuildingPage({
           </div>
         </div>
       </section>
+      <BuildingLocationSection locale={locale} building={building} />
 
       <section className="section-space">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
@@ -176,4 +178,3 @@ export default async function BuildingPage({
     </>
   );
 }
-

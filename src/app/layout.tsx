@@ -10,6 +10,7 @@ import { getLocale } from "@/lib/i18n/server";
 import { getProjectJsonLd } from "@/lib/json-ld";
 import { buildRootMetadata } from "@/lib/metadata";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 
 const serif = Prata({
   subsets: ["latin", "cyrillic"],
