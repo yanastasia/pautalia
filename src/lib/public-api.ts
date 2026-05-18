@@ -5,13 +5,15 @@ import { isAppError } from "@/lib/errors";
 import {
   getPublicBuilding,
   getPublicUnit,
+  getPublicParkingUnit,
   listPublicBuildings,
+  listPublicParkingUnits,
   listPublicUnits,
 } from "@/lib/pautalia-data";
 import type { Locale } from "@/lib/i18n/config";
 import { getPublicPost, listPublicPosts } from "@/lib/posts";
 import type { PostListResponse, PublicPost } from "@/types/posts";
-import type { PublicBuilding, PublicFloor, PublicUnit } from "@/types/public-api";
+import type { PublicBuilding, PublicFloor, PublicParkingUnit, PublicUnit } from "@/types/public-api";
 
 type NormalizedSearchParams = Record<string, string | string[] | undefined>;
 
@@ -122,6 +124,25 @@ export async function fetchAllPautaliaUnits(
   }
 
   return items;
+}
+
+export async function fetchPautaliaParkingUnits(locale: Locale, buildingSlugOrId?: string): Promise<PublicParkingUnit[]> {
+  try {
+    const userType = await getUserType();
+    return await listPublicParkingUnits(locale, buildingSlugOrId ?? null, userType);
+  } catch (error) {
+    wrapPublicDataError(error);
+  }
+}
+
+export async function fetchPautaliaParkingUnit(locale: Locale, slugOrId: string): Promise<PublicParkingUnit> {
+  try {
+    const userType = await getUserType();
+    const response = await getPublicParkingUnit(locale, slugOrId, userType);
+    return response.item;
+  } catch (error) {
+    wrapPublicDataError(error);
+  }
 }
 
 export async function fetchPautaliaUnit(locale: Locale, slugOrId: string): Promise<PublicUnit> {

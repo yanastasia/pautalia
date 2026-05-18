@@ -428,7 +428,7 @@ export function BuildingInventorySelector({
                 key={unit.id}
                 className="grid grid-cols-[1.2fr_0.8fr_0.75fr_0.9fr_0.9fr_0.8fr] gap-4 border-t border-[color:var(--line)] px-4 py-4 text-sm text-[color:var(--ink)]"
               >
-                <Link href={`/unit/${unit.slug}`} className="font-semibold hover:text-[color:var(--accent)]">
+                <Link href={`/units/${unit.slug}`} className="font-semibold hover:text-[color:var(--accent)]">
                   {unit.code}
                 </Link>
                 <span>{getResidenceLabel(locale, unit.rooms)}</span>

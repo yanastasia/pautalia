@@ -19,7 +19,7 @@ export default async function NotFound() {
             {messages.notFound.backHome}
           </Link>
           <Link
-            href="/apartments"
+            href="/units"
             className="rounded-full border border-[color:var(--line)] px-6 py-3 text-sm font-semibold text-[color:var(--ink)]"
           >
             {messages.notFound.browseApartments}

@@ -74,7 +74,7 @@ export function getHomeSelectorModel(
     .sort((left, right) => left.displayOrder - right.displayOrder)
     .map((building) => ({
       id: building.id,
-      href: `/building/${building.slug}`,
+      href: `/buildings/${building.slug}`,
       building,
     }));
 
@@ -86,7 +86,7 @@ export function getHomeSelectorModel(
     buildingCards,
     highlightedUnits: unitsToHighlight.map((unit) => ({
       id: unit.id,
-      href: `/unit/${unit.slug}`,
+      href: `/units/${unit.slug}`,
       code: unit.code,
       buildingName: unit.building?.name ?? "",
       floorLabel: getFloorLabel(locale, unit.floor),

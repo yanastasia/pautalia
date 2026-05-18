@@ -16,7 +16,7 @@ export function getDemoLead(): AdminLead {
     message: "Интересувам се от апартамент A-AP.08 и възможност за оглед.",
     status: demoLeadStatus,
     adminNotes: demoLeadNotes,
-    sourcePageUrl: "/unit/unit-a208",
+    sourcePageUrl: "/units/unit-a208",
     createdAt: new Date(),
     unit: { id: "a-204", externalCode: "A-AP.08", kind: "apartment" },
     building: { id: "a", name: "Building A", slug: "building-a" },
@@ -30,7 +30,7 @@ export function setDemoLead(status: AdminLeadStatus, adminNotes: string | null) 
 
 export function getDemoUnits(): AdminUnit[] {
   return [
-    ...units.map(makeDemoApartment),
+    ...units.filter((unit) => unit.kind === "apartment").map(makeDemoApartment),
     ...Array.from({ length: 14 }, (_, index) => makeDemoParking("a", `A-PM.${String(index + 1).padStart(2, "0")}`, `a-parking-${index + 1}`, 0)),
     ...buildingBParkingUnits.map((parking) => makeDemoParking("b", parking.code, parking.id, parking.areaSqm)),
   ];

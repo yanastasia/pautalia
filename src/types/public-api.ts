@@ -81,10 +81,14 @@ export interface PublicUnit {
 export interface PublicParkingUnit {
   kind: Extract<UnitKind, "parking">;
   id: string;
+  slug: string;
   code: string;
   externalCode: string;
   buildingId: string;
+  building: { id: string; slug: string; name: string } | null;
   floor: number;
+  unitNumber: string;
+  size: number;
   price: number | null;
   currency: string | null;
   status: UnitStatus;

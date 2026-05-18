@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client";
+import fs from "node:fs";
+import path from "node:path";
 import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { buildingPresentation } from "@/content/building-presentation";
@@ -7,6 +9,7 @@ import {
   floors as staticFloors,
   getPublicBuildings as getStaticPublicBuildings,
   getPublicUnits as getStaticPublicUnits,
+  getPublicParkingUnits as getStaticPublicParkingUnits,
   getTypology as getStaticTypology,
 } from "@/data/site";
 import type { Locale } from "@/lib/i18n/config";
@@ -16,7 +19,7 @@ import { getFeatureLabel, getOutdoorTypeLabel } from "@/lib/i18n/property";
 import { notFoundError, validationError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
 import type { Building as StaticBuilding, Floor as StaticFloor, Unit as StaticUnit, UnitPlanArea } from "@/types/domain";
-import type { PublicBuilding, PublicFloor, PublicUnit } from "@/types/public-api";
+import type { PublicBuilding, PublicFloor, PublicParkingUnit, PublicUnit } from "@/types/public-api";
 
 const unitSortValues = [
   "price_asc",
@@ -30,6 +33,73 @@ const unitSortValues = [
 const preferStaticInventory = process.env.PAUTALIA_INVENTORY_SOURCE?.toLowerCase() !== "database";
 const PUBLIC_DATA_REVALIDATE_SECONDS = 300;
 type PriceVisibility = "visible" | "hidden" | "per_unit";
+
+function padTwoDigits(value: string) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return value;
+  return numeric.toString().padStart(2, "0");
+}
+
+function normalizeUnitCode(buildingId: string, rawCode: string) {
+  const trimmed = rawCode.trim();
+  if (!trimmed) return trimmed;
+
+  const alreadyCanonical = trimmed.match(/^([AB])-(AP)\.(\d{2})$/i);
+  if (alreadyCanonical) {
+    return `${alreadyCanonical[1].toUpperCase()}-${alreadyCanonical[2].toUpperCase()}.${alreadyCanonical[3]}`;
+  }
+
+  const buildingLetter = buildingId.toUpperCase();
+  const apDot = trimmed.match(/^AP\.(\d{1,2})$/i);
+  if (apDot) return `${buildingLetter}-AP.${padTwoDigits(apDot[1])}`;
+
+  const apNoDash = trimmed.match(/^([AB])AP\.(\d{1,2})$/i);
+  if (apNoDash) return `${apNoDash[1].toUpperCase()}-AP.${padTwoDigits(apNoDash[2])}`;
+
+  const apLoose = trimmed.match(/^([AB])[- ]?AP[.-](\d{1,2})$/i);
+  if (apLoose) return `${apLoose[1].toUpperCase()}-AP.${padTwoDigits(apLoose[2])}`;
+
+  return trimmed;
+}
+
+function getBuildingSegmentFromAssetPath(assetPath: string) {
+  const marker = "/assets/buildings/";
+  const start = assetPath.indexOf(marker);
+  if (start === -1) return null;
+  const rest = assetPath.slice(start + marker.length);
+  const segment = rest.split("/")[0];
+  return segment || null;
+}
+
+function publicAssetExists(assetPath: string) {
+  const trimmed = assetPath.trim();
+  if (!trimmed.startsWith("/assets/")) return false;
+  try {
+    return fs.existsSync(path.join(process.cwd(), "public", trimmed));
+  } catch {
+    return false;
+  }
+}
+
+function preferStaticAssetPath(candidate: string, staticFallback?: string) {
+  const normalizedCandidate = candidate.trim();
+  const normalizedFallback = staticFallback?.trim() ?? "";
+
+  if (!normalizedCandidate) return normalizedFallback || normalizedCandidate;
+  if (!normalizedFallback) return normalizedCandidate;
+
+  const candidateSegment = getBuildingSegmentFromAssetPath(normalizedCandidate);
+  const fallbackSegment = getBuildingSegmentFromAssetPath(normalizedFallback);
+  if (candidateSegment && fallbackSegment && candidateSegment !== fallbackSegment) {
+    return normalizedFallback;
+  }
+
+  if (normalizedCandidate.startsWith("/assets/") && !publicAssetExists(normalizedCandidate) && publicAssetExists(normalizedFallback)) {
+    return normalizedFallback;
+  }
+
+  return normalizedCandidate;
+}
 
 export const pautaliaUnitsQuerySchema = z.object({
   building: z.string().trim().min(1).max(80).optional(),
@@ -363,6 +433,40 @@ function mapStaticPublicUnit(locale: Locale, unit: StaticUnit, priceVisibilityMo
   };
 }
 
+function mapStaticPublicParkingUnit(
+  locale: Locale,
+  unit: StaticUnit,
+  priceVisibilityMode: PriceVisibility = "per_unit",
+  userType: "internal" | "external" = "external",
+): PublicParkingUnit {
+  const building = staticBuildings.find((candidate) => candidate.id === unit.buildingId) ?? null;
+  const price = resolvePublicPrice(priceVisibilityMode, unit.price, unit.currency, unit.isPriceVisible);
+
+  return {
+    kind: "parking",
+    id: unit.id,
+    slug: unit.slug,
+    externalCode: unit.externalCode,
+    code: unit.code,
+    buildingId: unit.buildingId,
+    building: building
+      ? {
+          id: building.id,
+          slug: building.slug,
+          name: localizeBuildingName(locale, building, userType),
+        }
+      : null,
+    floor: unit.floor,
+    unitNumber: unit.unitNumber,
+    size: unit.size,
+    price: price.price,
+    currency: price.currency,
+    status: unit.status,
+    isPublished: unit.isPublished,
+    isPriceVisible: price.isPriceVisible,
+  };
+}
+
 function compareStaticUnits(a: StaticUnit, b: StaticUnit, sort: (typeof unitSortValues)[number]) {
   switch (sort) {
     case "price_desc":
@@ -385,6 +489,18 @@ function listStaticPublicBuildings(locale: Locale, userType: "internal" | "exter
   return getStaticPublicBuildings()
     .sort((a, b) => a.displayOrder - b.displayOrder)
     .map((building) => mapStaticPublicBuilding(locale, building, userType));
+}
+
+function listStaticPublicParkingUnits(locale: Locale, buildingSlugOrId: string | null, userType: "internal" | "external" = "external") {
+  const normalizedBuilding = buildingSlugOrId?.trim() ? buildingSlugOrId.trim() : null;
+  const building = normalizedBuilding
+    ? getStaticPublicBuildings().find((candidate) => candidate.slug === normalizedBuilding || candidate.id === normalizedBuilding) ?? null
+    : null;
+
+  return getStaticPublicParkingUnits()
+    .filter((unit) => (building ? unit.buildingId === building.id : true))
+    .map((unit) => mapStaticPublicParkingUnit(locale, unit, "per_unit", userType))
+    .sort((left, right) => left.code.localeCompare(right.code, undefined, { numeric: true, sensitivity: "base" }));
 }
 
 function getStaticPublicBuilding(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
@@ -519,6 +635,7 @@ function mapPublicBuilding(locale: Locale, building: BuildingRecord, userType: "
 
 function mapPublicFloor(locale: Locale, floor: FloorRecord): PublicFloor {
   const staticFloor = findStaticFloor(floor.buildingId, floor.number);
+  const normalizedFloorplan = normalizeFloorplanImagePath(floor.floorplanImage, staticFloor?.floorplanImage);
 
   return {
     id: floor.id,
@@ -526,9 +643,65 @@ function mapPublicFloor(locale: Locale, floor: FloorRecord): PublicFloor {
     number: floor.number,
     label: getFloorLabel(locale, floor.number),
     description: floor.description,
-    floorplanImage: normalizeFloorplanImagePath(floor.floorplanImage, staticFloor?.floorplanImage),
+    floorplanImage: preferStaticAssetPath(normalizedFloorplan, staticFloor?.floorplanImage),
     mapAspectRatio: floor.mapAspectRatio ?? staticFloor?.mapAspectRatio ?? undefined,
     svgOverlayData: null,
+  };
+}
+
+function getParkingSlugCandidates(slugOrId: string) {
+  const normalized = slugOrId.trim().toLowerCase();
+
+  if (!/^[ab]-pm[.-]\d{2}$/.test(normalized)) {
+    return [slugOrId];
+  }
+
+  const candidates = new Set<string>([slugOrId, normalized]);
+
+  if (normalized.includes(".")) {
+    candidates.add(normalized.replace(".", "-"));
+  }
+
+  if (/^[ab]-pm-\d{2}$/.test(normalized)) {
+    candidates.add(normalized.replace(/-([0-9]{2})$/, ".$1"));
+  }
+
+  return [...candidates];
+}
+
+function normalizeParkingSlug(slug: string, externalCode: string) {
+  const base = slug.trim() ? slug.trim() : externalCode.trim();
+  return base ? base.toLowerCase().replaceAll(".", "-") : "";
+}
+
+function mapPublicParkingUnit(
+  locale: Locale,
+  unit: UnitRecord,
+  priceVisibilityMode: PriceVisibility = "per_unit",
+  userType: "internal" | "external" = "external",
+): PublicParkingUnit {
+  const price = resolvePublicPrice(priceVisibilityMode, unit.price ?? null, unit.currency, unit.isPriceVisible);
+
+  return {
+    kind: "parking",
+    id: unit.id,
+    slug: normalizeParkingSlug(unit.slug, unit.externalCode),
+    externalCode: unit.externalCode,
+    code: unit.externalCode,
+    buildingId: unit.buildingId,
+    building: {
+      id: unit.building.id,
+      slug: unit.building.slug,
+      name: localizeBuildingName(locale, unit.building, userType),
+    },
+    floor: unit.floor?.number ?? 0,
+    unitNumber: unit.unitNumber,
+    size: unit.areaTotalSqm,
+    price: price.price,
+    currency: price.currency,
+    status: unit.status,
+    isPublished: unit.isPublished,
+    isPriceVisible: price.isPriceVisible,
   };
 }
 
@@ -538,13 +711,27 @@ function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: Pr
   const parsedPlanArea = parsePlanArea(unit.planArea);
   const staticPlanArea = staticUnit?.planArea;
   const parsedPlanRegions = parsePlanRegions(unit.planRegions);
+  const normalizedCode = normalizeUnitCode(unit.buildingId, unit.externalCode);
+  const derivedFloorplan =
+    normalizedCode.match(/^([AB])-AP\.(\d{2})$/)
+      ? unit.buildingId === "b"
+        ? `/assets/buildings/park/apartments/${normalizedCode}.png`
+        : unit.buildingId === "a"
+          ? `/assets/buildings/residence/apartments/${normalizedCode}.png`
+          : null
+      : null;
+  const normalizedFloorplan = normalizeFloorplanImagePath(unit.floorplan, derivedFloorplan ?? staticUnit?.floorplan);
+  const floorplan = preferStaticAssetPath(
+    normalizedFloorplan,
+    derivedFloorplan && publicAssetExists(derivedFloorplan) ? derivedFloorplan : staticUnit?.floorplan,
+  );
 
   return {
     kind: "apartment",
     id: unit.id,
     slug: unit.slug,
-    externalCode: unit.externalCode,
-    code: unit.externalCode,
+    externalCode: normalizedCode,
+    code: normalizedCode,
     buildingId: unit.buildingId,
     floorId: unit.floorId ?? "",
     typologyId: unit.typologyId ?? "",
@@ -593,9 +780,9 @@ function mapPublicUnit(locale: Locale, unit: UnitRecord, priceVisibilityMode: Pr
     isPriceVisible: price.isPriceVisible,
     description: buildUnitDescription(locale, { ...unit, floor: unit.floor ?? { number: 0 } }),
     highlight: buildUnitHighlight(locale, unit),
-    floorplan: normalizeFloorplanImagePath(unit.floorplan, staticUnit?.floorplan),
+    floorplan,
     gallery: unit.gallery,
-    panoramaImage: unit.panoramaImage ?? unit.gallery[0] ?? unit.floorplan,
+    panoramaImage: unit.panoramaImage ?? unit.gallery[0] ?? floorplan,
     features: buildUnitFeatures(locale, unit),
     planArea: hasUsablePlanArea(parsedPlanArea) ? parsedPlanArea : (staticPlanArea ?? parsedPlanArea),
     planRegions: parsedPlanRegions ?? staticUnit?.planRegions ?? null,
@@ -795,6 +982,35 @@ function getCachedUnitsFromDb(
   )();
 }
 
+function getCachedParkingUnitsFromDb(buildingId?: string) {
+  const cacheKey = buildingId ?? "all";
+  return unstable_cache(
+    async () =>
+      prisma.unit.findMany({
+        where: {
+          kind: "parking",
+          isPublished: true,
+          status: {
+            not: "hidden",
+          },
+          ...(buildingId ? { buildingId } : {}),
+        },
+        include: {
+          building: true,
+          floor: true,
+        },
+        orderBy: {
+          externalCode: "asc",
+        },
+      }),
+    ["pautalia-parking-units", cacheKey],
+    {
+      revalidate: PUBLIC_DATA_REVALIDATE_SECONDS,
+      tags: ["pautalia:inventory", "pautalia:units"],
+    },
+  )();
+}
+
 function getCachedSiteSettingsFromDb() {
   return unstable_cache(
     async () =>
@@ -828,6 +1044,32 @@ function getCachedUnitFromDb(slugOrId: string) {
         },
       }),
     ["pautalia-unit", slugOrId],
+    {
+      revalidate: PUBLIC_DATA_REVALIDATE_SECONDS,
+      tags: ["pautalia:inventory", "pautalia:units"],
+    },
+  )();
+}
+
+function getCachedParkingUnitFromDb(slugOrId: string) {
+  const slugCandidates = getParkingSlugCandidates(slugOrId);
+  return unstable_cache(
+    async () =>
+      prisma.unit.findFirst({
+        where: {
+          kind: "parking",
+          isPublished: true,
+          status: {
+            not: "hidden",
+          },
+          OR: [{ id: slugOrId }, { slug: { in: slugCandidates } }],
+        },
+        include: {
+          building: true,
+          floor: true,
+        },
+      }),
+    ["pautalia-parking-unit", slugOrId],
     {
       revalidate: PUBLIC_DATA_REVALIDATE_SECONDS,
       tags: ["pautalia:inventory", "pautalia:units"],
@@ -871,6 +1113,30 @@ export async function getPublicBuilding(locale: Locale, slugOrId: string, userTy
     };
   } catch {
     return getStaticPublicBuilding(locale, slugOrId, userType);
+  }
+}
+
+export async function listPublicParkingUnits(locale: Locale, buildingSlugOrId: string | null, userType: "internal" | "external" = "external") {
+  if (preferStaticInventory) {
+    return listStaticPublicParkingUnits(locale, buildingSlugOrId, userType);
+  }
+
+  let buildingId: string | undefined;
+
+  try {
+    if (buildingSlugOrId?.trim()) {
+      const building = await getCachedBuildingIdFromDb(buildingSlugOrId.trim());
+      if (!building) {
+        return listStaticPublicParkingUnits(locale, buildingSlugOrId, userType);
+      }
+      buildingId = building.id;
+    }
+
+    const settings = await getCachedSiteSettingsFromDb();
+    const items = await getCachedParkingUnitsFromDb(buildingId);
+    return items.map((unit) => mapPublicParkingUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit", userType));
+  } catch {
+    return listStaticPublicParkingUnits(locale, buildingSlugOrId, userType);
   }
 }
 
@@ -944,5 +1210,40 @@ export async function getPublicUnit(locale: Locale, slugOrId: string, userType: 
     };
   } catch {
     return getStaticPublicUnit(locale, slugOrId, userType);
+  }
+}
+
+function getStaticPublicParkingUnit(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
+  const candidates = getParkingSlugCandidates(slugOrId);
+  const unit = getStaticPublicParkingUnits().find((candidate) => candidates.includes(candidate.slug) || candidate.id === slugOrId);
+
+  if (!unit) {
+    throw notFoundError("Parking unit not found");
+  }
+
+  return {
+    item: mapStaticPublicParkingUnit(locale, unit, "per_unit", userType),
+  };
+}
+
+export async function getPublicParkingUnit(locale: Locale, slugOrId: string, userType: "internal" | "external" = "external") {
+  if (preferStaticInventory) {
+    return getStaticPublicParkingUnit(locale, slugOrId, userType);
+  }
+
+  try {
+    const unit = await getCachedParkingUnitFromDb(slugOrId);
+
+    if (!unit) {
+      return getStaticPublicParkingUnit(locale, slugOrId, userType);
+    }
+
+    const settings = await getCachedSiteSettingsFromDb();
+
+    return {
+      item: mapPublicParkingUnit(locale, unit, settings?.priceVisibilityMode ?? "per_unit", userType),
+    };
+  } catch {
+    return getStaticPublicParkingUnit(locale, slugOrId, userType);
   }
 }

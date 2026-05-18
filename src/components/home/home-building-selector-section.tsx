@@ -80,7 +80,7 @@ export function HomeBuildingSelectorSection({
               )}
             </div>
 
-            <Link href="/apartments" className="premium-button mt-6 w-full justify-center text-sm font-semibold">
+            <Link href="/units" className="premium-button mt-6 w-full justify-center text-sm font-semibold">
               {messages.common.openApartmentFinder}
               <ArrowRight className="size-4" />
             </Link>

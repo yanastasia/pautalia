@@ -55,7 +55,7 @@ export default async function HomePage() {
         copy={siteCopy.heroText}
         primaryHref="/buildings"
         primaryLabel={messages.home.openProject}
-        secondaryHref="/apartments"
+        secondaryHref="/units"
         secondaryLabel={messages.home.jumpToFinder}
         locationLabel={siteCopy.locationLabel}
         imageAlt={locale === "bg" ? "Екстериор на сградата" : "Building exterior"}
@@ -129,7 +129,7 @@ export default async function HomePage() {
             {buildings.map((building, index) => (
               <Link
                 key={building.id}
-                href={`/building/${building.slug}`}
+                href={`/buildings/${building.slug}`}
                 className="feature-grid-card motion-scale-in block"
                 style={{ animationDelay: `${140 + index * 120}ms` }}
               >

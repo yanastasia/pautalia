@@ -6,7 +6,6 @@ import type { Locale } from "@/lib/i18n/config";
 import type { UnitStatus } from "@/types/domain";
 
 type UnitPageHeroProps = {
-  buildingId: string;
   buildingSlug: string;
   buildingLabel: string;
   backToBuildingLabel: string;
@@ -18,7 +17,6 @@ type UnitPageHeroProps = {
 };
 
 export function UnitPageHero({
-  buildingId,
   buildingSlug,
   buildingLabel,
   backToBuildingLabel,
@@ -33,7 +31,7 @@ export function UnitPageHero({
       <section className="page-cover bg-[color:var(--surface-dark)]">
         <div className="page-cover-inner">
           <div className="page-cover-copy">
-            <Link href={`/building/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
+            <Link href={`/buildings/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
               <ArrowLeft className="size-4" />
               {backToBuildingLabel} {buildingLabel}
             </Link>
@@ -58,7 +56,7 @@ export function UnitPageHero({
       </div>
       <div className="page-cover-inner">
         <div className="page-cover-copy">
-          <Link href={`/building/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
+          <Link href={`/buildings/${buildingSlug}`} className="inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/68">
             <ArrowLeft className="size-4" />
             {backToBuildingLabel} {buildingLabel}
           </Link>

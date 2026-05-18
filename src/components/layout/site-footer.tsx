@@ -42,7 +42,7 @@ export function SiteFooter({
                   <span>{messages.footer.projectOverview}</span>
                   <ArrowUpRight className="size-4 text-white/46" />
                 </Link>
-                <Link href="/apartments" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
+                <Link href="/units" className="flex items-center justify-between rounded-[1.2rem] border border-white/8 px-4 py-3 text-sm text-white/68 hover:text-white">
                   <span>{messages.footer.apartmentFinder}</span>
                   <ArrowUpRight className="size-4 text-white/46" />
                 </Link>
@@ -95,7 +95,7 @@ export function SiteFooter({
                 <span>{messages.footer.projectOverview}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
-              <Link href="/apartments" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+              <Link href="/units" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
                 <span>{messages.footer.apartmentFinder}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>

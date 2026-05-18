@@ -88,7 +88,7 @@ export default function SiteModelCanvas({ buildings }: { buildings: PublicBuildi
                 onLeave={() => setActiveId(buildings[0]?.id ?? building.id)}
                 onSelect={(id) => {
                   const selected = buildings.find((building) => building.id === id);
-                  router.push(`/building/${selected?.slug ?? id}`);
+                  router.push(`/buildings/${selected?.slug ?? id}`);
                 }}
               />
             ))}
@@ -102,7 +102,7 @@ export default function SiteModelCanvas({ buildings }: { buildings: PublicBuildi
               key={building.id}
               type="button"
               onMouseEnter={() => setActiveId(building.id)}
-              onClick={() => router.push(`/building/${building.slug}`)}
+              onClick={() => router.push(`/buildings/${building.slug}`)}
               className={`w-full rounded-[1.2rem] border px-4 py-4 text-left transition-all ${
                 activeId === building.id
                   ? "border-[color:var(--accent)] bg-white text-[color:var(--surface-dark)] shadow-[0_18px_44px_rgba(255,255,255,0.16)]"

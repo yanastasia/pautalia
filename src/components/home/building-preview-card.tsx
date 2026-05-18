@@ -9,7 +9,7 @@ export function BuildingPreviewCard({ building, locale }: { building: PublicBuil
   const messages = getMessages(locale);
 
   return (
-    <Link href={`/building/${building.slug}`} className="group block motion-fade-up">
+    <Link href={`/buildings/${building.slug}`} className="group block motion-fade-up">
       <div className="selector-building-card overflow-hidden rounded-[1.1rem] border border-[color:var(--line)] bg-white shadow-[0_20px_60px_rgba(34,30,24,0.08)]">
         <div className="relative aspect-[4/3] overflow-hidden">
           <Image

@@ -39,7 +39,7 @@ describe("analytics developer exclusions", () => {
         "http://localhost:3000/api/pautalia/events",
         {
           eventType: "page_view",
-          sourcePageUrl: "/apartments",
+          sourcePageUrl: "/units",
         },
         { headers: { "content-type": "application/json", "x-forwarded-for": "127.0.0.1" } },
       ),

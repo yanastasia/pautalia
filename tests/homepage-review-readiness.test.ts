@@ -198,10 +198,10 @@ describe("homepage review readiness helpers", () => {
     const selector = getHomeSelectorModel("en", buildings, units);
 
     expect(selector.buildingCards).toHaveLength(1);
-    expect(selector.buildingCards[0]?.href).toBe("/building/residence");
+    expect(selector.buildingCards[0]?.href).toBe("/buildings/residence");
     expect(selector.highlightedUnits.map((unit: { href: string }) => unit.href)).toEqual([
-      "/unit/unit-a101",
-      "/unit/unit-a201",
+      "/units/unit-a101",
+      "/units/unit-a201",
     ]);
     expect(selector.highlightedUnits[0]).toMatchObject({
       code: "A-101",
