@@ -17,7 +17,7 @@ const envSchema = z.object({
   PAYLOAD_PUBLIC_SERVER_URL: optionalUrl,
   PAYLOAD_INTERNAL_URL: optionalUrl,
   REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
-  POSTMARK_SERVER_TOKEN: optionalNonEmptyString,
+  RESEND_API_KEY: optionalNonEmptyString,
   EMAIL_FROM: optionalNonEmptyString,
   ANALYTICS_EXCLUDED_IPS: z.string().default(""),
 });
@@ -34,7 +34,7 @@ export const env = envSchema.parse({
   PAYLOAD_PUBLIC_SERVER_URL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   PAYLOAD_INTERNAL_URL: process.env.PAYLOAD_INTERNAL_URL,
   REVALIDATE_SECRET: process.env.REVALIDATE_SECRET,
-  POSTMARK_SERVER_TOKEN: process.env.POSTMARK_SERVER_TOKEN ?? process.env.RESEND_API_KEY,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
   ANALYTICS_EXCLUDED_IPS: process.env.ANALYTICS_EXCLUDED_IPS,
 });

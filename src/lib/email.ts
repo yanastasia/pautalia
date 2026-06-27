@@ -14,30 +14,33 @@ type LeadEmailInput = {
 };
 
 async function sendEmail({ to, subject, html, tag }: { to: string; subject: string; html: string; tag: string }) {
-  if (!env.POSTMARK_SERVER_TOKEN || !env.EMAIL_FROM) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
     logger.warn("email.not_configured", { to, subject });
     return;
   }
 
-  const response = await fetch("https://api.postmarkapp.com/email", {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Accept: "application/json",
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
-      "X-Postmark-Server-Token": env.POSTMARK_SERVER_TOKEN,
     },
     body: JSON.stringify({
-      From: env.EMAIL_FROM,
-      To: to,
-      Subject: subject,
-      HtmlBody: html,
-      Tag: tag,
-      MessageStream: "outbound",
+      from: env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+      tags: [
+        {
+          name: "category",
+          value: tag,
+        },
+      ],
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Postmark failed with status ${response.status}`);
+    throw new Error(`Resend failed with status ${response.status}`);
   }
 }
 
@@ -65,7 +68,7 @@ export async function sendLeadEmails(input: LeadEmailInput) {
   await Promise.all([
     sendEmail({
       to: input.email,
-      subject: "[INQUIRY] Your Pautalia enquiry was received",
+      subject: "Your Pautalia enquiry was received",
       html: buyerHtml,
       tag: "inquiry",
     }),

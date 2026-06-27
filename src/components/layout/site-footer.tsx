@@ -81,33 +81,33 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="hidden gap-10 py-12 sm:py-14 md:grid md:grid-cols-2 md:gap-12 xl:grid-cols-4">
-          <div className="max-w-sm space-y-5">
+        <div className="hidden gap-y-12 py-14 sm:py-16 md:grid md:grid-cols-2 md:gap-x-12 lg:grid-cols-[1.18fr_0.86fr_0.9fr_0.9fr] lg:gap-x-10 xl:gap-x-14">
+          <div className="max-w-[25rem] space-y-5">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-white/42">{messages.footer.badge}</p>
-            <h2 className="font-serif text-[2rem] leading-tight text-white sm:text-[2.8rem]">{messages.footer.title}</h2>
+            <h2 className="font-serif text-[2rem] leading-[1.02] text-white sm:text-[2.55rem] xl:text-[2.8rem]">{messages.footer.title}</h2>
             <p className="text-base leading-7 text-white/64">{messages.footer.copy}</p>
           </div>
 
           <div className="space-y-4">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-white/42">{messages.footer.explore}</p>
-            <div className="space-y-3 text-sm text-white/68">
-              <Link href="/buildings" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+            <div className="text-sm text-white/68">
+              <Link href="/buildings" className="flex min-h-12 items-center justify-between border-b border-white/8 py-3 hover:text-white">
                 <span>{messages.footer.projectOverview}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
-              <Link href="/units" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+              <Link href="/units" className="flex min-h-12 items-center justify-between border-b border-white/8 py-3 hover:text-white">
                 <span>{messages.footer.apartmentFinder}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
-              <Link href="/gallery" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+              <Link href="/gallery" className="flex min-h-12 items-center justify-between border-b border-white/8 py-3 hover:text-white">
                 <span>{messages.footer.gallery}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
-              <Link href="/news" className="flex items-center justify-between border-b border-white/8 pb-3 hover:text-white">
+              <Link href="/news" className="flex min-h-12 items-center justify-between border-b border-white/8 py-3 hover:text-white">
                 <span>{locale === "bg" ? "Новини" : "News"}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>
-              <Link href="/contact" className="flex items-center justify-between hover:text-white">
+              <Link href="/contact" className="flex min-h-12 items-center justify-between py-3 hover:text-white">
                 <span>{messages.footer.contact}</span>
                 <ArrowUpRight className="size-4 text-white/46" />
               </Link>

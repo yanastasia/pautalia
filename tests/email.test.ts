@@ -13,7 +13,7 @@ describe("lead email notifications", () => {
   it("always sends lead notifications to the sales inbox", async () => {
     vi.doMock("@/lib/env", () => ({
       env: {
-        POSTMARK_SERVER_TOKEN: "test-postmark-token",
+        RESEND_API_KEY: "test-resend-key",
         EMAIL_FROM: "Pautalia Residence <sales@pautalia.com>",
       },
     }));
@@ -34,21 +34,24 @@ describe("lead email notifications", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.postmarkapp.com/email",
+      "https://api.resend.com/emails",
       expect.objectContaining({
         headers: expect.objectContaining({
-          "X-Postmark-Server-Token": "test-postmark-token",
+          Authorization: "Bearer test-resend-key",
         }),
       }),
     );
-    expect(payloads.map((payload) => payload.To)).toEqual([
+    expect(payloads.map((payload) => payload.to)).toEqual([
       "buyer@example.com",
       "sales@pautalia.com",
     ]);
-    expect(payloads.map((payload) => payload.Subject)).toEqual([
-      "[INQUIRY] Your Pautalia enquiry was received",
+    expect(payloads.map((payload) => payload.subject)).toEqual([
+      "Your Pautalia enquiry was received",
       "[ADMIN][INQUIRY] B-AP.03 - New lead from Test Buyer",
     ]);
-    expect(payloads.map((payload) => payload.Tag)).toEqual(["inquiry", "admin-inquiry"]);
+    expect(payloads.map((payload) => payload.tags[0])).toEqual([
+      { name: "category", value: "inquiry" },
+      { name: "category", value: "admin-inquiry" },
+    ]);
   });
 });
