@@ -25,7 +25,8 @@ Publishing rules:
 - Bulgarian and English title/body are required before publishing.
 - Draft and archived posts are hidden from public pages and APIs.
 - Posts can optionally relate to Residence or Park.
-- Images, galleries, and video URLs are supported.
+- Uploaded cover images, image galleries, uploaded videos, and external video
+  URLs are supported.
 
 ## Implemented Surface
 
@@ -52,10 +53,11 @@ type Post = {
   publishedAt?: Date;
   coverMediaId?: string;
   galleryMediaIds: string[];
+  videoMediaId?: string;
   videoUrl?: string;
   translations: {
-    bg: { title: string; excerpt: string; body: unknown; seoTitle?: string; seoDescription?: string };
-    en: { title: string; excerpt: string; body: unknown; seoTitle?: string; seoDescription?: string };
+    bg: { title: string; excerpt: string; body: string; seoTitle?: string; seoDescription?: string };
+    en: { title: string; excerpt: string; body: string; seoTitle?: string; seoDescription?: string };
   };
 };
 ```

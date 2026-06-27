@@ -14,7 +14,6 @@ import { Units } from "./collections/Units";
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
-  secret: process.env.PAYLOAD_SECRET ?? "replace-me",
   admin: {
     user: AdminUsers.slug,
   },

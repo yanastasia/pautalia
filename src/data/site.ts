@@ -41,7 +41,7 @@ const buildingSeeds = [
     amenities: [
       "Premium insulated facade",
       "Controlled access and CCTV",
-      "Underground parking access",
+      "Dedicated parking access",
       "Shared landscaped court",
     ],
     coordinates: [-3.8, 0, 0] as [number, number, number],

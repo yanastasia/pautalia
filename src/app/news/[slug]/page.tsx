@@ -56,7 +56,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
             <div className="space-y-6 text-lg leading-9 text-[color:var(--muted)]">
               {post.translation.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              <PostVideo url={post.videoUrl} title={post.translation.title} />
+              <PostVideo uploadedVideo={post.videoMedia} url={post.videoUrl} title={post.translation.title} />
             </div>
             <aside className="space-y-4">
               {post.gallery.map((image) => (

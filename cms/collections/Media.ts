@@ -5,6 +5,7 @@ export const Media: CollectionConfig = {
   slug: "media",
   upload: {
     staticDir: "media",
+    mimeTypes: ["image/*", "video/*"],
     imageSizes: [
       { name: "thumbnail", width: 300, height: 200 },
       { name: "card", width: 800, height: 600 },
@@ -14,4 +15,3 @@ export const Media: CollectionConfig = {
   access: { read: () => true, create: adminsOnly, update: adminsOnly, delete: adminsOnly },
   fields: [{ name: "alt", type: "text", required: true }],
 };
-

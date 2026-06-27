@@ -20,7 +20,8 @@ export const leadPatchSchema = z.object({
 });
 
 export const unitPatchSchema = z.object({
-  status: z.enum(["available", "reserved", "sold"]),
+  status: z.enum(["available", "reserved", "sold"]).optional(),
+  price: z.number().finite().nonnegative().nullable().optional(),
 }).strict();
 
 export const adminUnitFilterSchema = z.object({

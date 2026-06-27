@@ -21,7 +21,22 @@ function getEmbeddableVideoUrl(url: string) {
   return null;
 }
 
-export function PostVideo({ url, title }: { url?: string; title: string }) {
+type PostVideoProps = {
+  uploadedVideo?: { src: string; mimeType?: string };
+  url?: string;
+  title: string;
+};
+
+export function PostVideo({ uploadedVideo, url, title }: PostVideoProps) {
+  if (uploadedVideo) {
+    return (
+      <video className="aspect-video w-full bg-black object-contain" controls playsInline preload="metadata">
+        <source src={uploadedVideo.src} type={uploadedVideo.mimeType} />
+        {title}
+      </video>
+    );
+  }
+
   if (!url) return null;
 
   const embedUrl = getEmbeddableVideoUrl(url);

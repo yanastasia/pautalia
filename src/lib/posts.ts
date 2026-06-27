@@ -13,7 +13,7 @@ const postQuerySchema = z.object({
 });
 
 type PostQuery = z.infer<typeof postQuerySchema>;
-type PayloadMedia = { url?: string; alt?: string };
+type PayloadMedia = { url?: string; alt?: string; mimeType?: string };
 type PayloadBuilding = { id?: string; slug?: string; name?: string };
 type PayloadRichTextNode = {
   text?: string;
@@ -28,10 +28,11 @@ type PayloadPost = {
   publishedAt?: string;
   coverMedia?: string | PayloadMedia | null;
   galleryMedia?: Array<string | PayloadMedia> | null;
+  videoMedia?: string | PayloadMedia | null;
   videoUrl?: string;
   translations?: {
-    bg?: { title?: string; excerpt?: string; body?: PayloadRichTextNode[]; seoTitle?: string; seoDescription?: string };
-    en?: { title?: string; excerpt?: string; body?: PayloadRichTextNode[]; seoTitle?: string; seoDescription?: string };
+    bg?: { title?: string; excerpt?: string; body?: string | PayloadRichTextNode[]; seoTitle?: string; seoDescription?: string };
+    en?: { title?: string; excerpt?: string; body?: string | PayloadRichTextNode[]; seoTitle?: string; seoDescription?: string };
   };
 };
 
@@ -60,8 +61,12 @@ function filterPublishedPosts(parsed: PostQuery) {
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 }
 
-function richTextToParagraphs(value: PayloadRichTextNode[] | undefined) {
+function bodyToParagraphs(value: string | PayloadRichTextNode[] | undefined) {
   if (!value || value.length === 0) return [];
+
+  if (typeof value === "string") {
+    return value.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean);
+  }
 
   return value
     .map((node) => collectText(node).trim())
@@ -87,6 +92,7 @@ function mapPayloadPost(locale: Locale, post: PayloadPost): PublicPost | null {
       }
     : null;
   const coverMedia = typeof post.coverMedia === "object" ? post.coverMedia : null;
+  const videoMedia = typeof post.videoMedia === "object" ? post.videoMedia : null;
   const gallery = post.galleryMedia
     ?.map((image) => (typeof image === "object" && image.url ? { src: image.url, alt: image.alt ?? post.slug } : null))
     .filter((image): image is { src: string; alt: string } => Boolean(image)) ?? [];
@@ -94,14 +100,14 @@ function mapPayloadPost(locale: Locale, post: PayloadPost): PublicPost | null {
     bg: {
       title: bg.title,
       excerpt: bg.excerpt ?? "",
-      body: richTextToParagraphs(bg.body),
+      body: bodyToParagraphs(bg.body),
       seoTitle: bg.seoTitle,
       seoDescription: bg.seoDescription,
     },
     en: {
       title: en.title,
       excerpt: en.excerpt ?? "",
-      body: richTextToParagraphs(en.body),
+      body: bodyToParagraphs(en.body),
       seoTitle: en.seoTitle,
       seoDescription: en.seoDescription,
     },
@@ -118,6 +124,7 @@ function mapPayloadPost(locale: Locale, post: PayloadPost): PublicPost | null {
     coverImage: coverMedia?.url,
     coverImageAlt: coverMedia?.alt ?? post.slug,
     gallery,
+    videoMedia: videoMedia?.url ? { src: videoMedia.url, mimeType: videoMedia.mimeType } : undefined,
     videoUrl: post.videoUrl,
     translations,
     translation: translations[locale],

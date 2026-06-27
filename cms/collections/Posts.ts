@@ -47,8 +47,9 @@ export const Posts: CollectionConfig = {
     },
     { name: "building", type: "relationship", relationTo: "buildings" },
     { name: "publishedAt", type: "date" },
-    { name: "coverMedia", type: "relationship", relationTo: "media" },
+    { name: "coverMedia", type: "upload", relationTo: "media" },
     { name: "galleryMedia", type: "relationship", relationTo: "media", hasMany: true },
+    { name: "videoMedia", type: "upload", relationTo: "media" },
     { name: "videoUrl", type: "text" },
     {
       name: "translations",
@@ -60,7 +61,7 @@ export const Posts: CollectionConfig = {
           fields: [
             { name: "title", type: "text", required: true },
             { name: "excerpt", type: "textarea", required: true },
-            { name: "body", type: "richText", required: true },
+            { name: "body", type: "textarea", required: true },
             { name: "seoTitle", type: "text" },
             { name: "seoDescription", type: "textarea" },
           ],
@@ -71,7 +72,7 @@ export const Posts: CollectionConfig = {
           fields: [
             { name: "title", type: "text", required: true },
             { name: "excerpt", type: "textarea", required: true },
-            { name: "body", type: "richText", required: true },
+            { name: "body", type: "textarea", required: true },
             { name: "seoTitle", type: "text" },
             { name: "seoDescription", type: "textarea" },
           ],

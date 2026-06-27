@@ -30,9 +30,8 @@ export const Units: CollectionConfig = {
     { name: "isPublished", type: "checkbox", defaultValue: true },
     { name: "isPriceVisible", type: "checkbox", defaultValue: true },
     { name: "floorplan", type: "upload", relationTo: "media" },
-    { name: "gallery", type: "upload", relationTo: "media", hasMany: true },
+    { name: "gallery", type: "relationship", relationTo: "media", hasMany: true },
     { name: "features", type: "array", fields: [{ name: "label", type: "text" }] },
     { name: "internalNotes", type: "textarea", access: { read: adminsOnly, update: adminsOnly } },
   ],
 };
-

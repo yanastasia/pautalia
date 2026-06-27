@@ -6,7 +6,7 @@ const nowIso = "2026-03-18T09:00:00.000Z";
 type BuildingBUnitInput = {
   code: string;
   floor: 1 | 2 | 3;
-  rooms: 3 | 4;
+  rooms: 3;
   total: number;
   terrace: number;
   hasYard: boolean;
@@ -95,49 +95,49 @@ export const buildingBUnits: Unit[] = [
   makeBuildingBUnit({
     code: "B-AP.03",
     floor: 2,
-    rooms: 4,
+    rooms: 3,
     total: 83.75,
     terrace: 7.03,
     hasYard: false,
     typologyId: "b-type-b1",
     orientation: "south-east",
-    description: "Four-room apartment with dressing room and two balconies.",
+    description: "Three-room apartment with dressing room and two balconies.",
     highlight: "Upper-floor home with dressing room, open living area, and two balconies.",
   }),
   makeBuildingBUnit({
     code: "B-AP.04",
     floor: 2,
-    rooms: 4,
+    rooms: 3,
     total: 83.75,
     terrace: 7.03,
     hasYard: false,
     typologyId: "b-type-b2",
     orientation: "south-west",
-    description: "Mirror four-room apartment with dressing room and two balconies.",
+    description: "Mirror three-room apartment with dressing room and two balconies.",
     highlight: "Mirror upper-floor home with dressing room and two balconies.",
   }),
   makeBuildingBUnit({
     code: "B-AP.05",
     floor: 3,
-    rooms: 4,
+    rooms: 3,
     total: 83.75,
     terrace: 7.03,
     hasYard: false,
     typologyId: "b-type-b1",
     orientation: "south-east",
-    description: "Third-floor four-room apartment with dressing room and two balconies.",
+    description: "Third-floor three-room apartment with dressing room and two balconies.",
     highlight: "Upper-level home with two balconies and a practical day-night layout.",
   }),
   makeBuildingBUnit({
     code: "B-AP.06",
     floor: 3,
-    rooms: 4,
+    rooms: 3,
     total: 83.75,
     terrace: 7.03,
     hasYard: false,
     typologyId: "b-type-b2",
     orientation: "south-west",
-    description: "Mirror third-floor four-room apartment with dressing room and two balconies.",
+    description: "Mirror third-floor three-room apartment with dressing room and two balconies.",
     highlight: "Mirror upper-level home with two balconies and a practical plan.",
   }),
 ];
