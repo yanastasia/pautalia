@@ -72,10 +72,10 @@ const typologySeeds = [
     defaultFloorplanImageId: "media-floorplan-typical",
   },
   {
-    id: "typology-4a",
-    name: "Four-room premium",
-    rooms: 4,
-    description: "Largest premium unit type with broad frontage and terrace depth.",
+    id: "typology-3b",
+    name: "Three-room premium",
+    rooms: 3,
+    description: "Premium three-room unit type with broad frontage and terrace depth.",
     defaultFloorplanImageId: "media-floorplan-typical",
   },
 ] as const;
