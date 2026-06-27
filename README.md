@@ -100,9 +100,8 @@ Required Render environment variables:
 - `PAYLOAD_PUBLIC_SERVER_URL`
 - `PAYLOAD_INTERNAL_URL`
 - `REVALIDATE_SECRET`
-- `RESEND_API_KEY`
+- `POSTMARK_SERVER_TOKEN`
 - `EMAIL_FROM`
-- `ADMIN_NOTIFICATION_EMAIL`
 
 Recommended:
 
@@ -134,9 +133,8 @@ Recommended:
 - `PAYLOAD_PUBLIC_SERVER_URL`: browser-facing Payload URL
 - `PAYLOAD_INTERNAL_URL`: server-to-server Payload URL
 - `REVALIDATE_SECRET`: shared Payload webhook secret
-- `RESEND_API_KEY`: optional Resend key for lead emails
-- `EMAIL_FROM`: sender address for buyer/admin lead emails, for example `Pautalia <sales@pautalia.com>`
-- `ADMIN_NOTIFICATION_EMAIL`: notification target for lead delivery hooks
+- `POSTMARK_SERVER_TOKEN`: optional Postmark server token for lead emails
+- `EMAIL_FROM`: Postmark sender identity for all lead emails, set to `Pautalia Residence <sales@pautalia.com>`
 - `PAUTALIA_INVENTORY_SOURCE`: `static` by default; set to `database` only when inventory should come from PostgreSQL
 
 ## Admin Access

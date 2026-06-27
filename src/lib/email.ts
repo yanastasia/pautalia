@@ -1,6 +1,8 @@
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 
+const salesEmail = "sales@pautalia.com";
+
 type LeadEmailInput = {
   leadId: string;
   fullName: string;
@@ -11,28 +13,31 @@ type LeadEmailInput = {
   message?: string | null;
 };
 
-async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
+async function sendEmail({ to, subject, html, tag }: { to: string; subject: string; html: string; tag: string }) {
+  if (!env.POSTMARK_SERVER_TOKEN || !env.EMAIL_FROM) {
     logger.warn("email.not_configured", { to, subject });
     return;
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      Accept: "application/json",
       "Content-Type": "application/json",
+      "X-Postmark-Server-Token": env.POSTMARK_SERVER_TOKEN,
     },
     body: JSON.stringify({
-      from: env.EMAIL_FROM,
-      to,
-      subject,
-      html,
+      From: env.EMAIL_FROM,
+      To: to,
+      Subject: subject,
+      HtmlBody: html,
+      Tag: tag,
+      MessageStream: "outbound",
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Resend failed with status ${response.status}`);
+    throw new Error(`Postmark failed with status ${response.status}`);
   }
 }
 
@@ -57,19 +62,18 @@ export async function sendLeadEmails(input: LeadEmailInput) {
     <p>${input.message ?? ""}</p>
   `;
 
-  await Promise.allSettled([
+  await Promise.all([
     sendEmail({
       to: input.email,
-      subject: "Your Pautalia enquiry was received",
+      subject: "[INQUIRY] Your Pautalia enquiry was received",
       html: buyerHtml,
+      tag: "inquiry",
     }),
-    env.ADMIN_NOTIFICATION_EMAIL
-      ? sendEmail({
-          to: env.ADMIN_NOTIFICATION_EMAIL,
-          subject: `${input.unitCode ?? "Pautalia"} - New lead from ${input.fullName}`,
-          html: adminHtml,
-        })
-      : Promise.resolve(),
+    sendEmail({
+      to: salesEmail,
+      subject: `[ADMIN][INQUIRY] ${input.unitCode ?? "Pautalia"} - New lead from ${input.fullName}`,
+      html: adminHtml,
+      tag: "admin-inquiry",
+    }),
   ]);
 }
-
