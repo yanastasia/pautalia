@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireAdminSession } from "@/lib/admin-api";
 import { getUnitAnalytics } from "@/lib/admin-analytics";
-import { adminUnitStatuses, getAdminUnit, revalidateAdminCrm, updateAdminUnitStatus, type AdminUnitStatus } from "@/lib/admin-data";
+import { adminUnitStatuses, getAdminUnit, revalidateAdminCrm, updateAdminUnitPrice, updateAdminUnitStatus, type AdminUnitStatus } from "@/lib/admin-data";
 import { requireAdminPageSession } from "@/lib/admin-page";
 import { getBuildingLabel, getMessages, getStatusLabel } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
@@ -30,6 +30,27 @@ async function updateUnitStatusAction(formData: FormData) {
   const status = parseUnitStatus(formData.get("status"));
 
   await updateAdminUnitStatus(id, status);
+  revalidateAdminCrm();
+}
+
+function parseUnitPrice(value: FormDataEntryValue | null) {
+  if (value === null) return null;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  const normalized = raw.replace(",", ".");
+  const parsed = Number(normalized);
+  if (!Number.isFinite(parsed) || parsed < 0) throw new Error("Invalid unit price");
+  return parsed;
+}
+
+async function updateUnitPriceAction(formData: FormData) {
+  "use server";
+
+  await requireAdminSession();
+  const id = String(formData.get("id") ?? "");
+  const price = parseUnitPrice(formData.get("price"));
+
+  await updateAdminUnitPrice(id, price);
   revalidateAdminCrm();
 }
 
@@ -91,6 +112,25 @@ export default async function AdminUnitDetailPage({ params }: { params: Promise<
             </label>
             <button type="submit" className="min-h-12 rounded-full bg-[color:var(--ink)] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-white">
               {messages.admin.updateStatus}
+            </button>
+          </form>
+
+          <form action={updateUnitPriceAction} className="mt-4 flex flex-wrap items-end gap-3">
+            <input type="hidden" name="id" value={unit.id} />
+            <label className="grid gap-2">
+              <span className="premium-label text-[color:var(--muted)]">
+                {locale === "bg" ? `Цена (${unit.currency})` : `Price (${unit.currency})`}
+              </span>
+              <input
+                name="price"
+                inputMode="decimal"
+                defaultValue={unit.price ?? ""}
+                placeholder={locale === "bg" ? "Празно = при запитване" : "Empty = on request"}
+                className="min-h-12 w-[18rem] max-w-full rounded-2xl border border-[color:var(--line)] bg-white px-4 text-[color:var(--ink)]"
+              />
+            </label>
+            <button type="submit" className="min-h-12 rounded-full bg-[color:var(--ink)] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+              {locale === "bg" ? "Запази цена" : "Save price"}
             </button>
           </form>
         </div>

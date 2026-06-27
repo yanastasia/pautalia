@@ -6,6 +6,7 @@ import type { AdminLead, AdminLeadStatus, AdminUnit, AdminUnitStatus } from "@/l
 let demoLeadStatus: AdminLeadStatus = "new";
 let demoLeadNotes = "";
 const demoUnitStatuses = new Map<string, AdminUnitStatus>();
+const demoUnitPrices = new Map<string, number | null>();
 
 export function getDemoLead(): AdminLead {
   return {
@@ -44,13 +45,17 @@ export function setDemoUnitStatus(id: string, status: AdminUnitStatus) {
   demoUnitStatuses.set(id, status);
 }
 
+export function setDemoUnitPrice(id: string, price: number | null) {
+  demoUnitPrices.set(id, price);
+}
+
 function makeDemoApartment(unit: (typeof units)[number]): AdminUnit {
   return {
     id: unit.id,
     kind: "apartment",
     externalCode: unit.externalCode,
     status: demoUnitStatuses.get(unit.id) ?? "available",
-    price: unit.price,
+    price: demoUnitPrices.has(unit.id) ? (demoUnitPrices.get(unit.id) ?? null) : unit.price,
     currency: unit.currency,
     rooms: unit.rooms,
     areaLivingSqm: unit.area.living,
@@ -72,7 +77,7 @@ function makeDemoParking(buildingId: "a" | "b", code: string, id: string, areaSq
     kind: "parking",
     externalCode: code,
     status: demoUnitStatuses.get(id) ?? "available",
-    price: null,
+    price: demoUnitPrices.has(id) ? (demoUnitPrices.get(id) ?? null) : null,
     currency: "EUR",
     rooms: 0,
     areaLivingSqm: 0,

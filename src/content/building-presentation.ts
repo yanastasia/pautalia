@@ -31,13 +31,13 @@ export const buildingPresentation: Record<string, BuildingPresentation> = {
       en: [
         "Premium insulated facade",
         "Controlled access and CCTV",
-        "Underground parking access",
+        "Dedicated parking access",
         "Shared landscaped court",
       ],
       bg: [
         "Премиум топлоизолирана фасада",
         "Контролиран достъп и видеонаблюдение",
-        "Достъп до подземно паркиране",
+        "Достъп до паркоместа",
         "Озеленен общ двор",
       ],
     },

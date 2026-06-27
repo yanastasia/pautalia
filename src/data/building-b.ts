@@ -53,7 +53,7 @@ export const buildingBTypologies: Typology[] = [
   {
     id: "b-type-b1",
     name: "Upper Left",
-    rooms: 4,
+    rooms: 3,
     description: "Upper-floor apartment with dressing room and two balconies.",
     defaultFloorplanImageId: "media-floorplan-b-type-b1",
     createdAt: nowIso,
@@ -62,7 +62,7 @@ export const buildingBTypologies: Typology[] = [
   {
     id: "b-type-b2",
     name: "Upper Right",
-    rooms: 4,
+    rooms: 3,
     description: "Mirror upper-floor apartment with dressing room and two balconies.",
     defaultFloorplanImageId: "media-floorplan-b-type-b2",
     createdAt: nowIso,

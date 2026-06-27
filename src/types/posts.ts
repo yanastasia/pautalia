@@ -22,6 +22,7 @@ export type PublicPost = {
   coverImage?: string;
   coverImageAlt: string;
   gallery: Array<{ src: string; alt: string }>;
+  videoMedia?: { src: string; mimeType?: string };
   videoUrl?: string;
   translation: PublicPostTranslation;
   translations: Record<Locale, PublicPostTranslation>;

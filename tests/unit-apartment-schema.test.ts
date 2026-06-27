@@ -110,6 +110,7 @@ describe("unit/apartment data model", () => {
     ]);
     buildingBUnits.forEach((unit) => {
       expect(unit.buildingId).toBe("b");
+      expect(unit.rooms).toBe(3);
       expect(unit.ownership).toEqual({ commonPartsPercent: 0, landPercent: 0, landArea: 0 });
       expect(unit.digitalTwinId).toBeUndefined();
     });

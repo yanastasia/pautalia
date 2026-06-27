@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { getDemoLead, getDemoUnit, getDemoUnits, setDemoLead, setDemoUnitStatus } from "@/lib/admin-demo-data";
+import { getDemoLead, getDemoUnit, getDemoUnits, setDemoLead, setDemoUnitPrice, setDemoUnitStatus } from "@/lib/admin-demo-data";
 import { ensureAdminInventorySeed } from "@/lib/admin-inventory-seed";
 import { notFoundError } from "@/lib/errors";
 import { isProduction } from "@/lib/env";
@@ -146,6 +146,18 @@ export async function updateAdminUnitStatus(id: string, status: AdminUnitStatus)
   if (!unit) throw notFoundError("Unit not found");
 
   await prisma.unit.update({ where: { id }, data: { status } });
+}
+
+export async function updateAdminUnitPrice(id: string, price: number | null) {
+  if (!(await hasAdminDashboardSchema())) {
+    if (!isProduction && getDemoUnit(id)) setDemoUnitPrice(id, price);
+    return;
+  }
+
+  const unit = await getAdminUnit(id);
+  if (!unit) throw notFoundError("Unit not found");
+
+  await prisma.unit.update({ where: { id }, data: { price } });
 }
 
 export function revalidateAdminCrm() {
