@@ -46,9 +46,12 @@ describe("lead email notifications", () => {
       "sales@pautalia.com",
     ]);
     expect(payloads.map((payload) => payload.subject)).toEqual([
-      "Your Pautalia enquiry was received",
+      "Получихме Вашето запитване за Pautalia | Your Pautalia enquiry was received",
       "[ADMIN][INQUIRY] B-AP.03 - New lead from Test Buyer",
     ]);
+    expect(payloads[0].html).toContain("Здравейте, Test Buyer");
+    expect(payloads[0].html).toContain("----- English -----");
+    expect(payloads[0].html).toContain("Hello Test Buyer");
     expect(payloads.map((payload) => payload.tags[0])).toEqual([
       { name: "category", value: "inquiry" },
       { name: "category", value: "admin-inquiry" },

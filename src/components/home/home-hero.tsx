@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 type HeroImage = {
   src: string;
@@ -28,27 +31,59 @@ export function HomeHero({
   imageAlt: string;
   images: readonly HeroImage[];
 }) {
-  const heroImages = images.length > 0 ? images : [{ src: "/assets/buildings/residence/hero/exterior-front.jpg", alt: imageAlt }];
-  const durationSeconds = 12;
+  const heroImages = useMemo(
+    () => images.length > 0 ? images : [{ src: "/assets/buildings/residence/hero/exterior-front.jpg", alt: imageAlt }],
+    [imageAlt, images],
+  );
+  const carouselImages = useMemo(
+    () => heroImages.length > 1 ? [...heroImages, heroImages[0]] : heroImages,
+    [heroImages],
+  );
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
+
+  useEffect(() => {
+    if (heroImages.length <= 1) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((current) => current + 1);
+    }, 5200);
+
+    return () => window.clearInterval(intervalId);
+  }, [heroImages.length]);
+
+  function handleTrackTransitionEnd() {
+    if (activeIndex !== heroImages.length) return;
+
+    setIsResetting(true);
+    setActiveIndex(0);
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setIsResetting(false));
+    });
+  }
 
   return (
     <section className="home-hero-shell relative min-h-[100svh] -mt-[9.4rem] overflow-hidden pt-[9.4rem] md:-mt-[7.1rem] md:pt-[7.1rem]">
       <div className="home-hero-media">
-        {heroImages.map((image, index) => (
-          <Image
-            key={image.src}
-            src={image.src}
-            alt={image.alt}
-            fill
-            priority={index === 0}
-            className="home-hero-media-image home-hero-slide object-cover object-top"
-            sizes="100vw"
-            style={{
-              animationDelay: `${index * 6}s`,
-              animationDuration: `${durationSeconds}s`,
-            }}
-          />
-        ))}
+        <div
+          className={`home-hero-media-track ${isResetting ? "is-resetting" : ""}`}
+          style={{ transform: `translate3d(-${activeIndex * 100}%, 0, 0)` }}
+          onTransitionEnd={handleTrackTransitionEnd}
+        >
+          {carouselImages.map((image, index) => (
+            <div key={`${image.src}-${index}`} className="home-hero-slide-frame">
+              <Image
+                src={image.src}
+                alt={index >= heroImages.length ? "" : image.alt}
+                fill
+                priority={index === 0}
+                className="home-hero-media-image object-cover object-top"
+                sizes="100vw"
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[calc(100svh-9.4rem)] max-w-[1200px] flex-col justify-end px-4 pb-10 pt-24 sm:min-h-[calc(100svh-9.4rem)] sm:px-6 sm:pb-16 sm:pt-36 md:min-h-[calc(100svh-7.1rem)] lg:px-8 lg:pb-24 lg:pt-52">

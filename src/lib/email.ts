@@ -45,12 +45,19 @@ async function sendEmail({ to, subject, html, tag }: { to: string; subject: stri
 }
 
 export async function sendLeadEmails(input: LeadEmailInput) {
-  const unitLine = input.unitCode ? `<p><strong>Interest:</strong> ${input.unitCode}</p>` : "";
+  const buyerUnitLineBg = input.unitCode ? `<p><strong>Интерес:</strong> ${input.unitCode}</p>` : "";
+  const buyerUnitLineEn = input.unitCode ? `<p><strong>Interest:</strong> ${input.unitCode}</p>` : "";
+  const adminUnitLine = input.unitCode ? `<p><strong>Interest:</strong> ${input.unitCode}</p>` : "";
 
   const buyerHtml = `
+    <p>Здравейте, ${input.fullName},</p>
+    <p>Благодарим Ви за запитването за Pautalia Residence. Търговският ни екип ще се свърже с Вас скоро.</p>
+    ${buyerUnitLineBg}
+    <p>Референтен номер: ${input.leadId}</p>
+    <p>----- English -----</p>
     <p>Hello ${input.fullName},</p>
     <p>Thank you for your enquiry about Pautalia Residence. The sales team will follow up with you soon.</p>
-    ${unitLine}
+    ${buyerUnitLineEn}
     <p>Reference: ${input.leadId}</p>
   `;
 
@@ -59,7 +66,7 @@ export async function sendLeadEmails(input: LeadEmailInput) {
     <p><strong>Name:</strong> ${input.fullName}</p>
     <p><strong>Email:</strong> ${input.email}</p>
     <p><strong>Phone:</strong> ${input.phone ?? ""}</p>
-    ${unitLine}
+    ${adminUnitLine}
     <p><strong>Source:</strong> ${input.sourcePageUrl}</p>
     <p><strong>Message:</strong></p>
     <p>${input.message ?? ""}</p>
@@ -68,7 +75,7 @@ export async function sendLeadEmails(input: LeadEmailInput) {
   await Promise.all([
     sendEmail({
       to: input.email,
-      subject: "Your Pautalia enquiry was received",
+      subject: "Получихме Вашето запитване за Pautalia | Your Pautalia enquiry was received",
       html: buyerHtml,
       tag: "inquiry",
     }),
