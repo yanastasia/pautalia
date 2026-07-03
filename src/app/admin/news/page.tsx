@@ -16,8 +16,17 @@ export default async function AdminNewsPage() {
   await requireAdminPageSession();
 
   const locale = await getLocale();
-  const posts = await listAdminPosts();
   const isConfigured = isPayloadAdminConfigured();
+  let posts: Awaited<ReturnType<typeof listAdminPosts>> = [];
+  let loadError = false;
+
+  if (isConfigured) {
+    try {
+      posts = await listAdminPosts();
+    } catch {
+      loadError = true;
+    }
+  }
 
   return (
     <section className="section-space">
@@ -51,6 +60,23 @@ export default async function AdminNewsPage() {
                 ? "Добавете PAYLOAD_INTERNAL_URL и REVALIDATE_SECRET или PAYLOAD_SECRET, за да редактирате новини от този админ панел."
                 : "Add PAYLOAD_INTERNAL_URL and REVALIDATE_SECRET or PAYLOAD_SECRET to edit news from this admin panel."}
             </p>
+          </div>
+        ) : loadError ? (
+          <div className="mt-8 rounded-[var(--radius-xl)] card-surface p-6">
+            <h2 className="font-serif text-3xl text-[color:var(--ink)]">{locale === "bg" ? "Не успяхме да заредим новините" : "Could not load news"}</h2>
+            <p className="mt-3 max-w-2xl text-[color:var(--muted)]">
+              {locale === "bg"
+                ? "Админ панелът е свързан, но Payload CMS не отговори успешно. Проверете PAYLOAD_INTERNAL_URL и вътрешната тайна в Render, след което опитайте отново."
+                : "The admin panel is configured, but Payload CMS did not respond successfully. Check PAYLOAD_INTERNAL_URL and the internal secret in Render, then try again."}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/admin/news" className="rounded-full border border-[color:var(--accent)] bg-[color:var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-dark)] shadow-sm hover:border-[color:var(--accent-deep)] hover:bg-[color:var(--accent-deep)] hover:text-white">
+                {locale === "bg" ? "Опитай отново" : "Retry"}
+              </Link>
+              <Link href="/admin" className="rounded-full border border-[rgba(16,18,20,0.14)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--ink)]">
+                {locale === "bg" ? "Към админ панела" : "Back to dashboard"}
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="mt-8 overflow-x-auto rounded-[var(--radius-xl)] card-surface p-6">
