@@ -1,5 +1,5 @@
 import type { CollectionConfig, FieldHook } from "payload/types";
-import { adminsOnly } from "./access";
+import { adminsOrInternalSecret } from "./access";
 
 const requirePublishedTranslations: FieldHook = ({ data, value }) => {
   if (value !== "published") return value;
@@ -17,7 +17,7 @@ const requirePublishedTranslations: FieldHook = ({ data, value }) => {
 
 export const Posts: CollectionConfig = {
   slug: "posts",
-  access: { read: () => true, create: adminsOnly, update: adminsOnly, delete: adminsOnly },
+  access: { read: () => true, create: adminsOrInternalSecret, update: adminsOrInternalSecret, delete: adminsOrInternalSecret },
   admin: { useAsTitle: "slug", defaultColumns: ["slug", "category", "status", "publishedAt"] },
   fields: [
     { name: "slug", type: "text", required: true, unique: true },

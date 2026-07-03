@@ -1,0 +1,192 @@
+import { revalidatePath, revalidateTag } from "next/cache";
+import { z } from "zod";
+import { env } from "@/lib/env";
+
+export const adminPostStatuses = ["draft", "published", "archived"] as const;
+export const adminPostCategories = ["news", "construction_update", "announcement", "press"] as const;
+
+export type AdminPostStatus = (typeof adminPostStatuses)[number];
+export type AdminPostCategory = (typeof adminPostCategories)[number];
+
+export type AdminPost = {
+  id: string;
+  slug: string;
+  status: AdminPostStatus;
+  category: AdminPostCategory;
+  publishedAt?: string | null;
+  videoUrl?: string | null;
+  translations?: {
+    bg?: AdminPostTranslation;
+    en?: AdminPostTranslation;
+  };
+};
+
+type AdminPostTranslation = {
+  title?: string;
+  excerpt?: string;
+  body?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+};
+
+type PayloadListResponse = {
+  docs?: AdminPost[];
+};
+
+const postInputSchema = z.object({
+  slug: z.string().trim().min(2).max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and hyphens."),
+  status: z.enum(adminPostStatuses),
+  category: z.enum(adminPostCategories),
+  publishedAt: z.string().trim().optional(),
+  videoUrl: z.preprocess((value) => value === "" ? undefined : value, z.string().url().optional()),
+  translations: z.object({
+    bg: z.object({
+      title: z.string().trim().min(2).max(180),
+      excerpt: z.string().trim().min(2).max(420),
+      body: z.string().trim().min(2).max(12000),
+      seoTitle: z.string().trim().max(180).optional(),
+      seoDescription: z.string().trim().max(300).optional(),
+    }),
+    en: z.object({
+      title: z.string().trim().min(2).max(180),
+      excerpt: z.string().trim().min(2).max(420),
+      body: z.string().trim().min(2).max(12000),
+      seoTitle: z.string().trim().max(180).optional(),
+      seoDescription: z.string().trim().max(300).optional(),
+    }),
+  }),
+});
+
+export type AdminPostInput = z.infer<typeof postInputSchema>;
+
+export function isPayloadAdminConfigured() {
+  return Boolean(env.PAYLOAD_INTERNAL_URL && (env.REVALIDATE_SECRET || env.PAYLOAD_SECRET));
+}
+
+function getPayloadConfig() {
+  const baseUrl = env.PAYLOAD_INTERNAL_URL;
+  const secret = env.REVALIDATE_SECRET || env.PAYLOAD_SECRET;
+  if (!baseUrl || !secret) return null;
+  return { baseUrl: baseUrl.replace(/\/$/, ""), secret };
+}
+
+async function payloadRequest<T>(path: string, init?: RequestInit) {
+  const config = getPayloadConfig();
+  if (!config) throw new Error("Payload CMS is not configured for admin news editing.");
+
+  const response = await fetch(`${config.baseUrl}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "x-pautalia-internal-secret": config.secret,
+      ...init?.headers,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const message = await response.text().catch(() => "");
+    throw new Error(`Payload request failed with ${response.status}${message ? `: ${message}` : ""}`);
+  }
+
+  return await response.json() as T;
+}
+
+export async function listAdminPosts() {
+  if (!isPayloadAdminConfigured()) return [];
+
+  const params = new URLSearchParams({
+    sort: "-updatedAt",
+    depth: "0",
+    limit: "100",
+  });
+  const body = await payloadRequest<PayloadListResponse>(`/api/posts?${params}`);
+  return body.docs ?? [];
+}
+
+export async function getAdminPost(id: string) {
+  if (!isPayloadAdminConfigured()) return null;
+  return await payloadRequest<AdminPost>(`/api/posts/${encodeURIComponent(id)}?depth=0`);
+}
+
+function optionalString(formData: FormData, name: string) {
+  const value = String(formData.get(name) ?? "").trim();
+  return value || undefined;
+}
+
+function requiredString(formData: FormData, name: string) {
+  return String(formData.get(name) ?? "").trim();
+}
+
+export function parseAdminPostForm(formData: FormData): AdminPostInput {
+  const status = requiredString(formData, "status");
+  const publishedAt = optionalString(formData, "publishedAt");
+  const defaultedPublishedAt = (publishedAt || status === "published") ? publishedAt ?? new Date().toISOString() : undefined;
+
+  return postInputSchema.parse({
+    slug: requiredString(formData, "slug"),
+    status,
+    category: requiredString(formData, "category"),
+    publishedAt: defaultedPublishedAt,
+    videoUrl: optionalString(formData, "videoUrl"),
+    translations: {
+      bg: {
+        title: requiredString(formData, "bgTitle"),
+        excerpt: requiredString(formData, "bgExcerpt"),
+        body: requiredString(formData, "bgBody"),
+        seoTitle: optionalString(formData, "bgSeoTitle"),
+        seoDescription: optionalString(formData, "bgSeoDescription"),
+      },
+      en: {
+        title: requiredString(formData, "enTitle"),
+        excerpt: requiredString(formData, "enExcerpt"),
+        body: requiredString(formData, "enBody"),
+        seoTitle: optionalString(formData, "enSeoTitle"),
+        seoDescription: optionalString(formData, "enSeoDescription"),
+      },
+    },
+  });
+}
+
+export async function createAdminPost(input: AdminPostInput) {
+  const post = await payloadRequest<AdminPost>("/api/posts", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  revalidatePosts();
+  return post;
+}
+
+export async function updateAdminPost(id: string, input: AdminPostInput) {
+  const post = await payloadRequest<AdminPost>(`/api/posts/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+  revalidatePosts();
+  return post;
+}
+
+export function formatAdminPostStatus(status: AdminPostStatus, locale: "bg" | "en") {
+  const labels: Record<AdminPostStatus, { bg: string; en: string }> = {
+    draft: { bg: "Чернова", en: "Draft" },
+    published: { bg: "Публикувана", en: "Published" },
+    archived: { bg: "Архивирана", en: "Archived" },
+  };
+  return labels[status][locale];
+}
+
+export function formatAdminPostCategory(category: AdminPostCategory, locale: "bg" | "en") {
+  const labels: Record<AdminPostCategory, { bg: string; en: string }> = {
+    news: { bg: "Новини", en: "News" },
+    construction_update: { bg: "Строителство", en: "Construction" },
+    announcement: { bg: "Съобщение", en: "Announcement" },
+    press: { bg: "Преса", en: "Press" },
+  };
+  return labels[category][locale];
+}
+
+function revalidatePosts() {
+  revalidateTag("pautalia:posts");
+  revalidatePath("/news");
+  revalidatePath("/sitemap.xml");
+}

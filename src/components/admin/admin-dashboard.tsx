@@ -101,6 +101,12 @@ export function AdminDashboard({ counts, leads, units, locale }: { counts: Dashb
           </Link>
           <Link
             className="rounded-full border border-[rgba(16,18,20,0.14)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
+            href="/admin/news"
+          >
+            {locale === "bg" ? "Управление на новини" : "Manage news"}
+          </Link>
+          <Link
+            className="rounded-full border border-[rgba(16,18,20,0.14)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
             href="/api/admin/leads/export"
           >
             {messages.admin.exportLeads}
