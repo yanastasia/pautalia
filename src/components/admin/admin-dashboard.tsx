@@ -32,11 +32,16 @@ export function AdminDashboard({ counts, leads, units, locale }: { counts: Dashb
           <p className="premium-label text-[color:var(--accent)]">{messages.admin.privateOperations}</p>
           <h1 className="mt-3 font-serif text-4xl leading-tight text-[color:var(--ink)]">{messages.admin.workspaceTitle}</h1>
         </div>
-        <form action="/api/admin/logout" method="post">
-          <button type="submit" className="rounded-full border border-[rgba(16,18,20,0.14)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink)]">
-            {messages.admin.signOut}
-          </button>
-        </form>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/admin/news" className="rounded-full bg-[color:var(--ink)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[color:var(--accent)]">
+            {locale === "bg" ? "Новини" : "News"}
+          </Link>
+          <form action="/api/admin/logout" method="post">
+            <button type="submit" className="rounded-full border border-[rgba(16,18,20,0.14)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--ink)]">
+              {messages.admin.signOut}
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

@@ -190,7 +190,7 @@ describe("homepage review readiness helpers", () => {
       { label: "Building", value: "1" },
       { label: "Homes", value: "3" },
       { label: "Floors", value: "4" },
-      { label: "Available", value: "2" },
+      { label: "Available", value: "3" },
     ]);
   });
 
@@ -201,6 +201,7 @@ describe("homepage review readiness helpers", () => {
     expect(selector.buildingCards[0]?.href).toBe("/buildings/residence");
     expect(selector.highlightedUnits.map((unit: { href: string }) => unit.href)).toEqual([
       "/units/unit-a101",
+      "/units/unit-b101",
       "/units/unit-a201",
     ]);
     expect(selector.highlightedUnits[0]).toMatchObject({

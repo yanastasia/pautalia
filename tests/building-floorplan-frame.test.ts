@@ -3,7 +3,7 @@ import { resolveFloorplanFrame } from "@/components/buildings/building-floorplan
 import { buildingSelectorVisuals } from "@/data/building-selector-visuals";
 
 describe("resolveFloorplanFrame", () => {
-  it("keeps the building floor plans fully visible in their native 1000 / 634 frame", () => {
+  it("keeps the building floor plans fully visible in their square selector frame", () => {
     const floorImages = [
       "/assets/buildings/residence/floors/floor-01.png",
       "/assets/buildings/residence/floors/floor-02.png",
@@ -13,7 +13,7 @@ describe("resolveFloorplanFrame", () => {
 
     for (const imagePath of floorImages) {
       expect(resolveFloorplanFrame(imagePath)).toMatchObject({
-        aspectRatio: "1000 / 634",
+        aspectRatio: "1 / 1",
         imageWrapperClassName: "",
         imageClassName: "object-center",
       });
@@ -33,28 +33,28 @@ describe("resolveFloorplanFrame", () => {
 
   it("normalizes legacy Residence floorplan paths before resolving frames", () => {
     expect(resolveFloorplanFrame("/assets/floorplans/second_floor.png")).toMatchObject({
-      aspectRatio: "1000 / 634",
+      aspectRatio: "1 / 1",
       imageWrapperClassName: "",
       imageClassName: "object-center",
-      hotspotScale: 0.96,
-      hotspotOffsetX: 2.4,
-      hotspotOffsetY: -6.6,
+      hotspotScale: 1,
+      hotspotOffsetX: 0,
+      hotspotOffsetY: 0,
     });
   });
 
   it("uses Park floorplan dimensions and selector floor bands", () => {
     expect(resolveFloorplanFrame("/assets/buildings/park/floors/floor-01.png")).toMatchObject({
-      aspectRatio: "18140 / 11336",
+      aspectRatio: "1 / 1",
       imageWrapperClassName: "",
       imageClassName: "object-center",
     });
     expect(resolveFloorplanFrame("/assets/buildings/park/floors/floor-02.png")).toMatchObject({
-      aspectRatio: "13856 / 10667",
+      aspectRatio: "1 / 1",
       imageWrapperClassName: "",
       imageClassName: "object-center",
     });
     expect(resolveFloorplanFrame("/assets/buildings/park/floors/floor-03.png")).toMatchObject({
-      aspectRatio: "13701 / 10616",
+      aspectRatio: "1 / 1",
       imageWrapperClassName: "",
       imageClassName: "object-center",
     });

@@ -106,7 +106,7 @@ describe("apartment finder filter state", () => {
 
   it("filters units by rooms, floor, orientation, price, and availability", () => {
     const units = [
-      createUnit({ id: "a-201", rooms: 3, floor: 2, orientation: "south-west", price: 153000 }),
+      createUnit({ id: "a-201", rooms: 3, floor: 2, orientation: "south-west", price: 153000, status: "available" }),
       createUnit({ id: "a-202", rooms: 2, floor: 2, orientation: "south-west", price: 125000 }),
       createUnit({ id: "a-203", rooms: 3, floor: 3, orientation: "south-west", price: 155000 }),
       createUnit({ id: "a-204", rooms: 3, floor: 2, orientation: "east", price: 150000 }),

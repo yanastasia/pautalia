@@ -64,7 +64,7 @@ describe("unit/apartment data model", () => {
       ownership: { commonPartsPercent: 8.02, landPercent: 5.955, landArea: 61.16 },
       priceCents: 15321200,
       availabilityStatus: "available",
-      floorplanImage: "/assets/buildings/residence/apartments/A-A-AP.08.png",
+      floorplanImage: "/assets/buildings/residence/apartments/A-AP.08.png",
       description: expect.stringContaining("Second-floor"),
     });
   });
@@ -86,16 +86,16 @@ describe("unit/apartment data model", () => {
       expect(parkingUnitCodeSchema.safeParse(code).success).toBe(true);
     });
     expect(buildingBParkingUnits.map((parking) => parking.code)).toEqual([
-      "B-PM-01",
-      "B-PM-02",
-      "B-PM-03",
-      "B-PM-04",
-      "B-PM-05",
-      "B-PM-06",
+      "B-PM.01",
+      "B-PM.02",
+      "B-PM.03",
+      "B-PM.04",
+      "B-PM.05",
+      "B-PM.06",
     ]);
-    expect(prismaSeed).toContain("count: 14");
-    expect(prismaSeed).toContain("buildingBParkingUnits");
-    expect(prismaSeed).toContain('kind: "parking"');
+    expect(prismaSeed).toContain("import { buildings, floors, units }");
+    expect(prismaSeed).toContain("for (const unit of units)");
+    expect(prismaSeed).toContain('kind: unit.kind as "apartment" | "parking"');
   });
 
   it("stages Park units without invented official ownership values", () => {
