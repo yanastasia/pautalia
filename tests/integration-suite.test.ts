@@ -159,6 +159,8 @@ describe("cross-module integration suite", () => {
     expect(html).toContain('href="/admin/news"');
     expect(html).toContain("News");
     expect(html).toContain("Manage news");
+    expect(html).toContain("bg-[color:var(--accent)]");
+    expect(html).toContain("text-[color:var(--surface-dark)]");
   });
 });
 

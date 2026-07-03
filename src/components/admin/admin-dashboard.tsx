@@ -33,7 +33,7 @@ export function AdminDashboard({ counts, leads, units, locale }: { counts: Dashb
           <h1 className="mt-3 font-serif text-4xl leading-tight text-[color:var(--ink)]">{messages.admin.workspaceTitle}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/admin/news" className="rounded-full bg-[color:var(--ink)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[color:var(--accent)]">
+          <Link href="/admin/news" className="rounded-full border border-[color:var(--accent)] bg-[color:var(--accent)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-dark)] shadow-sm transition hover:border-[color:var(--accent-deep)] hover:bg-[color:var(--accent-deep)] hover:text-white">
             {locale === "bg" ? "Новини" : "News"}
           </Link>
           <form action="/api/admin/logout" method="post">
@@ -105,7 +105,7 @@ export function AdminDashboard({ counts, leads, units, locale }: { counts: Dashb
             {messages.admin.manageInventory}
           </Link>
           <Link
-            className="rounded-full border border-[rgba(16,18,20,0.14)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
+            className="rounded-full border border-[color:var(--accent)] bg-[color:var(--accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-dark)] shadow-sm hover:border-[color:var(--accent-deep)] hover:bg-[color:var(--accent-deep)] hover:text-white"
             href="/admin/news"
           >
             {locale === "bg" ? "Управление на новини" : "Manage news"}
