@@ -46,7 +46,7 @@ export default async function AdminNewsPage() {
             </p>
           </div>
           {isConfigured ? (
-            <Link href="/admin/news/new" className="rounded-full bg-[color:var(--ink)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+            <Link href="/admin/news/new" className="rounded-full border border-[color:var(--accent)] bg-[color:var(--accent)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-dark)] shadow-sm hover:border-[color:var(--accent-deep)] hover:bg-[color:var(--accent-deep)] hover:text-white">
               {locale === "bg" ? "Нова новина" : "New post"}
             </Link>
           ) : null}
