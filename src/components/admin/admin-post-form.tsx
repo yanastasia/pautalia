@@ -22,9 +22,13 @@ function textAreaClass(extra = "") {
   return `rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 text-[color:var(--ink)] ${extra}`;
 }
 
+function mediaUrl(media: AdminPost["coverMedia"]) {
+  return typeof media === "object" && media ? media.url : undefined;
+}
+
 export function AdminPostForm({ action, locale, post, postId, submitLabel }: AdminPostFormProps) {
   return (
-    <form action={action} className="mt-8 grid gap-6">
+    <form action={action} encType="multipart/form-data" className="mt-8 grid gap-6">
       {postId ? <input type="hidden" name="id" value={postId} /> : null}
       <section className="rounded-[var(--radius-xl)] card-surface p-6">
         <div className="grid gap-4 md:grid-cols-2">
@@ -52,9 +56,29 @@ export function AdminPostForm({ action, locale, post, postId, submitLabel }: Adm
               ))}
             </select>
           </label>
-          <label className="grid gap-2 md:col-span-2">
-            <span className="premium-label text-[color:var(--muted)]">{locale === "bg" ? "Видео URL" : "Video URL"}</span>
-            <input name="videoUrl" type="url" defaultValue={post?.videoUrl ?? ""} placeholder="https://..." className={fieldClass()} />
+        </div>
+      </section>
+
+      <section className="rounded-[var(--radius-xl)] card-surface p-6">
+        <p className="premium-label text-[color:var(--accent)]">{locale === "bg" ? "Медия" : "Media"}</p>
+        <div className="mt-4 grid gap-4">
+          <label className="grid gap-2">
+            <span className="premium-label text-[color:var(--muted)]">{locale === "bg" ? "Основна снимка / thumbnail" : "Hero image / thumbnail"}</span>
+            <input name="coverMedia" type="file" accept="image/*" required={!post?.coverMedia} className={fieldClass("py-3")} />
+            {mediaUrl(post?.coverMedia) ? (
+              <span className="text-sm text-[color:var(--muted)]">{locale === "bg" ? "Текуща снимка:" : "Current image:"} {mediaUrl(post?.coverMedia)}</span>
+            ) : null}
+          </label>
+          <label className="grid gap-2">
+            <span className="premium-label text-[color:var(--muted)]">{locale === "bg" ? "Допълнителни снимки" : "Additional images"}</span>
+            <input name="galleryMedia" type="file" accept="image/*" multiple className={fieldClass("py-3")} />
+          </label>
+          <label className="grid gap-2">
+            <span className="premium-label text-[color:var(--muted)]">{locale === "bg" ? "Видео (по желание)" : "Video (optional)"}</span>
+            <input name="videoMedia" type="file" accept="video/*" className={fieldClass("py-3")} />
+            {mediaUrl(post?.videoMedia) ? (
+              <span className="text-sm text-[color:var(--muted)]">{locale === "bg" ? "Текущо видео:" : "Current video:"} {mediaUrl(post?.videoMedia)}</span>
+            ) : null}
           </label>
         </div>
       </section>

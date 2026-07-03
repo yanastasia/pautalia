@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       pathname: `/news/${slug}`,
       title: post.translation.seoTitle ?? post.translation.title,
       description: post.translation.seoDescription ?? post.translation.excerpt,
-      imagePath: post.coverImage ?? "/assets/buildings/residence/exterior/exterior-front.jpg",
+      imagePath: post.coverImage,
       imageAlt: post.coverImageAlt,
     });
   } catch {
@@ -37,7 +37,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <article>
         <section className="page-cover">
           <div className="page-cover-media">
-            <Image src={post.coverImage ?? "/assets/buildings/residence/exterior/exterior-front.jpg"} alt={post.coverImageAlt} fill className="object-cover" sizes="100vw" />
+            <Image src={post.coverImage} alt={post.coverImageAlt} fill className="object-cover" sizes="100vw" />
           </div>
           <div className="page-cover-inner">
             <div className="page-cover-copy">

@@ -47,7 +47,7 @@ export const Posts: CollectionConfig = {
     },
     { name: "building", type: "relationship", relationTo: "buildings" },
     { name: "publishedAt", type: "date" },
-    { name: "coverMedia", type: "upload", relationTo: "media" },
+    { name: "coverMedia", type: "upload", relationTo: "media", required: true },
     { name: "galleryMedia", type: "relationship", relationTo: "media", hasMany: true },
     { name: "videoMedia", type: "upload", relationTo: "media" },
     { name: "videoUrl", type: "text" },

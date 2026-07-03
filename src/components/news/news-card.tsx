@@ -9,15 +9,13 @@ export function NewsCard({ post, locale }: { post: PublicPost; locale: Locale })
     <article className="group">
       <Link href={`/news/${post.slug}`} className="block">
         <div className="page-image-block min-h-[18rem] sm:min-h-[22rem]">
-          {post.coverImage ? (
-            <Image
-              src={post.coverImage}
-              alt={post.coverImageAlt}
-              fill
-              className="object-cover transition duration-500 group-hover:scale-[1.03]"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          ) : null}
+          <Image
+            src={post.coverImage}
+            alt={post.coverImageAlt}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
         </div>
         <div className="page-simple-card pt-5">
           <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">

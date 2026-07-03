@@ -19,7 +19,7 @@ export type PublicPost = {
   buildingId?: string;
   building?: { id: string; slug: string; name: string } | null;
   publishedAt: string;
-  coverImage?: string;
+  coverImage: string;
   coverImageAlt: string;
   gallery: Array<{ src: string; alt: string }>;
   videoMedia?: { src: string; mimeType?: string };

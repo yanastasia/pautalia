@@ -92,6 +92,8 @@ function mapPayloadPost(locale: Locale, post: PayloadPost): PublicPost | null {
       }
     : null;
   const coverMedia = typeof post.coverMedia === "object" ? post.coverMedia : null;
+  if (!coverMedia?.url) return null;
+
   const videoMedia = typeof post.videoMedia === "object" ? post.videoMedia : null;
   const gallery = post.galleryMedia
     ?.map((image) => (typeof image === "object" && image.url ? { src: image.url, alt: image.alt ?? post.slug } : null))
@@ -121,8 +123,8 @@ function mapPayloadPost(locale: Locale, post: PayloadPost): PublicPost | null {
     ...(building?.id ? { buildingId: building.id } : {}),
     building,
     publishedAt: post.publishedAt ?? new Date().toISOString(),
-    coverImage: coverMedia?.url,
-    coverImageAlt: coverMedia?.alt ?? post.slug,
+    coverImage: coverMedia.url,
+    coverImageAlt: coverMedia.alt ?? post.slug,
     gallery,
     videoMedia: videoMedia?.url ? { src: videoMedia.url, mimeType: videoMedia.mimeType } : undefined,
     videoUrl: post.videoUrl,

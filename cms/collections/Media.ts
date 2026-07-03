@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload/types";
-import { adminsOnly } from "./access";
+import { adminsOnly, adminsOrInternalSecret } from "./access";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -12,6 +12,6 @@ export const Media: CollectionConfig = {
       { name: "hero", width: 1920, height: 1080 },
     ],
   },
-  access: { read: () => true, create: adminsOnly, update: adminsOnly, delete: adminsOnly },
+  access: { read: () => true, create: adminsOrInternalSecret, update: adminsOnly, delete: adminsOnly },
   fields: [{ name: "alt", type: "text", required: true }],
 };

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AdminPostForm } from "@/components/admin/admin-post-form";
 import { requireAdminSession } from "@/lib/admin-api";
 import { requireAdminPageSession } from "@/lib/admin-page";
-import { getAdminPost, parseAdminPostForm, updateAdminPost } from "@/lib/admin-posts";
+import { getAdminPost, parseAdminPostFormWithUploads, updateAdminPost } from "@/lib/admin-posts";
 import { getLocale } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,8 @@ async function updatePostAction(formData: FormData) {
 
   await requireAdminSession();
   const id = String(formData.get("id") ?? "");
-  await updateAdminPost(id, parseAdminPostForm(formData));
+  const post = await getAdminPost(id);
+  await updateAdminPost(id, await parseAdminPostFormWithUploads(formData, post));
 }
 
 export default async function AdminEditPostPage({ params }: { params: Promise<{ id: string }> }) {

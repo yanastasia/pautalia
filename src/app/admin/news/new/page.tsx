@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { AdminPostForm } from "@/components/admin/admin-post-form";
 import { requireAdminSession } from "@/lib/admin-api";
 import { requireAdminPageSession } from "@/lib/admin-page";
-import { createAdminPost, isPayloadAdminConfigured, parseAdminPostForm } from "@/lib/admin-posts";
+import { createAdminPost, isPayloadAdminConfigured, parseAdminPostFormWithUploads } from "@/lib/admin-posts";
 import { getLocale } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ async function createPostAction(formData: FormData) {
   "use server";
 
   await requireAdminSession();
-  const post = await createAdminPost(parseAdminPostForm(formData));
+  const post = await createAdminPost(await parseAdminPostFormWithUploads(formData));
   redirect(`/admin/news/${post.id}`);
 }
 

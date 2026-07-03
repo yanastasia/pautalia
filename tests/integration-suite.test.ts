@@ -41,6 +41,7 @@ describe("cross-module integration suite", () => {
         slug: "integration-news",
         status: "published",
         category: "announcement",
+        coverMedia: "media-cover",
         translations: {
           bg: { title: "Интеграционна новина", excerpt: "Кратко описание", body: "Текст" },
           en: { title: "Integration news", excerpt: "Short excerpt", body: "Body" },
@@ -53,6 +54,7 @@ describe("cross-module integration suite", () => {
     formData.set("slug", "integration-news");
     formData.set("status", "published");
     formData.set("category", "announcement");
+    formData.set("coverMediaId", "media-cover");
     formData.set("bgTitle", "Интеграционна новина");
     formData.set("bgExcerpt", "Кратко описание");
     formData.set("bgBody", "Текст");

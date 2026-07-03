@@ -14,12 +14,24 @@ export type AdminPost = {
   status: AdminPostStatus;
   category: AdminPostCategory;
   publishedAt?: string | null;
+  coverMedia?: AdminMediaReference | null;
+  galleryMedia?: AdminMediaReference[] | null;
+  videoMedia?: AdminMediaReference | null;
   videoUrl?: string | null;
   translations?: {
     bg?: AdminPostTranslation;
     en?: AdminPostTranslation;
   };
 };
+
+type AdminMedia = {
+  id: string;
+  url?: string;
+  alt?: string;
+  mimeType?: string;
+};
+
+type AdminMediaReference = string | AdminMedia;
 
 type AdminPostTranslation = {
   title?: string;
@@ -38,6 +50,9 @@ const postInputSchema = z.object({
   status: z.enum(adminPostStatuses),
   category: z.enum(adminPostCategories),
   publishedAt: z.string().trim().optional(),
+  coverMedia: z.string().trim().min(1, "A hero image is required."),
+  galleryMedia: z.array(z.string().trim().min(1)).optional(),
+  videoMedia: z.string().trim().min(1).optional(),
   videoUrl: z.preprocess((value) => value === "" ? undefined : value, z.string().url().optional()),
   translations: z.object({
     bg: z.object({
@@ -92,6 +107,31 @@ async function payloadRequest<T>(path: string, init?: RequestInit) {
   return await response.json() as T;
 }
 
+async function payloadUpload(file: File, alt: string) {
+  const config = getPayloadConfig();
+  if (!config) throw new Error("Payload CMS is not configured for media uploads.");
+
+  const formData = new FormData();
+  formData.set("_payload", JSON.stringify({ alt }));
+  formData.set("file", file, file.name);
+
+  const response = await fetch(`${config.baseUrl}/api/media`, {
+    method: "POST",
+    headers: {
+      "x-pautalia-internal-secret": config.secret,
+    },
+    body: formData,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const message = await response.text().catch(() => "");
+    throw new Error(`Payload media upload failed with ${response.status}${message ? `: ${message}` : ""}`);
+  }
+
+  return await response.json() as AdminMedia;
+}
+
 export async function listAdminPosts() {
   if (!isPayloadAdminConfigured()) return [];
 
@@ -118,12 +158,37 @@ function requiredString(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
 }
 
-export function parseAdminPostForm(formData: FormData): AdminPostInput {
+function mediaId(media?: AdminMediaReference | null) {
+  if (!media) return undefined;
+  return typeof media === "string" ? media : media.id;
+}
+
+function mediaIds(media?: AdminMediaReference[] | null) {
+  return media?.map((item) => mediaId(item)).filter((id): id is string => Boolean(id)) ?? [];
+}
+
+function optionalFile(formData: FormData, name: string) {
+  const value = formData.get(name);
+  if (!(value instanceof File) || value.size === 0) return null;
+  return value;
+}
+
+function fileList(formData: FormData, name: string) {
+  return formData.getAll(name).filter((value): value is File => value instanceof File && value.size > 0);
+}
+
+function assertMimeType(file: File, prefix: "image/" | "video/", label: string) {
+  if (!file.type.startsWith(prefix)) {
+    throw new Error(`${label} must be a ${prefix === "image/" ? "image" : "video"} upload.`);
+  }
+}
+
+function baseAdminPostInput(formData: FormData) {
   const status = requiredString(formData, "status");
   const publishedAt = optionalString(formData, "publishedAt");
   const defaultedPublishedAt = (publishedAt || status === "published") ? publishedAt ?? new Date().toISOString() : undefined;
 
-  return postInputSchema.parse({
+  return {
     slug: requiredString(formData, "slug"),
     status,
     category: requiredString(formData, "category"),
@@ -145,6 +210,46 @@ export function parseAdminPostForm(formData: FormData): AdminPostInput {
         seoDescription: optionalString(formData, "enSeoDescription"),
       },
     },
+  };
+}
+
+export function parseAdminPostForm(formData: FormData): AdminPostInput {
+  return postInputSchema.parse({
+    ...baseAdminPostInput(formData),
+    coverMedia: requiredString(formData, "coverMediaId"),
+    galleryMedia: formData.getAll("galleryMediaId").map((value) => String(value).trim()).filter(Boolean),
+    videoMedia: optionalString(formData, "videoMediaId"),
+  });
+}
+
+export async function parseAdminPostFormWithUploads(formData: FormData, existingPost?: AdminPost | null): Promise<AdminPostInput> {
+  const baseInput = baseAdminPostInput(formData);
+  const coverFile = optionalFile(formData, "coverMedia");
+  const galleryFiles = fileList(formData, "galleryMedia");
+  const videoFile = optionalFile(formData, "videoMedia");
+  const title = baseInput.translations.en.title || baseInput.translations.bg.title || baseInput.slug;
+
+  if (coverFile) assertMimeType(coverFile, "image/", "Hero image");
+  galleryFiles.forEach((file) => assertMimeType(file, "image/", "Gallery media"));
+  if (videoFile) assertMimeType(videoFile, "video/", "Video media");
+
+  const uploadedCoverMedia = coverFile ? await payloadUpload(coverFile, `${title} hero image`) : null;
+  const uploadedGalleryMedia = await Promise.all(
+    galleryFiles.map((file, index) => payloadUpload(file, `${title} gallery image ${index + 1}`)),
+  );
+  const uploadedVideoMedia = videoFile ? await payloadUpload(videoFile, `${title} video`) : null;
+  const coverMedia = uploadedCoverMedia?.id ?? mediaId(existingPost?.coverMedia);
+  const galleryMedia = [
+    ...mediaIds(existingPost?.galleryMedia),
+    ...uploadedGalleryMedia.map((item) => item.id),
+  ];
+  const videoMedia = uploadedVideoMedia?.id ?? mediaId(existingPost?.videoMedia);
+
+  return postInputSchema.parse({
+    ...baseInput,
+    coverMedia,
+    galleryMedia,
+    videoMedia,
   });
 }
 
