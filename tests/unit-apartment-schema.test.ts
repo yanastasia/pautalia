@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildingBParkingUnits } from "@/data/building-b";
 import { buildingBUnits } from "@/data/building-b-units";
+import { buildingBParsedUnits } from "@/data/building-b-floorplans";
 import { officialApartmentValuesByCode, officialParkingValuesByCode } from "@/data/official-unit-values";
 import { parkGeneralGalleryImages, parkUnitGalleriesByCode } from "@/data/unit-gallery-assets";
 import { unitApartmentSeeds } from "@/data/unit-apartment-seed";
@@ -114,6 +115,29 @@ describe("unit/apartment data model", () => {
       expect(unit.ownership).toEqual({ commonPartsPercent: 0, landPercent: 0, landArea: 0 });
       expect(unit.digitalTwinId).toBeUndefined();
     });
+  });
+
+  it("uses the official Park storey schedule areas", () => {
+    const expectedAreas = {
+      "B-AP.01": { total: 67.37, terrace: 37.11 },
+      "B-AP.02": { total: 69.35, terrace: 33.32 },
+      "B-AP.03": { total: 83.75, terrace: 5.83 },
+      "B-AP.04": { total: 85.72, terrace: 5.83 },
+      "B-AP.05": { total: 83.75, terrace: 5.83 },
+      "B-AP.06": { total: 85.72, terrace: 5.83 },
+    } as const;
+
+    for (const unit of buildingBUnits) {
+      const expected = expectedAreas[unit.externalCode as keyof typeof expectedAreas];
+      expect(unit.areaTotalSqm).toBe(expected.total);
+      expect(unit.terraceSqm).toBe(expected.terrace);
+    }
+
+    for (const unit of buildingBParsedUnits) {
+      const expected = expectedAreas[unit.externalCode as keyof typeof expectedAreas];
+      expect(unit.areaTotalSqm).toBe(expected.total);
+      expect(unit.terraceSqm).toBe(expected.terrace);
+    }
   });
 
   it("maps Park units to apartment-specific render galleries", () => {
