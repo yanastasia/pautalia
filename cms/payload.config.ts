@@ -1,5 +1,7 @@
 import { buildConfig } from "payload/config";
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { webpackBundler } from "@payloadcms/bundler-webpack";
+import { slateEditor } from "@payloadcms/richtext-slate";
 import { AdminUsers } from "./collections/AdminUsers";
 import { Buildings } from "./collections/Buildings";
 import { Floors } from "./collections/Floors";
@@ -14,7 +16,9 @@ import { Units } from "./collections/Units";
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  editor: slateEditor({}),
   admin: {
+    bundler: webpackBundler(),
     user: AdminUsers.slug,
   },
   db: postgresAdapter({

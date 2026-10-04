@@ -5,6 +5,7 @@ node_modules
 .env
 .env.local
 dist
+cms/build
 coverage
 .playwright-cli
 .playwright-mcp/

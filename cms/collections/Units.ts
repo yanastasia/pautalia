@@ -32,6 +32,13 @@ export const Units: CollectionConfig = {
     { name: "floorplan", type: "upload", relationTo: "media" },
     { name: "gallery", type: "relationship", relationTo: "media", hasMany: true },
     { name: "features", type: "array", fields: [{ name: "label", type: "text" }] },
-    { name: "internalNotes", type: "textarea", access: { read: adminsOnly, update: adminsOnly } },
+    {
+      name: "internalNotes",
+      type: "textarea",
+      access: {
+        read: ({ req }) => Boolean(req.user),
+        update: ({ req }) => Boolean(req.user),
+      },
+    },
   ],
 };
