@@ -13,6 +13,7 @@
     "@payloadcms/bundler-webpack": "1.0.7",
     "@payloadcms/db-postgres": "0.8.10",
     "@payloadcms/richtext-slate": "1.5.2",
+    "drizzle-orm": "0.32.1",
     "express": "^4.21.2",
     "payload": "2.32.3",
     "tsx": "4.20.6"
