@@ -4,21 +4,24 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "payload dev",
+    "dev": "tsx watch server.ts",
     "build": "payload build",
-    "start": "payload serve",
+    "start": "tsx server.ts",
     "generate:types": "payload generate:types"
   },
   "dependencies": {
     "@payloadcms/bundler-webpack": "1.0.7",
     "@payloadcms/db-postgres": "0.8.10",
     "@payloadcms/richtext-slate": "1.5.2",
-    "payload": "2.32.3"
+    "express": "^4.21.2",
+    "payload": "2.32.3",
+    "tsx": "4.20.6"
   },
   "overrides": {
     "drizzle-kit": "0.23.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "typescript": "^5.9.3"
   }
 }

@@ -9,6 +9,5 @@
     "resolveJsonModule": true,
     "outDir": "dist"
   },
-  "include": ["payload.config.ts", "collections/**/*.ts"]
+  "include": ["server.ts", "payload.config.ts", "collections/**/*.ts"]
 }
-
