@@ -1,16 +1,16 @@
 import { Prisma } from "@prisma/client";
-import { revalidatePath } from "next/cache";
-import { getDemoLead, getDemoUnit, getDemoUnits, setDemoLead, setDemoUnitPrice, setDemoUnitStatus } from "@/lib/admin-demo-data";
+import type { AdminUnitStatus } from "@/lib/admin-unit-status";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { getDemoLead, getDemoUnit, getDemoUnits, setDemoLead, setDemoUnitPrice } from "@/lib/admin-demo-data";
 import { ensureAdminInventorySeed } from "@/lib/admin-inventory-seed";
-import { notFoundError } from "@/lib/errors";
+import { notFoundError, serviceUnavailableError } from "@/lib/errors";
 import { isProduction } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
 export const leadStatuses = ["new", "contacted", "qualified", "viewing_booked", "reserved", "closed", "archived", "spam"] as const;
-export const adminUnitStatuses = ["available", "reserved", "sold"] as const;
+export { adminUnitStatuses, type AdminUnitStatus } from "@/lib/admin-unit-status";
 
 export type AdminLeadStatus = (typeof leadStatuses)[number];
-export type AdminUnitStatus = (typeof adminUnitStatuses)[number];
 
 export type AdminLead = {
   id: string;
@@ -138,8 +138,7 @@ export async function getAdminUnit(id: string) {
 
 export async function updateAdminUnitStatus(id: string, status: AdminUnitStatus) {
   if (!(await hasAdminDashboardSchema())) {
-    if (!isProduction && getDemoUnit(id)) setDemoUnitStatus(id, status);
-    return;
+    throw serviceUnavailableError("Inventory database schema is not ready. Status was not saved.");
   }
 
   const unit = await getAdminUnit(id);
@@ -164,6 +163,8 @@ export function revalidateAdminCrm() {
   revalidatePath("/admin");
   revalidatePath("/admin/leads");
   revalidatePath("/admin/units");
+  revalidatePath("/admin/units/[id]", "page");
+  revalidateTag("pautalia:inventory");
 }
 
 const leadSelect = {

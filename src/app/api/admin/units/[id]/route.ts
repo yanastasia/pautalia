@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin-api";
 import { unitPatchSchema } from "@/lib/admin-crm";
-import { getAdminUnit, updateAdminUnitPrice, updateAdminUnitStatus } from "@/lib/admin-data";
+import { getAdminUnit, revalidateAdminCrm, updateAdminUnitPrice, updateAdminUnitStatus } from "@/lib/admin-data";
 import { jsonError, parseJson } from "@/lib/http";
 
-export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     await requireAdminSession();
     const { id } = await context.params;
@@ -16,6 +16,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       await updateAdminUnitPrice(id, body.price);
     }
     const unit = await getAdminUnit(id);
+    revalidateAdminCrm();
 
     return NextResponse.json({ ok: true, item: unit });
   } catch (error) {

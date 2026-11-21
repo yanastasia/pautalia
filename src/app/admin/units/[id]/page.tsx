@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { AdminUnitStatusForm } from "@/components/admin/admin-unit-status-form";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireAdminSession } from "@/lib/admin-api";
 import { getUnitAnalytics } from "@/lib/admin-analytics";
-import { adminUnitStatuses, getAdminUnit, revalidateAdminCrm, updateAdminUnitPrice, updateAdminUnitStatus, type AdminUnitStatus } from "@/lib/admin-data";
+import { getAdminUnit, revalidateAdminCrm, updateAdminUnitPrice } from "@/lib/admin-data";
 import { requireAdminPageSession } from "@/lib/admin-page";
 import { getBuildingLabel, getMessages, getStatusLabel } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/server";
@@ -15,23 +16,6 @@ export const metadata: Metadata = {
   title: "Unit detail",
   robots: { index: false, follow: false },
 };
-
-function parseUnitStatus(value: FormDataEntryValue | null): AdminUnitStatus {
-  const status = adminUnitStatuses.find((item) => item === value);
-  if (!status) throw new Error("Invalid unit status");
-  return status;
-}
-
-async function updateUnitStatusAction(formData: FormData) {
-  "use server";
-
-  await requireAdminSession();
-  const id = String(formData.get("id") ?? "");
-  const status = parseUnitStatus(formData.get("status"));
-
-  await updateAdminUnitStatus(id, status);
-  revalidateAdminCrm();
-}
 
 function parseUnitPrice(value: FormDataEntryValue | null) {
   if (value === null) return null;
@@ -97,23 +81,7 @@ export default async function AdminUnitDetailPage({ params }: { params: Promise<
             ) : null}
           </div>
 
-          <form action={updateUnitStatusAction} className="mt-6 flex flex-wrap items-end gap-3">
-            <input type="hidden" name="id" value={unit.id} />
-            <label className="grid gap-2">
-              <span className="premium-label text-[color:var(--muted)]">{messages.admin.editStatus}</span>
-              <select name="status" defaultValue={unit.status} className="min-h-12 rounded-2xl border border-[color:var(--line)] bg-white px-4 text-[color:var(--ink)]">
-                {!adminUnitStatuses.includes(unit.status as AdminUnitStatus) ? (
-                  <option value={unit.status}>{getStatusLabel(locale, unit.status as UnitStatus)}</option>
-                ) : null}
-                {adminUnitStatuses.map((status) => (
-                  <option key={status} value={status}>{getStatusLabel(locale, status)}</option>
-                ))}
-              </select>
-            </label>
-            <button type="submit" className="min-h-12 rounded-full bg-[color:var(--ink)] px-5 text-xs font-semibold uppercase tracking-[0.16em] text-white">
-              {messages.admin.updateStatus}
-            </button>
-          </form>
+          <AdminUnitStatusForm id={unit.id} status={unit.status} locale={locale} className="mt-6 flex flex-wrap items-end gap-3" />
 
           <form action={updateUnitPriceAction} className="mt-4 flex flex-wrap items-end gap-3">
             <input type="hidden" name="id" value={unit.id} />
